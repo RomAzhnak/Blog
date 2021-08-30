@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { useState } from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
+// import Link from '@material-ui/core/Link';
+import { Link } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import { withRouter } from "react-router-dom";
+import { useAppDispatch } from '../app/hooks';
+import { addUser } from "../redux/todoSlice";
+import { userSignUp } from "../api/userApi";
+// import { useDispatch } from "react-redux";
+// import { withRouter } from "react-router-dom";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,10 +40,45 @@ const useStyles = makeStyles((theme) => ({
 export default function SignUp() {
   const classes = useStyles();
 
-//   const redirectToLogin = () => {
-//     props.updateTitle('Login')
-//     props.history.push('/login'); 
-// }
+  //   const redirectToLogin = () => {
+  //     props.updateTitle('Login')
+  //     props.history.push('/login'); 
+  // }
+
+  
+  // const [user, setUser] = useState({
+  //   firstName: '',
+  //   lastName: '',
+  //   email: '',
+  //   password: ''
+  // });
+
+  // const onChange = (event: { target: { name: string | number; value: any; }; }) => {
+  //   setUser({[event.target.name] = event.target.value})
+  // }
+
+  const dispatch = useAppDispatch();
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");	
+
+  const onSubmit = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    if (email) {
+      dispatch(addUser({
+        firstName,
+        lastName,
+        email,
+        password
+      }));
+    };
+    userSignUp({firstName, lastName, email, password});
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setPassword('');
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -50,11 +90,11 @@ export default function SignUp() {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={onSubmit} noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6}>
               <TextField
-                autoComplete="fname"
+                autoComplete="firstName"
                 name="firstName"
                 variant="outlined"
                 required
@@ -62,6 +102,8 @@ export default function SignUp() {
                 id="firstName"
                 label="First Name"
                 autoFocus
+                value={firstName}
+                onChange={(event) => setFirstName(event.target.value)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -72,7 +114,9 @@ export default function SignUp() {
                 id="lastName"
                 label="Last Name"
                 name="lastName"
-                autoComplete="lname"
+                autoComplete="lastName"
+                value={lastName}
+                onChange={(event) => setLastName(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -84,6 +128,8 @@ export default function SignUp() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -96,6 +142,8 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
               />
             </Grid>
           </Grid>
@@ -110,7 +158,7 @@ export default function SignUp() {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="/login" variant="body2" >
+              <Link to="/login" >
                 Already have an account? Sign in
               </Link>
             </Grid>
