@@ -45,40 +45,56 @@ export default function SignUp() {
   //     props.history.push('/login'); 
   // }
 
-  
-  // const [user, setUser] = useState({
-  //   firstName: '',
-  //   lastName: '',
-  //   email: '',
-  //   password: ''
-  // });
 
-  // const onChange = (event: { target: { name: string | number; value: any; }; }) => {
-  //   setUser({[event.target.name] = event.target.value})
-  // }
+  const [user, setUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
 
-  const dispatch = useAppDispatch();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");	
+  const onChange = (event: { target: { name: string | number; value: any; }; }) => {
+    setUser(user => ({ ...user, [event.target.name]: event.target.value }))
+  }
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    if (email) {
-      dispatch(addUser({
-        firstName,
-        lastName,
-        email,
-        password
-      }));
+    if (user.email) {
+      dispatch(addUser( user ));
     };
-    userSignUp({firstName, lastName, email, password});
-    setFirstName('');
-    setLastName('');
-    setEmail('');
-    setPassword('');
+    userSignUp(user);
+    setUser(
+      {
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: ''
+      }
+    );
   };
+  const dispatch = useAppDispatch();
+
+  // const [firstName, setFirstName] = useState("");
+  // const [lastName, setLastName] = useState("");
+  // const [email, setEmail] = useState("");
+  // const [password, setPassword] = useState("");	
+
+  // const onSubmit = (event: { preventDefault: () => void; }) => {
+  //   event.preventDefault();
+  //   if (email) {
+  //     dispatch(addUser({
+  //       firstName,
+  //       lastName,
+  //       email,
+  //       password
+  //     }));
+  //   };
+  //   userSignUp({firstName, lastName, email, password});
+  //   setFirstName('');
+  //   setLastName('');
+  //   setEmail('');
+  //   setPassword('');
+  // };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -102,8 +118,8 @@ export default function SignUp() {
                 id="firstName"
                 label="First Name"
                 autoFocus
-                value={firstName}
-                onChange={(event) => setFirstName(event.target.value)}
+                value={user.firstName}
+                onChange={onChange}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -115,8 +131,8 @@ export default function SignUp() {
                 label="Last Name"
                 name="lastName"
                 autoComplete="lastName"
-                value={lastName}
-                onChange={(event) => setLastName(event.target.value)}
+                value={user.lastName}
+                onChange={onChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -128,8 +144,8 @@ export default function SignUp() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                value={user.email}
+                onChange={onChange}
               />
             </Grid>
             <Grid item xs={12}>
@@ -142,8 +158,8 @@ export default function SignUp() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                value={user.password}
+                onChange={onChange}
               />
             </Grid>
           </Grid>

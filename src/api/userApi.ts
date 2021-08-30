@@ -19,7 +19,7 @@ interface Data {
 }
 
 instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');  //ocalStorage.setItem("token", data.jwt)
+  const token = localStorage.getItem('token');  //localStorage.setItem("token", data.jwt)
   if (token) {
     config.headers.authorization = `Bearer ${token}`
   }
