@@ -3,19 +3,18 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-// import Link from '@material-ui/core/Link';
 import { Link } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import { useAppDispatch } from '../app/hooks';
-import { addUser } from "../redux/todoSlice";
 import { userSignUp } from "../api/userApi";
+// import { useAppDispatch } from '../app/hooks';
+// import { addUser } from "../redux/todoSlice";
 // import { useDispatch } from "react-redux";
 // import { withRouter } from "react-router-dom";
-
+// import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -47,54 +46,29 @@ export default function SignUp() {
 
 
   const [user, setUser] = useState({
-    firstName: '',
-    lastName: '',
+    userName: '',
     email: '',
     password: ''
   });
 
-  const onChange = (event: { target: { name: string | number; value: any; }; }) => {
+  const onChange = (event: { target: { name: string; value: string; }; }) => {
     setUser(user => ({ ...user, [event.target.name]: event.target.value }))
   }
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     if (user.email) {
-      dispatch(addUser( user ));
+      // dispatch(addUser( user ));
+      userSignUp(user);
+      setUser(
+        {
+          userName: '',
+          email: '',
+          password: ''
+        }
+      );
     };
-    userSignUp(user);
-    setUser(
-      {
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: ''
-      }
-    );
   };
-  const dispatch = useAppDispatch();
-
-  // const [firstName, setFirstName] = useState("");
-  // const [lastName, setLastName] = useState("");
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");	
-
-  // const onSubmit = (event: { preventDefault: () => void; }) => {
-  //   event.preventDefault();
-  //   if (email) {
-  //     dispatch(addUser({
-  //       firstName,
-  //       lastName,
-  //       email,
-  //       password
-  //     }));
-  //   };
-  //   userSignUp({firstName, lastName, email, password});
-  //   setFirstName('');
-  //   setLastName('');
-  //   setEmail('');
-  //   setPassword('');
-  // };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -108,21 +82,21 @@ export default function SignUp() {
         </Typography>
         <form className={classes.form} onSubmit={onSubmit} noValidate>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <TextField
-                autoComplete="firstName"
-                name="firstName"
+                autoComplete="userName"
+                name="userName"
                 variant="outlined"
                 required
                 fullWidth
-                id="firstName"
+                id="userName"
                 label="First Name"
                 autoFocus
-                value={user.firstName}
+                value={user.userName}
                 onChange={onChange}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6}>
               <TextField
                 variant="outlined"
                 required
@@ -134,7 +108,7 @@ export default function SignUp() {
                 value={user.lastName}
                 onChange={onChange}
               />
-            </Grid>
+            </Grid> */}
             <Grid item xs={12}>
               <TextField
                 variant="outlined"

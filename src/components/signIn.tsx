@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -10,6 +10,7 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { userSignIn } from "../api/userApi";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,6 +34,30 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignIn() {
   const classes = useStyles();
+  const [user, setUser] = useState({
+    userName: '',
+    email: '',
+    password: ''
+  });
+
+  const onChange = (event: { target: { name: string; value: string; }; }) => {
+    setUser(user => ({ ...user, [event.target.name]: event.target.value }))
+  }
+
+  const onSubmit = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    if (user.email) {
+      // dispatch(addUser( user ));
+      userSignIn(user);
+      setUser(
+        {
+          userName: '',
+          email: '',
+          password: ''
+        }
+      );
+    };
+  };
 
   return (
     <Container component="main" maxWidth="xs">
@@ -44,7 +69,7 @@ export default function SignIn() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={onSubmit} noValidate>
           <TextField
             variant="outlined"
             margin="normal"
@@ -55,6 +80,8 @@ export default function SignIn() {
             name="email"
             autoComplete="email"
             autoFocus
+            value={user.email}
+            onChange={onChange}
           />
           <TextField
             variant="outlined"
@@ -66,6 +93,8 @@ export default function SignIn() {
             type="password"
             id="password"
             autoComplete="current-password"
+            value={user.password}
+            onChange={onChange}
           />
           <Button
             type="submit"
