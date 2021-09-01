@@ -10,7 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { userSignUp } from "../api/userApi";
-// import { useAppDispatch } from '../app/hooks';
+import { fetchAdd } from "../redux/userSlice";
+import { useAppDispatch } from '../app/hooks';
 // import { addUser } from "../redux/todoSlice";
 // import { useDispatch } from "react-redux";
 // import { withRouter } from "react-router-dom";
@@ -38,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
   const classes = useStyles();
-
+  const dispatch = useAppDispatch();
   //   const redirectToLogin = () => {
   //     props.updateTitle('Login')
   //     props.history.push('/login'); 
@@ -58,8 +59,8 @@ export default function SignUp() {
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     if (user.email) {
-      // dispatch(addUser( user ));
-      userSignUp(user);
+      const result = dispatch(fetchAdd( user ));
+      // userSignUp(user);
       setUser(
         {
           userName: '',

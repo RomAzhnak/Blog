@@ -11,6 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { userSignIn } from "../api/userApi";
+import { useAppDispatch } from '../app/hooks';
+import { addUser } from "../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -33,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignIn() {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const [user, setUser] = useState({
     userName: '',
@@ -47,7 +50,7 @@ export default function SignIn() {
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     if (user.email) {
-      // dispatch(addUser( user ));
+      dispatch(addUser( user ));
       userSignIn(user);
       setUser(
         {

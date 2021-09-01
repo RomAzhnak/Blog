@@ -1,5 +1,5 @@
-import SignUp from './components/signUp';
-import SignIn from './components/signIn';
+import SignUp from './components/SignUp';
+import SignIn from './components/SignIn';
 import {
   BrowserRouter as Router,
   Switch,
