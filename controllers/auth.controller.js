@@ -46,11 +46,10 @@ exports.signin = async (req, res) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     }
-    const token = jwt.sign({ id: user.id }, config.secret, {
+    const token = jwt.sign({ email: user.email }, config.secret, {    //{ id: user.id }
       expiresIn: 86400 // 60*60*24
     });
     res.status(200).send({
-      id: user.id,
       username: user.username,
       email: user.email,
       accessToken: token

@@ -3,14 +3,16 @@ import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-// import Link from '@material-ui/core/Link';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { userSignIn } from "../api/userApi";
+import { useAppDispatch } from '../app/hooks';
+import { addUser, fetchLogin } from "../redux/userSlice";
+// import Link from '@material-ui/core/Link';
+// import { userSignIn } from "../api/userApi";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -32,23 +34,28 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignIn() {
+type Props = {
+};
+
+const SignIn: React.FC<Props> = (props) => {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const [user, setUser] = useState({
     userName: '',
     email: '',
     password: ''
   });
-
+  let history = useHistory();
   const onChange = (event: { target: { name: string; value: string; }; }) => {
     setUser(user => ({ ...user, [event.target.name]: event.target.value }))
   }
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
+    
     event.preventDefault();
-    if (user.email) {
-      // dispatch(addUser( user ));
-      userSignIn(user);
+    if (user.email) {;
+      // dispatch(fetchLogin( user ));
+      dispatch(addUser(user));
       setUser(
         {
           userName: '',
@@ -57,6 +64,7 @@ export default function SignIn() {
         }
       );
     };
+    history.push("/protected");
   };
 
   return (
@@ -117,3 +125,5 @@ export default function SignIn() {
     </Container>
   );
 }
+
+export default SignIn;

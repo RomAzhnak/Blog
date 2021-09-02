@@ -9,9 +9,10 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import { userSignUp } from "../api/userApi";
-// import { useAppDispatch } from '../app/hooks';
-// import { addUser } from "../redux/todoSlice";
+import { useAppDispatch } from '../app/hooks';
+import { fetchAdd } from "../redux/userSlice";
+// import { userSignUp } from "../api/userApi";
+import { addUser } from "../redux/userSlice";
 // import { useDispatch } from "react-redux";
 // import { withRouter } from "react-router-dom";
 // import Link from '@material-ui/core/Link';
@@ -36,13 +37,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
-  const classes = useStyles();
+type Props = {
+};
 
-  //   const redirectToLogin = () => {
-  //     props.updateTitle('Login')
-  //     props.history.push('/login'); 
-  // }
+const SignUp: React.FC<Props> = (props) => {
+  const dispatch = useAppDispatch();
+  const classes = useStyles();
 
 
   const [user, setUser] = useState({
@@ -58,8 +58,8 @@ export default function SignUp() {
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     if (user.email) {
-      // dispatch(addUser( user ));
-      userSignUp(user);
+      // dispatch(fetchAdd( user ));
+      dispatch(addUser(user));
       setUser(
         {
           userName: '',
@@ -96,19 +96,6 @@ export default function SignUp() {
                 onChange={onChange}
               />
             </Grid>
-            {/* <Grid item xs={12} sm={6}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                id="lastName"
-                label="Last Name"
-                name="lastName"
-                autoComplete="lastName"
-                value={user.lastName}
-                onChange={onChange}
-              />
-            </Grid> */}
             <Grid item xs={12}>
               <TextField
                 variant="outlined"
@@ -159,4 +146,4 @@ export default function SignUp() {
   );
 }
 
-// export default withRouter(SignUp);
+export default SignUp;
