@@ -11,11 +11,6 @@ import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppDispatch } from '../app/hooks';
 import { fetchAdd } from "../redux/userSlice";
-// import { userSignUp } from "../api/userApi";
-import { addUser } from "../redux/userSlice";
-// import { useDispatch } from "react-redux";
-// import { withRouter } from "react-router-dom";
-// import Link from '@material-ui/core/Link';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -58,8 +53,7 @@ const SignUp: React.FC<Props> = (props) => {
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     if (user.email) {
-      // dispatch(fetchAdd( user ));
-      dispatch(addUser(user));
+      dispatch(fetchAdd( user ));
       setUser(
         {
           userName: '',

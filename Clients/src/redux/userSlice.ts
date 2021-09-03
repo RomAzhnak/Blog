@@ -4,10 +4,10 @@ import { RootState } from './store';
 
 export interface User {
 	userName: string,
-		email: string,
-		password: string
+	email: string,
+	password: string
 };
-interface UserState {
+export interface UserState {
 	user: User,
 	error: string
 };
@@ -27,18 +27,18 @@ interface UserLogin {
 	accessToken: string
 }
 
-export const fetchAdd = createAsyncThunk<string, User, {state: RootState}>(
+export const fetchAdd = createAsyncThunk<string, User, { state: RootState }>(
 	'user/fetchAdd',
 	async (user, thankApi) => {
-		const resp = await fetchAddUser(user)
+		const resp = await fetchAddUser(user);
 		return resp.data
 	}
 );
 
-export const fetchLogin = createAsyncThunk<UserLogin, User, {state: RootState}>(
+export const fetchLogin = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchLogin',
 	async (user, thankApi) => {
-		const resp = await fetchLoginUser(user)
+		const resp = await fetchLoginUser(user);
 		return resp.data
 	}
 )
@@ -61,8 +61,7 @@ export const userSlice = createSlice({
 	extraReducers: (builder) => {
 		builder
 			.addCase(fetchAdd.pending, (state, action) => {
-					console.log('START');
-				})
+			})
 			.addCase(fetchAdd.fulfilled, (state, action) => {
 				state.error = action.payload;
 			})
@@ -70,8 +69,8 @@ export const userSlice = createSlice({
 				state.error = 'error';
 			})
 			.addCase(fetchLogin.pending, (state, action) => {
-					console.log('START');
-				})
+
+			})
 			.addCase(fetchLogin.fulfilled, (state, action) => {
 				state.user.email = action.payload.email;
 				state.user.userName = action.payload.username;
@@ -81,7 +80,7 @@ export const userSlice = createSlice({
 				state.error = 'error';
 			})
 	}
-	
+
 	// ,
 	// extraReducers: (builder) => {
 	// 	builder.addCase(fetchUserById.pending, (state, action) => {

@@ -7,8 +7,10 @@ import {
   Switch,
   Route
 } from "react-router-dom";
+import SignInSide from './components/InputFormPhoto';
 
 function App() {
+
   return (
     <Router>
           <Switch>
@@ -21,6 +23,9 @@ function App() {
             <Route path="/login">
               <SignIn/>
             </Route>
+            <Route path="/logintest">
+              <SignInSide/>
+            </Route>            
             <PrivateRoute path="/protected">
               <ProtectedPage />
             </PrivateRoute>
@@ -28,7 +33,5 @@ function App() {
     </Router>
   );
 }
-
-
 
 export default App;

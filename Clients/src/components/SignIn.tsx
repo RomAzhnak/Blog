@@ -11,8 +11,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useAppDispatch } from '../app/hooks';
 import { addUser, fetchLogin } from "../redux/userSlice";
-// import Link from '@material-ui/core/Link';
-// import { userSignIn } from "../api/userApi";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -51,20 +49,25 @@ const SignIn: React.FC<Props> = (props) => {
   }
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
-    
     event.preventDefault();
-    if (user.email) {;
-      // dispatch(fetchLogin( user ));
-      dispatch(addUser(user));
-      setUser(
-        {
-          userName: '',
-          email: '',
-          password: ''
-        }
-      );
+    
+    if (user.email) {
+        dispatch(fetchLogin( user ))
+          .unwrap()
+          .then(res => {
+            setUser(
+              {
+                userName: '',
+                email: '',
+                password: ''
+              }
+            );
+          history.push("/protected");  
+          })
+          .catch(e => {
+
+          })
     };
-    history.push("/protected");
   };
 
   return (
