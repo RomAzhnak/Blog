@@ -1,5 +1,4 @@
 import {
-  // BrowserRouter as Router,
   Route,
   Redirect,
   RouteProps,
@@ -7,13 +6,9 @@ import {
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 
-// type Props = {
-// };
-
 interface PrivateRouteProps extends RouteProps {
   children?: any;
 }
-
 const PrivateRoute = (props: PrivateRouteProps) => {
   const {children, ...rest } = props;
   const stateUser = useSelector((state: RootState) => state.user.user);

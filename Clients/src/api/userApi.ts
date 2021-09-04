@@ -1,35 +1,40 @@
 import axios from "axios";
 import { User } from "../redux/userSlice";
-// import { useAppDispatch } from '../app/hooks';
-// import { addUser } from "../redux/userSlice";
-
-export const getUserByToken = async (token: string) => {
-  return {
-    id: 1,
-    name: 'asd'
-  }
-};
 
 const instance = axios.create({
-  baseURL: 'localhost'
+  baseURL: 'http://localhost:4000/'
 });
+
+// type config = {headers: {authorization: string}};
 
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.authorization = `Bearer ${token}`
   } else {
-    config.headers.authorization = 'TEST'
+
   }
   return config;
 });
 
 export const fetchAddUser = (user: User): Promise<any> => {
-  return instance.post("/auth/signup", JSON.stringify({ user }));
+  return instance.post("/auth/signup", user );
 }
 
 export const fetchLoginUser = (user: User): Promise<any> => {
-  return instance.post("/auth/signin", JSON.stringify({ user }));
+  return instance.post("/auth/signin", user );
+  // return new Promise((res, rej) => {
+  //   setTimeout(() => {
+  //     res({
+  //       data: {
+  //         username: user.userName,
+  //         email: user.email,
+  //         accessToken: 'token'
+  //       }
+  //     })
+  //   }, 100)
+  // })
+
 }
 
 // export const userSignUp = async (user: User) => {
@@ -62,3 +67,5 @@ export const fetchLoginUser = (user: User): Promise<any> => {
 //     }
 //   }
 // }
+
+export default instance;

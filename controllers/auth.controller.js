@@ -15,9 +15,10 @@ exports.allUser = (req, res) => {
 }
 
 exports.signup = async (req, res) => {
+
   try {
     await User.create({
-      username: req.body.username,
+      username: req.body.userName,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8)
     })
@@ -27,9 +28,9 @@ exports.signup = async (req, res) => {
   }
 };
 
-
 exports.signin = async (req, res) => {
-
+  console.log('RECORDING');
+  console.log(req.body);
   try {
     const user = await User.findOne({
       where: {
