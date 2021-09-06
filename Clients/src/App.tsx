@@ -7,7 +7,7 @@ import {
   Switch,
   Route
 } from "react-router-dom";
-import SignInSide from './components/InputFormPhoto';
+import InputFormPhoto from './components/InputFormPhoto';
 
 function App() {
 
@@ -23,8 +23,8 @@ function App() {
             <Route path="/login">
               <SignIn/>
             </Route>
-            <Route path="/logintest">
-              <SignInSide/>
+            <Route path="/edituser">
+              <InputFormPhoto/>
             </Route>            
             <PrivateRoute path="/protected">
               <ProtectedPage />

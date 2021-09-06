@@ -11,7 +11,7 @@ interface PrivateRouteProps extends RouteProps {
 }
 const PrivateRoute = (props: PrivateRouteProps) => {
   const {children, ...rest } = props;
-  const stateUser = useSelector((state: RootState) => state.user.user);
+  const stateUser = useSelector((state: RootState) => state.user.userFields);
   return (
     <Route
       {...rest}

@@ -1,6 +1,7 @@
 const db = require("../models");
 const config = require("../config/auth.config");
 const User = db.User;
+const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -15,7 +16,6 @@ exports.allUser = (req, res) => {
 }
 
 exports.signup = async (req, res) => {
-
   try {
     await User.create({
       username: req.body.userName,
@@ -29,8 +29,6 @@ exports.signup = async (req, res) => {
 };
 
 exports.signin = async (req, res) => {
-  console.log('RECORDING');
-  console.log(req.body);
   try {
     const user = await User.findOne({
       where: {
@@ -58,4 +56,122 @@ exports.signin = async (req, res) => {
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
+};
+
+exports.findAll = (req, res) => {
+  const title = req.query.title;
+  const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+
+  User.findAll({ where: condition })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving user."
+      });
+    });
+};
+
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+
+  User.findByPk(id)
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving user with id=" + id
+      });
+    });
+};
+
+exports.update = (req, res) => {
+  const id = req.params.id;
+
+  User.update(req.body, {
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update user with id=${id}. Maybe user was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating user with id=" + id
+      });
+    });
+};
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  User.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete user with id=${id}. Maybe user was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete user with id=" + id
+      });
+    });
+};
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+
+  User.destroy({
+    where: { id: id }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete user with id=${id}. Maybe user was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete user with id=" + id
+      });
+    });
+};
+
+exports.deleteAll = (req, res) => {
+  User.destroy({
+    where: {},
+    truncate: false
+  })
+    .then(nums => {
+      res.send({ message: `${nums} Users were deleted successfully!` });
+    })
+    .catch(err => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while removing all users."
+      });
+    });
 };

@@ -4,7 +4,6 @@ const controllerAuth = require("./controllers/auth.controller");
 const db = require("./models");
 const userReq = require("./routers/user.requests");
 const cors = require('cors');
-const { body } = require("express-validator");
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists
@@ -14,11 +13,11 @@ app.use(cors());
 app.use(express.json());
 // app.use((req,res,next) => {console.log(req);
 //                 next()});
-// app.get('/test', (req, res) => {
-//   res.json({
-//     message: 'Hello'
-//   })
-// })
+app.get('/test', (req, res) => {
+  res.json({
+    message: 'Hello'
+  })
+})
 
 app.use("/auth", userReq);
 

@@ -10,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useAppDispatch } from '../app/hooks';
-import { addUser, fetchLogin } from "../redux/userSlice";
+import { fetchLogin } from "../redux/userSlice";
 
 const useStyles = makeStyles((theme) => ({
   paper: {

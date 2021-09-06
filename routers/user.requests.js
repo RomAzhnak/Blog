@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const controllerAuth = require("../controllers/auth.controller");
-const { verifyToken } = require("../middleware/authJwt");
 const { checkDuplicateUsernameOrEmail } = require("../middleware/verifySignUp");
+// const { verifyToken } = require("../middleware/authJwt");
 
-router.get("/test", verifyToken, (req,res) => {res.status(200).send(`User Content id = ${req.userId} `);});
+// router.get("/test", verifyToken, (req,res) => {res.status(200).send(`User Content id = ${req.userId} `);});
 
 router.post(
   "/signup",

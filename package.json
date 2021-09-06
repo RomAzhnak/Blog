@@ -14,14 +14,9 @@
     "express-validator": "^6.12.1",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.0",
-<<<<<<< HEAD
-    "typescript": "^4.4.2",
-    "sequelize": "^5.22.4"
-=======
     "nodemon": "^2.0.12",
     "sequelize": "^5.22.4",
     "typescript": "^4.4.2"
->>>>>>> ce3187e54f79fa42dab52dcc1086f6673297cf21
   },
   "devDependencies": {
     "sequelize-cli": "^6.2.0"

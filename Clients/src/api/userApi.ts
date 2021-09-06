@@ -34,8 +34,9 @@ export const fetchLoginUser = (user: User): Promise<any> => {
   //     })
   //   }, 100)
   // })
-
 }
+
+export default instance;
 
 // export const userSignUp = async (user: User) => {
 //   try {
@@ -67,5 +68,3 @@ export const fetchLoginUser = (user: User): Promise<any> => {
 //     }
 //   }
 // }
-
-export default instance;

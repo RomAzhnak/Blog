@@ -8,12 +8,12 @@ export interface User {
 	password: string
 };
 export interface UserState {
-	user: User,
+	userFields: User,
 	error: string
 };
 
 const initialState: UserState = {
-	user: {
+	userFields: {
 		userName: '',
 		email: '',
 		password: ''
@@ -48,13 +48,13 @@ export const userSlice = createSlice({
 	initialState,
 	reducers: {
 		addUser: (state, action) => {
-			state.user = action.payload;
+			state.userFields = action.payload;
 
 		},
 		clearUser: (state) => {
-			state.user.userName = '';
-			state.user.email = '';
-			state.user.password = '';
+			state.userFields.userName = '';
+			state.userFields.email = '';
+			state.userFields.password = '';
 		},
 	}
 	,
@@ -72,8 +72,8 @@ export const userSlice = createSlice({
 
 			})
 			.addCase(fetchLogin.fulfilled, (state, action) => {
-				state.user.email = action.payload.email;
-				state.user.userName = action.payload.username;
+				state.userFields.email = action.payload.email;
+				state.userFields.userName = action.payload.username;
 				localStorage.setItem('token', action.payload.accessToken);
 			})
 			.addCase(fetchLogin.rejected, (state, action) => {
