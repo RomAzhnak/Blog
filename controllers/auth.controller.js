@@ -13,7 +13,55 @@ exports.allUser = (req, res) => {
     .then(user => {
       res.json(user)
     });
-}
+};
+
+exports.edit = (req, res) => {
+  console.log(req.body);
+  const email = req.body.email;
+
+  User.update({username: req.body.userName},
+    { where: { email: email }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update user with email=${email}. Maybe user was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating user with email=" + id
+      });
+    });
+};
+
+exports.delete = (req, res) => {
+  const email = req.body.email;
+  User.destroy({
+    where: { email: email }
+  })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete user with email=${emaild}. Maybe user was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete user with email=" + email
+      });
+    });
+};
 
 exports.signup = async (req, res) => {
   try {
@@ -88,77 +136,31 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {
-  const id = req.params.id;
 
-  User.update(req.body, {
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "User was updated successfully."
-        });
-      } else {
-        res.send({
-          message: `Cannot update user with id=${id}. Maybe user was not found or req.body is empty!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating user with id=" + id
-      });
-    });
-};
 
-exports.delete = (req, res) => {
-  const id = req.params.id;
+// exports.delete = (req, res) => {
+//   const id = req.params.id;
 
-  User.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "User was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete user with id=${id}. Maybe user was not found!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete user with id=" + id
-      });
-    });
-};
-
-exports.delete = (req, res) => {
-  const id = req.params.id;
-
-  User.destroy({
-    where: { id: id }
-  })
-    .then(num => {
-      if (num == 1) {
-        res.send({
-          message: "User was deleted successfully!"
-        });
-      } else {
-        res.send({
-          message: `Cannot delete user with id=${id}. Maybe user was not found!`
-        });
-      }
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Could not delete user with id=" + id
-      });
-    });
-};
+//   User.destroy({
+//     where: { id: id }
+//   })
+//     .then(num => {
+//       if (num == 1) {
+//         res.send({
+//           message: "User was deleted successfully!"
+//         });
+//       } else {
+//         res.send({
+//           message: `Cannot delete user with id=${id}. Maybe user was not found!`
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       res.status(500).send({
+//         message: "Could not delete user with id=" + id
+//       });
+//     });
+// };
 
 exports.deleteAll = (req, res) => {
   User.destroy({

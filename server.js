@@ -11,7 +11,7 @@ db.sequelize.sync();
 // });
 app.use(cors());
 app.use(express.json());
-// app.use((req,res,next) => {console.log(req);
+// app.use((req,res,next) => {console.log(req.body);
 //                 next()});
 app.get('/test', (req, res) => {
   res.json({

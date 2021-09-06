@@ -1,39 +1,35 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Link } from 'react-router-dom';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import pict from '../img/i4.jpg';
 import { useAppDispatch } from '../app/hooks';
-import { fetchAdd } from "../redux/userSlice";
-// import CssBaseline from '@material-ui/core/CssBaseline';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-// import Checkbox from '@material-ui/core/Checkbox';
-// import Box from '@material-ui/core/Box';
-// import Link from '@material-ui/core/Link';
+import { clearUser, fetchEdit, User, UserState } from "../redux/userSlice";
+import { useSelector } from 'react-redux';
+// import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      height: '100vh',
+      alignItems: 'center',
+      display: 'flex',
+      justifyContent: 'center',
+      flexDirection: 'column',
+      // height: '100vh',
       margin: 'auto',
+    },
+    '& > *': {
+      margin: theme.spacing(1),
     },
     input: {
       display: "none",
     },
     image: {
-      // backgroundImage: 'url(https://source.unsplash.com/random)',
-      // backgroundRepeat: 'no-repeat',
-      // backgroundColor:
-      //   theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
-      // backgroundSize: 'cover',
-      // backgroundPosition: 'center',
       display: 'flex',
       alignSelf: 'center',
     },
@@ -52,7 +48,8 @@ const useStyles = makeStyles((theme: Theme) =>
       marginTop: theme.spacing(1),
     },
     submit: {
-      margin: theme.spacing(3, 0, 2),
+      margin: theme.spacing(3),
+      width: theme.spacing(10),
     },
     large: {
 
@@ -63,16 +60,44 @@ const useStyles = makeStyles((theme: Theme) =>
   }));
 
 export default function SignInSide() {
+  const stateUser = useSelector(({user}: any) => user.userFields);
+
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [myData, setData] = useState();
   const [user, setUser] = useState({
-    userName: '',
-    email: '',
+    userName: stateUser.userName,
+    email: stateUser.email,
     password: ''
   }); 
-
   
+  const [image, _setImage] = useState(pict);
+  // const inputFileRef = createRef(null);
+
+  const cleanup = () => {
+    URL.revokeObjectURL(image);
+    // inputFileRef.current.value = null;
+  };
+
+  const setImage = (newImage: any) => {
+    if (image) {
+      cleanup();
+    }
+    _setImage(newImage);
+  };
+
+  const handleOnChange = (event: any) => {
+    const newImage = event.target?.files?.[0];
+    console.log(stateUser);
+    if (newImage) {
+      setImage(URL.createObjectURL(newImage));
+    }
+  };
+
+  // const handleChangePicture = (event: any) => {
+  //   const image = URL.createObjectURL(event.target.files[0]);
+  //   setPicture(image);
+  //   console.log(event.target.files[0]);
+  // }
 
   const onChange = (event: { target: { name: string; value: string; }; }) => {
     setUser(user => ({ ...user, [event.target.name]: event.target.value }))
@@ -80,8 +105,14 @@ export default function SignInSide() {
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
+    const fetchUser = {
+      userName: user.userName,
+      email: user.email,
+      password: user.password,
+      // urlAvatar: image
+    }
     if (user.email) {
-      dispatch(fetchAdd(user));
+      dispatch(fetchEdit( fetchUser ));
       setUser(
         {
           userName: '',
@@ -92,29 +123,44 @@ export default function SignInSide() {
     };
   };
 
+  const onClickDelete = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    // dispatch(fetchDelete( user.email ));
+    dispatch(clearUser());
+    setUser(
+      {
+        userName: '',
+        email: '',
+        password: ''
+      }
+    );
+  }
+
   return (
     <Grid container component="main" className={classes.root} xs={8}>
-      <Grid item xs={6} sm={4} md={7} className={classes.image} >
+      {/* <Grid item xs={6} sm={6} 
+       className={classes.image} > */}
 
-        <input accept=".jpg, .jpeg, .png"
+        <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
           type="file" 
-
+          onChange={handleOnChange}
+          // ref={inputFileRef}
         />
         <label htmlFor="icon-button-file">
-          <IconButton color="primary" aria-label="upload picture" component="span">
-            <Avatar src={pict} className={classes.large} />
+          <IconButton color="primary" component="span">
+            <Avatar src={image} className={classes.large} />
           </IconButton>
         </label>
 
         {/* <Avatar alt="Photo" src={pict} className={classes.large} /> */}
-      </Grid>
-      <Grid item xs={6} sm={8} md={5} component={Paper} elevation={6} square>
+      {/* </Grid> */}
+      <Grid item xs={6} sm={6} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
+          {/* <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
-          </Avatar>
+          </Avatar> */}
           <Typography component="h1" variant="h5">
             Edit
           </Typography>
@@ -163,15 +209,36 @@ export default function SignInSide() {
                 />
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              className={classes.submit}
-            >
-              Edit
-            </Button>
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-around"
+              alignItems="center">
+              <Grid  xs={4}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={onClickDelete}
+                >
+                  Delete
+                </Button>
+              </Grid>
+              <Grid xs={4}>
+                <Button
+                  type="submit"
+                  // size='medium'
+                  // fullWidth
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  // onClick={onClickEdit}
+                >
+                  Edit
+                </Button>
+              </Grid>
+            </Grid>
             {/* <Grid container>
               <Grid item xs>
                 <Link to="/" >

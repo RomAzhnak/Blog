@@ -11,6 +11,8 @@ import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppDispatch } from '../app/hooks';
 import { fetchAdd } from "../redux/userSlice";
+import IconButton from '@material-ui/core/IconButton';
+// import pict from '../img/i4.jpg';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -30,6 +32,15 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  input: {
+    display: "none",
+  },
+    large: {
+
+      width: theme.spacing(35),
+      height: theme.spacing(35),
+      margin: 'auto',
+    }
 }));
 
 type Props = {
@@ -38,7 +49,27 @@ type Props = {
 const SignUp: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
+  const [image, _setImage] = useState('');
 
+
+  const cleanup = () => {
+    URL.revokeObjectURL(image);
+  };
+
+  const setImage = (newImage: any) => {
+    if (image) {
+      cleanup();
+    }
+    _setImage(newImage);
+  };
+
+  const handleOnChange = (event: any) => {
+    const newImage = event.target?.files?.[0];
+
+    if (newImage) {
+      setImage(URL.createObjectURL(newImage));
+    }
+  };
 
   const [user, setUser] = useState({
     userName: '',
@@ -52,8 +83,14 @@ const SignUp: React.FC<Props> = (props) => {
 
   const onSubmit = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
+    const fetchUser = {
+      userName: user.userName,
+      email: user.email,
+      password: user.password,
+      urlAvatar: image
+    }
     if (user.email) {
-      dispatch(fetchAdd( user ));
+      dispatch(fetchAdd( fetchUser ));
       setUser(
         {
           userName: '',
@@ -68,9 +105,20 @@ const SignUp: React.FC<Props> = (props) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
+      <input accept="image/*"
+          className={classes.input}
+          id="icon-button-file"
+          type="file" 
+          onChange={handleOnChange}
+        />
+        <label htmlFor="icon-button-file">
+          <IconButton color="primary" component="span">
+            <Avatar src={image} className={classes.large} />
+          </IconButton>
+        </label>
+        {/* <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
-        </Avatar>
+        </Avatar> */}
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>

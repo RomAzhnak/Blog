@@ -24,7 +24,8 @@ router.post(
   checkDuplicateUsernameOrEmail,
   controllerAuth.signup
 );
-
 router.post("/signin", controllerAuth.signin);
+router.post("/delete", controllerAuth.delete);
+router.post("/edit", controllerAuth.edit);
 
 module.exports = router;

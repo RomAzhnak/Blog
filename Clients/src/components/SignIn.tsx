@@ -41,6 +41,7 @@ const SignIn: React.FC<Props> = (props) => {
   const [user, setUser] = useState({
     userName: '',
     email: '',
+    urlAvatar: '',
     password: ''
   });
   let history = useHistory();
@@ -59,7 +60,8 @@ const SignIn: React.FC<Props> = (props) => {
               {
                 userName: '',
                 email: '',
-                password: ''
+                password: '',
+                urlAvatar: ''
               }
             );
           history.push("/protected");  

@@ -1,10 +1,11 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchAddUser, fetchLoginUser } from '../api/userApi';
+import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser } from '../api/userApi';
 import { RootState } from './store';
 
 export interface User {
 	userName: string,
 	email: string,
+	// urlAvatar: string,
 	password: string
 };
 export interface UserState {
@@ -16,6 +17,7 @@ const initialState: UserState = {
 	userFields: {
 		userName: '',
 		email: '',
+		// urlAvatar: '',
 		password: ''
 	},
 	error: ''
@@ -41,7 +43,15 @@ export const fetchLogin = createAsyncThunk<UserLogin, User, { state: RootState }
 		const resp = await fetchLoginUser(user);
 		return resp.data
 	}
-)
+);
+
+export const fetchEdit = createAsyncThunk<UserLogin, User, { state: RootState }>(
+	'user/fetchEdit',
+	async (user, thankApi) => {
+		const resp = await fetchEditUser(user);
+		return resp.data
+	}
+);
 
 export const userSlice = createSlice({
 	name: 'user',
@@ -52,6 +62,9 @@ export const userSlice = createSlice({
 
 		},
 		clearUser: (state) => {
+			
+			// fetchDelUser(state.userFields.email);
+			fetchDelUser({email: 'aaa@gmail.com'});
 			state.userFields.userName = '';
 			state.userFields.email = '';
 			state.userFields.password = '';
@@ -77,6 +90,15 @@ export const userSlice = createSlice({
 				localStorage.setItem('token', action.payload.accessToken);
 			})
 			.addCase(fetchLogin.rejected, (state, action) => {
+				state.error = 'error';
+			})
+			.addCase(fetchEdit.pending, (state, action) => {
+			})
+			.addCase(fetchEdit.fulfilled, (state, action) => {
+				state.userFields.email = action.payload.email;
+				state.userFields.userName = action.payload.username;
+			})
+			.addCase(fetchEdit.rejected, (state, action) => {
 				state.error = 'error';
 			})
 	}
