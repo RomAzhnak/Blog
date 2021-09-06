@@ -11,6 +11,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useAppDispatch } from '../app/hooks';
 import { fetchLogin } from "../redux/userSlice";
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { User } from '../redux/userSlice'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -49,10 +52,11 @@ const SignIn: React.FC<Props> = (props) => {
     setUser(user => ({ ...user, [event.target.name]: event.target.value }))
   }
 
-  const onSubmit = (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
+  const onSubmitForm = (user: User) => {
+    // event.preventDefault();
     
     if (user.email) {
+
         dispatch(fetchLogin( user ))
           .unwrap()
           .then(res => {
@@ -72,6 +76,31 @@ const SignIn: React.FC<Props> = (props) => {
     };
   };
 
+  const validationSchema = yup.object({
+
+    email: yup
+      .string()
+      .email('Enter a valid email')
+      .required('Email is required'),
+    password: yup
+      .string()
+      .min(6, 'Password should be of minimum 6 characters length')
+      .required('Password is required'),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      userName: '',
+      email: '',
+      password: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      console.log(values);
+      onSubmitForm(values);
+    },
+  });
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -82,33 +111,47 @@ const SignIn: React.FC<Props> = (props) => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} onSubmit={onSubmit} noValidate>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={user.email}
-            onChange={onChange}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={user.password}
-            onChange={onChange}
-          />
+        <form className={classes.form} 
+          onSubmit={formik.handleSubmit} 
+          noValidate>
+          <Grid item xs={12}>
+            <TextField
+              variant="outlined"
+              // margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              // value={user.email}
+              // onChange={onChange}
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              // value={user.password}
+              // onChange={onChange}
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
+            />
+          </Grid>
           <Button
             type="submit"
             fullWidth

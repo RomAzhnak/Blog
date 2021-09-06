@@ -5,14 +5,17 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { Link } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppDispatch } from '../app/hooks';
 import { fetchAdd } from "../redux/userSlice";
 import IconButton from '@material-ui/core/IconButton';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { User } from '../redux/userSlice'
 // import pict from '../img/i4.jpg';
+// import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -37,8 +40,8 @@ const useStyles = makeStyles((theme) => ({
   },
     large: {
 
-      width: theme.spacing(35),
-      height: theme.spacing(35),
+      width: theme.spacing(25),
+      height: theme.spacing(25),
       margin: 'auto',
     }
 }));
@@ -77,12 +80,12 @@ const SignUp: React.FC<Props> = (props) => {
     password: ''
   });
 
-  const onChange = (event: { target: { name: string; value: string; }; }) => {
-    setUser(user => ({ ...user, [event.target.name]: event.target.value }))
-  }
+  // const onChange = (event: { target: { name: string; value: string; }; }) => {
+  //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
+  // }
 
-  const onSubmit = (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
+  const onSubmitForm = (user: User) => {
+    // event.preventDefault();
     const fetchUser = {
       userName: user.userName,
       email: user.email,
@@ -100,6 +103,32 @@ const SignUp: React.FC<Props> = (props) => {
       );
     };
   };
+
+  const validationSchema = yup.object({
+    userName: yup
+      .string()
+      .required('UserName is required'),
+    email: yup
+      .string()
+      .email('Enter a valid email')
+      .required('Email is required'),
+    password: yup
+      .string()
+      .min(6, 'Password should be of minimum 6 characters length')
+      .required('Password is required'),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      userName: '',
+      email: '',
+      password: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      onSubmitForm(values);
+    },
+  });
 
   return (
     <Container component="main" maxWidth="xs">
@@ -122,7 +151,10 @@ const SignUp: React.FC<Props> = (props) => {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} onSubmit={onSubmit} noValidate>
+        <form className={classes.form}
+          // onSubmit={onSubmitForm}
+          onSubmit={formik.handleSubmit}
+          noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -134,8 +166,12 @@ const SignUp: React.FC<Props> = (props) => {
                 id="userName"
                 label="First Name"
                 autoFocus
-                value={user.userName}
-                onChange={onChange}
+                // value={user.userName}
+                // onChange={onChange}
+                value={formik.values.userName}
+                onChange={formik.handleChange}
+                error={formik.touched.userName && Boolean(formik.errors.userName)}
+                helperText={formik.touched.userName && formik.errors.userName}
               />
             </Grid>
             <Grid item xs={12}>
@@ -147,8 +183,12 @@ const SignUp: React.FC<Props> = (props) => {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                value={user.email}
-                onChange={onChange}
+                // value={user.email}
+                // onChange={onChange}
+                value={formik.values.email}
+                onChange={formik.handleChange}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
               />
             </Grid>
             <Grid item xs={12}>
@@ -161,8 +201,12 @@ const SignUp: React.FC<Props> = (props) => {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                value={user.password}
-                onChange={onChange}
+                // value={user.password}
+                // onChange={onChange}
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                error={formik.touched.password && Boolean(formik.errors.password)}
+                helperText={formik.touched.password && formik.errors.password}
               />
             </Grid>
           </Grid>
