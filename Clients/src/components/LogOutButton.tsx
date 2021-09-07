@@ -4,7 +4,7 @@ import { clearUser } from '../redux/userSlice';
 
 type Props = {
 };
-const AuthButton: React.FC<Props> = (props) => {
+const LogOutButton: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();  
 
 let history = useHistory();
@@ -12,6 +12,7 @@ let history = useHistory();
       <p>
         <button
           onClick={() => {
+            
             dispatch(clearUser());
             history.push("/");
           }}
@@ -22,4 +23,4 @@ let history = useHistory();
   );
 }
 
-export default AuthButton;
+export default LogOutButton;

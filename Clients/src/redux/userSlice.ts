@@ -5,7 +5,7 @@ import { RootState } from './store';
 export interface User {
 	userName: string,
 	email: string,
-	// urlAvatar: string,
+	urlAvatar: string,
 	password: string
 };
 export interface UserState {
@@ -17,7 +17,7 @@ const initialState: UserState = {
 	userFields: {
 		userName: '',
 		email: '',
-		// urlAvatar: '',
+		urlAvatar: '',
 		password: ''
 	},
 	error: ''
@@ -62,9 +62,7 @@ export const userSlice = createSlice({
 
 		},
 		clearUser: (state) => {
-			
-			// fetchDelUser(state.userFields.email);
-			fetchDelUser({email: 'aaa@gmail.com'});
+			fetchDelUser(state.userFields.email);
 			state.userFields.userName = '';
 			state.userFields.email = '';
 			state.userFields.password = '';
@@ -102,20 +100,6 @@ export const userSlice = createSlice({
 				state.error = 'error';
 			})
 	}
-
-	// ,
-	// extraReducers: (builder) => {
-	// 	builder.addCase(fetchUserById.pending, (state, action) => {
-	// 		state.loading = true
-	// 	});
-	// 	builder.addCase(fetchUserById.fulfilled, (state, action) => {
-	// 		state.loading = false;
-	// 		state.user = action.payload
-	// 	});
-	// 	builder.addCase(fetchUserById.rejected, (state, action) => {
-	// 		state.error = 
-	// 	});
-	// }
 });
 
 

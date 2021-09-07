@@ -48,9 +48,9 @@ const SignIn: React.FC<Props> = (props) => {
     password: ''
   });
   let history = useHistory();
-  const onChange = (event: { target: { name: string; value: string; }; }) => {
-    setUser(user => ({ ...user, [event.target.name]: event.target.value }))
-  }
+  // const onChange = (event: { target: { name: string; value: string; }; }) => {
+  //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
+  // }
 
   const onSubmitForm = (user: User) => {
     // event.preventDefault();
@@ -60,14 +60,14 @@ const SignIn: React.FC<Props> = (props) => {
         dispatch(fetchLogin( user ))
           .unwrap()
           .then(res => {
-            setUser(
-              {
-                userName: '',
-                email: '',
-                password: '',
-                urlAvatar: ''
-              }
-            );
+            // setUser(
+            //   {
+            //     userName: '',
+            //     email: '',
+            //     password: '',
+            //     urlAvatar: ''
+            //   }
+            // );
           history.push("/protected");  
           })
           .catch(e => {
@@ -93,10 +93,11 @@ const SignIn: React.FC<Props> = (props) => {
       userName: '',
       email: '',
       password: '',
+      urlAvatar: '',
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      // console.log(values);
       onSubmitForm(values);
     },
   });

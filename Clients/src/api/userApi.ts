@@ -40,29 +40,15 @@ export const fetchEditUser = (user: User): Promise<any> => {
   return instance.post("/auth/edit", user);
 }
 
-export const fetchDelUser = (user: any) => {
-  instance.post("/auth/delete", user);
+export const fetchDelUser = (email: string) => {
+  instance.delete('/auth', {
+    params: {
+      email: email
+    }
+  })
 }
 
 export default instance;
-
-// export const userSignUp = async (user: User) => {
-//   try {
-//     const resp = await instance.post("/auth/signup", JSON.stringify({ user }));
-//   } catch (error) {
-
-//   }
-// };
-
-// export const userSignIn = async (user: User) => {
-//   try {
-//     const resp = await instance.post("/auth/signin", JSON.stringify({ user }));
-//     console.log(resp);
-//     localStorage.setItem('token', resp.data.accessToken)
-//   } catch (error) {
-
-//   }
-// };
 
 // export const userReLogin = async () => {
 //   const token = localStorage.getItem('token');

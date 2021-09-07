@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const controllerAuth = require("../controllers/auth.controller");
+const controller = require("../controller/file.controller");
 const { checkDuplicateUsernameOrEmail } = require("../middleware/verifySignUp");
 // const { verifyToken } = require("../middleware/authJwt");
 
@@ -25,7 +26,11 @@ router.post(
   controllerAuth.signup
 );
 router.post("/signin", controllerAuth.signin);
-router.post("/delete", controllerAuth.delete);
+router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);
+
+router.post("/upload", controller.upload);
+router.get("/files", controller.getListFiles);
+router.get("/files/:name", controller.download);
 
 module.exports = router;

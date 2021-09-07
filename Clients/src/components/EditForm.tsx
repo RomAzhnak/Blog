@@ -9,8 +9,10 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import pict from '../img/i4.jpg';
 import { useAppDispatch } from '../app/hooks';
-import { clearUser, fetchEdit, User, UserState } from "../redux/userSlice";
+import { addUser, clearUser, fetchEdit, User, UserState } from "../redux/userSlice";
 import { useSelector } from 'react-redux';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 // import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -59,8 +61,11 @@ const useStyles = makeStyles((theme: Theme) =>
     }
   }));
 
-export default function SignInSide() {
-  const stateUser = useSelector(({user}: any) => user.userFields);
+  interface State {
+    user: UserState };
+
+export default function EditForm() {
+  const stateUser = useSelector(({user}: State) => user.userFields);
 
   const classes = useStyles();
   const dispatch = useAppDispatch();
@@ -87,7 +92,6 @@ export default function SignInSide() {
 
   const handleOnChange = (event: any) => {
     const newImage = event.target?.files?.[0];
-    console.log(stateUser);
     if (newImage) {
       setImage(URL.createObjectURL(newImage));
     }
@@ -99,27 +103,31 @@ export default function SignInSide() {
   //   console.log(event.target.files[0]);
   // }
 
-  const onChange = (event: { target: { name: string; value: string; }; }) => {
-    setUser(user => ({ ...user, [event.target.name]: event.target.value }))
-  }
+  // const onChange = (event: { target: { name: string; value: string; }; }) => {
+  //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
+  // }
 
-  const onSubmit = (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
+  const onSubmitForm = (user: User) => {
+    // event.preventDefault();
     const fetchUser = {
       userName: user.userName,
       email: user.email,
       password: user.password,
-      // urlAvatar: image
+      urlAvatar: image
     }
     if (user.email) {
-      dispatch(fetchEdit( fetchUser ));
-      setUser(
-        {
-          userName: '',
-          email: '',
-          password: ''
-        }
-      );
+      dispatch(fetchEdit( fetchUser ))
+      .unwrap()
+      .then( () => {
+        dispatch(addUser(fetchUser))
+      })
+      // setUser(
+      //   {
+      //     userName: '',
+      //     email: '',
+      //     password: ''
+      //   }
+      // );
     };
   };
 
@@ -135,6 +143,39 @@ export default function SignInSide() {
       }
     );
   }
+
+  const validationSchema = yup.object({
+    userName: yup
+      .string()
+      .required('Username is required')
+      .min(3, 'Username must be at least 6 characters')
+      .max(20, 'Username must not exceed 20 characters'),
+    email: yup
+      .string()
+      .email('Enter a valid email')
+      .required('Email is required'),
+    password: yup
+      .string()
+      .required('Password is required')      
+      .min(6, 'Password should be of minimum 6 characters length'),
+    //   confirmPassword: Yup.string()
+    //   .required('Confirm Password is required')
+    //   .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
+    // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      userName: stateUser.userName,
+      email: stateUser.email,
+      password: stateUser.password,
+      urlAvatar: image,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      onSubmitForm(values);
+    },
+  });
 
   return (
     <Grid container component="main" className={classes.root} xs={8}>
@@ -165,7 +206,7 @@ export default function SignInSide() {
             Edit
           </Typography>
 
-          <form className={classes.form} onSubmit={onSubmit} noValidate>
+          <form className={classes.form} onSubmit={formik.handleSubmit} noValidate>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -177,8 +218,12 @@ export default function SignInSide() {
                   id="userName"
                   label="User Name"
                   autoFocus
-                  value={user.userName}
-                  onChange={onChange}
+                  // value={user.userName}
+                  // onChange={onChange}
+                  value={formik.values.userName}
+                  onChange={formik.handleChange}
+                  error={formik.touched.userName && Boolean(formik.errors.userName)}
+                  helperText={formik.touched.userName && formik.errors.userName}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -190,8 +235,12 @@ export default function SignInSide() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  value={user.email}
-                  onChange={onChange}
+                  // value={user.email}
+                  // onChange={onChange}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -204,8 +253,12 @@ export default function SignInSide() {
                   type="password"
                   id="password"
                   autoComplete="current-password"
-                  value={user.password}
-                  onChange={onChange}
+                  // value={user.password}
+                  // onChange={onChange}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  error={formik.touched.password && Boolean(formik.errors.password)}
+                  helperText={formik.touched.password && formik.errors.password}
                 />
               </Grid>
             </Grid>
@@ -239,18 +292,6 @@ export default function SignInSide() {
                 </Button>
               </Grid>
             </Grid>
-            {/* <Grid container>
-              <Grid item xs>
-                <Link to="/" >
-                  Forgot password?
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link to="/register">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid> */}
           </form>
         </div>
       </Grid>

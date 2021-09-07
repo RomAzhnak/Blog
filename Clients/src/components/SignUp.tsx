@@ -74,11 +74,11 @@ const SignUp: React.FC<Props> = (props) => {
     }
   };
 
-  const [user, setUser] = useState({
-    userName: '',
-    email: '',
-    password: ''
-  });
+  // const [user, setUser] = useState({
+  //   userName: '',
+  //   email: '',
+  //   password: ''
+  // });
 
   // const onChange = (event: { target: { name: string; value: string; }; }) => {
   //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
@@ -92,30 +92,36 @@ const SignUp: React.FC<Props> = (props) => {
       password: user.password,
       urlAvatar: image
     }
-    if (user.email) {
+    // if (user.email) {
       dispatch(fetchAdd( fetchUser ));
-      setUser(
-        {
-          userName: '',
-          email: '',
-          password: ''
-        }
-      );
-    };
+      // setUser(
+      //   {
+      //     userName: '',
+      //     email: '',
+      //     password: ''
+      //   }
+      // );
+    // };
   };
 
   const validationSchema = yup.object({
     userName: yup
       .string()
-      .required('UserName is required'),
+      .required('Username is required')
+      .min(3, 'Username must be at least 6 characters')
+      .max(20, 'Username must not exceed 20 characters'),
     email: yup
       .string()
       .email('Enter a valid email')
       .required('Email is required'),
     password: yup
       .string()
-      .min(6, 'Password should be of minimum 6 characters length')
-      .required('Password is required'),
+      .required('Password is required')      
+      .min(6, 'Password should be of minimum 6 characters length'),
+    //   confirmPassword: Yup.string()
+    //   .required('Confirm Password is required')
+    //   .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
+    // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
   });
 
   const formik = useFormik({
@@ -123,6 +129,7 @@ const SignUp: React.FC<Props> = (props) => {
       userName: '',
       email: '',
       password: '',
+      urlAvatar: image,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -134,7 +141,7 @@ const SignUp: React.FC<Props> = (props) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-      <input accept="image/*"
+        <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
           type="file" 

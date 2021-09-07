@@ -5,13 +5,15 @@ const db = require("./models");
 const userReq = require("./routers/user.requests");
 const cors = require('cors');
 
+global.__basedir = __dirname;
+
 db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 // });
 app.use(cors());
 app.use(express.json());
-// app.use((req,res,next) => {console.log(req.body);
+// app.use((req,res,next) => {console.log(req.query.email);
 //                 next()});
 app.get('/test', (req, res) => {
   res.json({
