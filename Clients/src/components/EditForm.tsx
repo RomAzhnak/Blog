@@ -7,12 +7,13 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import pict from '../img/i4.jpg';
+// import pict from '../img/i4.jpg';
 import { useAppDispatch } from '../app/hooks';
 import { addUser, clearUser, fetchEdit, User, UserState } from "../redux/userSlice";
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useHistory } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -74,8 +75,9 @@ export default function EditForm() {
     email: stateUser.email,
     password: ''
   }); 
+  let history = useHistory();
   
-  const [image, _setImage] = useState(pict);
+  const [image, _setImage] = useState(stateUser.urlAvatar);
   // const inputFileRef = createRef(null);
 
   const cleanup = () => {
@@ -142,6 +144,7 @@ export default function EditForm() {
         password: ''
       }
     );
+    history.push("/");
   }
 
   const validationSchema = yup.object({

@@ -9,11 +9,11 @@ import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppDispatch } from '../app/hooks';
-import { fetchAdd } from "../redux/userSlice";
+import { fetchAdd, fetchAddAvatar } from "../redux/userSlice";
 import IconButton from '@material-ui/core/IconButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { User } from '../redux/userSlice'
+import { User, addUser } from '../redux/userSlice'
 // import pict from '../img/i4.jpg';
 // import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
@@ -53,6 +53,7 @@ const SignUp: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const [image, _setImage] = useState('');
+  const [fileName, setFileName] = useState('');
 
 
   const cleanup = () => {
@@ -70,9 +71,12 @@ const SignUp: React.FC<Props> = (props) => {
     const newImage = event.target?.files?.[0];
 
     if (newImage) {
+      // console.log(newImage);
       setImage(URL.createObjectURL(newImage));
+      setFileName(newImage);
     }
   };
+
 
   // const [user, setUser] = useState({
   //   userName: '',
@@ -86,6 +90,11 @@ const SignUp: React.FC<Props> = (props) => {
 
   const onSubmitForm = (user: User) => {
     // event.preventDefault();
+    let formData = new FormData();
+    formData.append("file", fileName);
+    // formData.append("userName", user.userName);
+    // formData.append("email", user.email);
+    // formData.append("password", user.password);
     const fetchUser = {
       userName: user.userName,
       email: user.email,
@@ -93,7 +102,14 @@ const SignUp: React.FC<Props> = (props) => {
       urlAvatar: image
     }
     // if (user.email) {
-      dispatch(fetchAdd( fetchUser ));
+      dispatch(fetchAdd( fetchUser ))
+      .unwrap()
+      .then( () => {
+        dispatch(addUser(fetchUser))
+      })
+      .then( () => {
+        dispatch(fetchAddAvatar(formData))
+      })
       // setUser(
       //   {
       //     userName: '',
@@ -134,6 +150,7 @@ const SignUp: React.FC<Props> = (props) => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       onSubmitForm(values);
+      // console.log(fileName);
     },
   });
 
@@ -141,10 +158,17 @@ const SignUp: React.FC<Props> = (props) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
+
+        <form className={classes.form}
+          // onSubmit={onSubmitForm}
+          onSubmit={formik.handleSubmit}
+          noValidate> 
+
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
           type="file" 
+          name="file"
           onChange={handleOnChange}
         />
         <label htmlFor="icon-button-file">
@@ -155,13 +179,14 @@ const SignUp: React.FC<Props> = (props) => {
         {/* <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
         </Avatar> */}
-        <Typography component="h1" variant="h5">
+        {/* <Typography component="h1" variant="h5">
           Sign up
-        </Typography>
-        <form className={classes.form}
+        </Typography> */}
+        {/* <form className={classes.form}
           // onSubmit={onSubmitForm}
           onSubmit={formik.handleSubmit}
-          noValidate>
+          noValidate>  */}
+
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField

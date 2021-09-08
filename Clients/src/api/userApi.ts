@@ -17,6 +17,14 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+export const fetchAvatar = (user: any): Promise<any> => {
+  return instance.post("/auth/upload", user, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
 export const fetchAddUser = (user: User): Promise<any> => {
   return instance.post("/auth/signup", user);
 }

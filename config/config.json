@@ -2,21 +2,21 @@
   "development": {
     "username": "user",
     "password": "user",
-    "database": "users_development",
+    "database": "blog_development",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "test": {
     "username": "user",
     "password": "user",
-    "database": "users_test",
+    "database": "blog_test",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
     "username": "user",
     "password": "user",
-    "database": "users_production",
+    "database": "blog_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
   }

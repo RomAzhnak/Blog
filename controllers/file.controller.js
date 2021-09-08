@@ -1,9 +1,11 @@
 const uploadFile = require("../middleware/upload");
 
 const upload = async (req, res) => {
+  console.log('!!!!!!!!!!');
+  console.log(req.file);
   try {
     await uploadFile(req, res);
-
+    
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }

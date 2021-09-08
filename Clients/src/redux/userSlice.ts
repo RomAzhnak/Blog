@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser } from '../api/userApi';
+import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, fetchAvatar } from '../api/userApi';
 import { RootState } from './store';
 
 export interface User {
@@ -33,6 +33,14 @@ export const fetchAdd = createAsyncThunk<string, User, { state: RootState }>(
 	'user/fetchAdd',
 	async (user, thankApi) => {
 		const resp = await fetchAddUser(user);
+		return resp.data
+	}
+);
+
+export const fetchAddAvatar = createAsyncThunk<string, any, { state: RootState }>(
+	'user/fetchAdd',
+	async (user, thankApi) => {
+		const resp = await fetchAvatar(user);
 		return resp.data
 	}
 );

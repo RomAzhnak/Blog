@@ -14,6 +14,18 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
+      avatarfilename: {
+        type: Sequelize.STRING
+      },
+      roleId: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Roles',
+          key: 'id',
+          as: 'roleId'
+        }
+      },
       password: {
         type: Sequelize.STRING
       },
