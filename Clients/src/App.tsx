@@ -8,11 +8,34 @@ import {
   Route
 } from "react-router-dom";
 import EditForm from './components/EditForm';
+import { useEffect, useState } from 'react';
+import { useAppDispatch } from './app/hooks';
+import { fetchGet } from './api/userApi';
+import { addUser, fetchLogin } from './redux/userSlice';
 
 function App() {
+  const dispatch = useAppDispatch();
+  const [initialized, setInitialized] = useState(false);
+  useEffect(() => {
+    if (!localStorage.getItem('token')) {
+      return setInitialized(true);
+    }     
 
+    fetchGet()
+      .then((res) => {
+        dispatch(addUser(res.data));
+      })
+      .catch(e => {
+        console.log('Login by token error', e.message)
+      })
+      .finally(()=> {
+        setInitialized(true);
+      })
+  },[]);
   return (
-    <Router>
+    <>
+      {initialized
+        ? <Router>
           <Switch>
             <Route path="/" exact={true} >
               <SignUp />
@@ -21,16 +44,19 @@ function App() {
               <SignUp />
             </Route>
             <Route path="/login">
-              <SignIn/>
+              <SignIn />
             </Route>
-            <Route path="/edituser">
-              <EditForm/>
-            </Route>            
+            <PrivateRoute path="/edituser">
+              <EditForm />
+            </PrivateRoute>
             <PrivateRoute path="/protected">
               <ProtectedPage />
             </PrivateRoute>
           </Switch>
-    </Router>
+        </Router>
+        : <p>Loading...</p>
+      }
+    </>
   );
 }
 

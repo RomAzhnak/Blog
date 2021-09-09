@@ -6,6 +6,7 @@ const userReq = require("./routers/user.requests");
 const cors = require('cors');
 
 global.__basedir = __dirname;
+// global.baseURL = 'http://localhost:4000/'
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists

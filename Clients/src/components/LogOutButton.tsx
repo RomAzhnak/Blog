@@ -12,9 +12,10 @@ let history = useHistory();
       <p>
         <button
           onClick={() => {
-            
+            localStorage.removeItem('token');
             dispatch(clearUser());
             history.push("/");
+            
           }}
         >
           Sign out

@@ -1,8 +1,8 @@
 const uploadFile = require("../middleware/upload");
+fs = require('fs');
+const baseUrl = 'http://localhost:4000/auth/files/';
 
 const upload = async (req, res) => {
-  console.log('!!!!!!!!!!');
-  console.log(req.file);
   try {
     await uploadFile(req, res);
     
@@ -21,8 +21,8 @@ const upload = async (req, res) => {
 };
 
 const getListFiles = (req, res) => {
-  const directoryPath = __basedir + "/resources/static/assets/uploads/";
-
+  const directoryPath = __basedir + "/resources/static/";
+  
   fs.readdir(directoryPath, function (err, files) {
     if (err) {
       res.status(500).send({
@@ -45,7 +45,7 @@ const getListFiles = (req, res) => {
 
 const download = (req, res) => {
   const fileName = req.params.name;
-  const directoryPath = __basedir + "/resources/static/assets/uploads/";
+  const directoryPath = __basedir + "/resources/static/";
 
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {

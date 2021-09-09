@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -9,11 +9,13 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import pict from '../img/i4.jpg';
 import { useAppDispatch } from '../app/hooks';
-import { addUser, clearUser, fetchEdit, User, UserState } from "../redux/userSlice";
+import { addUser, clearUser, fetchAddAvatar, fetchDel, fetchEdit, User, UserState } from "../redux/userSlice";
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useHistory } from 'react-router-dom';
+import { getFiles } from '../api/userApi';
+import ListItem from '@material-ui/core/ListItem';
 // import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -55,9 +57,13 @@ const useStyles = makeStyles((theme: Theme) =>
       width: theme.spacing(10),
     },
     large: {
-
       width: theme.spacing(35),
       height: theme.spacing(35),
+      margin: 'auto',
+    },
+    middle: {
+      width: theme.spacing(10),
+      height: theme.spacing(10),
       margin: 'auto',
     }
   }));
@@ -67,22 +73,23 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function EditForm() {
   const stateUser = useSelector(({user}: State) => user.userFields);
-
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const [user, setUser] = useState({
-    userName: stateUser.userName,
-    email: stateUser.email,
-    password: ''
-  }); 
   let history = useHistory();
-  
+  const [imageInfos, setAvatar] = useState([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
-  // const inputFileRef = createRef(null);
+  const [fileName, setFileName] = useState('');
+
+  
+  useEffect(() => {
+    getFiles().then((response) => {
+      setAvatar( response.data );
+    });
+  }, [])
 
   const cleanup = () => {
     URL.revokeObjectURL(image);
-    // inputFileRef.current.value = null;
+
   };
 
   const setImage = (newImage: any) => {
@@ -96,6 +103,7 @@ export default function EditForm() {
     const newImage = event.target?.files?.[0];
     if (newImage) {
       setImage(URL.createObjectURL(newImage));
+      setFileName(newImage);
     }
   };
 
@@ -110,6 +118,8 @@ export default function EditForm() {
   // }
 
   const onSubmitForm = (user: User) => {
+    let formData = new FormData();
+    formData.append("file", fileName);
     // event.preventDefault();
     const fetchUser = {
       userName: user.userName,
@@ -123,27 +133,26 @@ export default function EditForm() {
       .then( () => {
         dispatch(addUser(fetchUser))
       })
-      // setUser(
-      //   {
-      //     userName: '',
-      //     email: '',
-      //     password: ''
-      //   }
-      // );
+      .then( () => {
+        dispatch(fetchAddAvatar(formData))
+      })
     };
   };
 
   const onClickDelete = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     // dispatch(fetchDelete( user.email ));
+    // dispatch(clearUser());
+    dispatch(fetchDel(stateUser.email));
+    localStorage.removeItem('token');
+    history.push("/");
+  }
+
+  const onClickLogOut = (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    // dispatch(fetchDelete( user.email ));
     dispatch(clearUser());
-    setUser(
-      {
-        userName: '',
-        email: '',
-        password: ''
-      }
-    );
+    localStorage.removeItem('token');
     history.push("/");
   }
 
@@ -171,7 +180,7 @@ export default function EditForm() {
     initialValues: {
       userName: stateUser.userName,
       email: stateUser.email,
-      password: stateUser.password,
+      password: '',
       urlAvatar: image,
     },
     validationSchema: validationSchema,
@@ -181,122 +190,152 @@ export default function EditForm() {
   });
 
   return (
-    <Grid container component="main" className={classes.root} xs={8}>
-      {/* <Grid item xs={6} sm={6} 
-       className={classes.image} > */}
+    <Grid className={classes.image} xs={12}>
+      <Grid container component="main" className={classes.root} xs={6}>
+        {/* <Grid item xs={6} sm={6} 
+        className={classes.image} > */}
 
-        <input accept="image/*"
-          className={classes.input}
-          id="icon-button-file"
-          type="file" 
-          onChange={handleOnChange}
-          // ref={inputFileRef}
-        />
-        <label htmlFor="icon-button-file">
-          <IconButton color="primary" component="span">
-            <Avatar src={image} className={classes.large} />
-          </IconButton>
-        </label>
+          <input accept="image/*"
+            className={classes.input}
+            id="icon-button-file"
+            type="file" 
+            onChange={handleOnChange}
+            // ref={inputFileRef}
+          />
+          <label htmlFor="icon-button-file">
+            <IconButton color="primary" component="span">
+              <Avatar src={image} className={classes.large} />
+            </IconButton>
+          </label>
 
-        {/* <Avatar alt="Photo" src={pict} className={classes.large} /> */}
-      {/* </Grid> */}
-      <Grid item xs={6} sm={6} component={Paper} elevation={6} square>
-        <div className={classes.paper}>
-          {/* <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar> */}
-          <Typography component="h1" variant="h5">
-            Edit
-          </Typography>
+          {/* <Avatar alt="Photo" src={pict} className={classes.large} /> */}
+        {/* </Grid> */}
+        <Grid item xs={8} component={Paper} elevation={6} square>
+          <div className={classes.paper}>
+            <Typography component="h1" variant="h5">
+              Edit
+            </Typography>
 
-          <form className={classes.form} onSubmit={formik.handleSubmit} noValidate>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  autoComplete="userName"
-                  name="userName"
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="userName"
-                  label="User Name"
-                  autoFocus
-                  // value={user.userName}
-                  // onChange={onChange}
-                  value={formik.values.userName}
-                  onChange={formik.handleChange}
-                  error={formik.touched.userName && Boolean(formik.errors.userName)}
-                  helperText={formik.touched.userName && formik.errors.userName}
-                />
+            <form className={classes.form} onSubmit={formik.handleSubmit} noValidate>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    autoComplete="userName"
+                    name="userName"
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="userName"
+                    label="User Name"
+                    // autoFocus
+                    // value={user.userName}
+                    // onChange={onChange}
+                    value={formik.values.userName}
+                    onChange={formik.handleChange}
+                    error={formik.touched.userName && Boolean(formik.errors.userName)}
+                    helperText={formik.touched.userName && formik.errors.userName}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    // value={user.email}
+                    // onChange={onChange}
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    error={formik.touched.email && Boolean(formik.errors.email)}
+                    helperText={formik.touched.email && formik.errors.email}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    variant="outlined"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    // value={user.password}
+                    // onChange={onChange}
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    error={formik.touched.password && Boolean(formik.errors.password)}
+                    helperText={formik.touched.password && formik.errors.password}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
-                  autoComplete="email"
-                  // value={user.email}
-                  // onChange={onChange}
-                  value={formik.values.email}
-                  onChange={formik.handleChange}
-                  error={formik.touched.email && Boolean(formik.errors.email)}
-                  helperText={formik.touched.email && formik.errors.email}
-                />
+              <Grid
+                container
+                direction="row"
+                justifyContent="space-around"
+                alignItems="center">
+                <Grid  >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    onClick={onClickDelete}
+                  >
+                    Delete
+                  </Button>
+                </Grid>
+                <Grid >
+                  <Button
+                    type="submit"
+                    // size='medium'
+                    // fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    // onClick={onClickEdit}
+                  >
+                    Edit
+                  </Button>
+                </Grid>
+                <Grid >
+                  <Button
+                    type="submit"
+                    // size='medium'
+                    // fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    onClick={onClickLogOut}
+                  >
+                    LogOut
+                  </Button>
+                </Grid>                
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant="outlined"
-                  required
-                  fullWidth
-                  name="password"
-                  label="Password"
-                  type="password"
-                  id="password"
-                  autoComplete="current-password"
-                  // value={user.password}
-                  // onChange={onChange}
-                  value={formik.values.password}
-                  onChange={formik.handleChange}
-                  error={formik.touched.password && Boolean(formik.errors.password)}
-                  helperText={formik.touched.password && formik.errors.password}
-                />
-              </Grid>
-            </Grid>
-            <Grid
-              container
-              direction="row"
-              justifyContent="space-around"
-              alignItems="center">
-              <Grid  xs={4}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  onClick={onClickDelete}
-                >
-                  Delete
-                </Button>
-              </Grid>
-              <Grid xs={4}>
-                <Button
-                  type="submit"
-                  // size='medium'
-                  // fullWidth
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  // onClick={onClickEdit}
-                >
-                  Edit
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
+            </form>
+          </div>
+        </Grid>
+      </Grid>
+      <Grid className={classes.root}>
+        <Typography variant="h6" className="list-header">
+            List of Users
+            </Typography>
+          <ul className="list-group">
+            {imageInfos &&
+              imageInfos.map((image: any, index) => (
+                <ListItem
+                  divider
+                  key={index}>
+                  {/* <img src={image.url} alt={image.name} height="80px" className="mr20" /> */}
+                  <Avatar src={image.url} className={classes.middle} />
+                  {/* <a href={image.url}>{image.name}</a> */}
+                </ListItem>
+              ))}
+          </ul>
+
       </Grid>
     </Grid>
   );

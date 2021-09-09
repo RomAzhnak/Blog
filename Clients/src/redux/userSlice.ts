@@ -24,7 +24,7 @@ const initialState: UserState = {
 };
 
 interface UserLogin {
-	username: string,
+	userName: string,
 	email: string,
 	accessToken: string
 }
@@ -37,8 +37,8 @@ export const fetchAdd = createAsyncThunk<string, User, { state: RootState }>(
 	}
 );
 
-export const fetchAddAvatar = createAsyncThunk<string, any, { state: RootState }>(
-	'user/fetchAdd',
+export const fetchAddAvatar = createAsyncThunk<string, FormData, { state: RootState }>(
+	'user/fetchAddAvatar',
 	async (user, thankApi) => {
 		const resp = await fetchAvatar(user);
 		return resp.data
@@ -61,16 +61,26 @@ export const fetchEdit = createAsyncThunk<UserLogin, User, { state: RootState }>
 	}
 );
 
+export const fetchDel = createAsyncThunk<UserLogin, string, { state: RootState }>(
+	'user/fetchDel',
+	async (user, thankApi) => {
+		const resp = await fetchDelUser(user);
+		return resp.data
+	}
+);
+
 export const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
 		addUser: (state, action) => {
-			state.userFields = action.payload;
+			state.userFields.email = action.payload.email;
+			state.userFields.userName = action.payload.username;
+			// state.userFields = action.payload;
 
 		},
 		clearUser: (state) => {
-			fetchDelUser(state.userFields.email);
+			// fetchDelUser(state.userFields.email);
 			state.userFields.userName = '';
 			state.userFields.email = '';
 			state.userFields.password = '';
@@ -92,7 +102,7 @@ export const userSlice = createSlice({
 			})
 			.addCase(fetchLogin.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
-				state.userFields.userName = action.payload.username;
+				state.userFields.userName = action.payload.userName;
 				localStorage.setItem('token', action.payload.accessToken);
 			})
 			.addCase(fetchLogin.rejected, (state, action) => {
@@ -102,9 +112,18 @@ export const userSlice = createSlice({
 			})
 			.addCase(fetchEdit.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
-				state.userFields.userName = action.payload.username;
+				state.userFields.userName = action.payload.userName;
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
+				state.error = 'error';
+			})
+			.addCase(fetchDel.pending, (state, action) => {
+			})
+			.addCase(fetchDel.fulfilled, (state, action) => {
+				state.userFields.email = '';
+				state.userFields.userName = '';
+			})
+			.addCase(fetchDel.rejected, (state, action) => {
 				state.error = 'error';
 			})
 	}

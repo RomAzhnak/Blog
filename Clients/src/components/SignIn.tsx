@@ -54,9 +54,10 @@ const SignIn: React.FC<Props> = (props) => {
 
   const onSubmitForm = (user: User) => {
     // event.preventDefault();
-    
+  
     if (user.email) {
-
+      console.log('LOGIN');
+      console.log(user);
         dispatch(fetchLogin( user ))
           .unwrap()
           .then(res => {

@@ -17,12 +17,20 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-export const fetchAvatar = (user: any): Promise<any> => {
-  return instance.post("/auth/upload", user, {
+export const fetchGet = (): Promise<any> => {
+  return instance.get('/auth');
+}
+
+export const fetchAvatar = (file: FormData): Promise<any> => {
+  return instance.post("/auth/upload", file, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
+}
+
+export const getFiles = ()  => {
+  return instance.get("/auth/files");
 }
 
 export const fetchAddUser = (user: User): Promise<any> => {
@@ -49,7 +57,7 @@ export const fetchEditUser = (user: User): Promise<any> => {
 }
 
 export const fetchDelUser = (email: string) => {
-  instance.delete('/auth', {
+  return instance.delete('/auth', {
     params: {
       email: email
     }

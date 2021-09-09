@@ -54,6 +54,27 @@ exports.signup = async (req, res) => {
   }
 };
 
+exports.getUser = async (req, res) => {
+  // const userId = req.userEmail;
+  try {
+    const user = await User.findOne({
+      where: {
+        email: req.userEmail
+      }
+    });
+    if (!user) {
+      throw new Error("Failed! User Not found!");
+    }
+    res.status(200).send({
+      username: user.username,
+      email: user.email,
+      // accessToken: token
+    });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
+
 exports.signin = async (req, res) => {
   try {
     const user = await User.findOne({
