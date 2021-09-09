@@ -43,7 +43,7 @@ export const fetchLoginUser = (user: User): Promise<any> => {
   //   setTimeout(() => {
   //     res({
   //       data: {
-  //         username: user.userName,
+  //         userName: user.userName,
   //         email: user.email,
   //         accessToken: 'token'
   //       }
@@ -56,10 +56,11 @@ export const fetchEditUser = (user: User): Promise<any> => {
   return instance.post("/auth/edit", user);
 }
 
-export const fetchDelUser = (email: string) => {
+export const fetchDelUser = (user: User) => {
   return instance.delete('/auth', {
     params: {
-      email: email
+      email: user.email,
+      password: user.password
     }
   })
 }

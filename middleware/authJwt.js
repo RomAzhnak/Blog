@@ -7,7 +7,6 @@ exports.verifyToken = (req, res, next) => {
         message: "Unauthorized!"
       });
   }
-  console.log(req.headers.authorization);
   const token = req.headers.authorization.split(' ')[1];
   if (!token) {
     return res.status(403).send({
@@ -21,7 +20,6 @@ exports.verifyToken = (req, res, next) => {
         message: "Unauthorized!"
       });
     }
-    console.log(decoded.email);
     req.userEmail = decoded.email;
     next();
   });

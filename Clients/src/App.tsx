@@ -20,7 +20,6 @@ function App() {
     if (!localStorage.getItem('token')) {
       return setInitialized(true);
     }     
-
     fetchGet()
       .then((res) => {
         dispatch(addUser(res.data));

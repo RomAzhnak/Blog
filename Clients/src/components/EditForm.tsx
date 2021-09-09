@@ -9,7 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 // import pict from '../img/i4.jpg';
 import { useAppDispatch } from '../app/hooks';
-import { addUser, clearUser, fetchAddAvatar, fetchDel, fetchEdit, User, UserState } from "../redux/userSlice";
+import { clearUser, fetchAddAvatar, fetchDel, fetchEdit, User, UserState } from "../redux/userSlice";
 import { useSelector } from 'react-redux';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -73,13 +73,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function EditForm() {
   const stateUser = useSelector(({user}: State) => user.userFields);
+  const oldAvatar = stateUser.urlAvatar;
   const classes = useStyles();
   const dispatch = useAppDispatch();
   let history = useHistory();
   const [imageInfos, setAvatar] = useState([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
   const [fileName, setFileName] = useState('');
-
   
   useEffect(() => {
     getFiles().then((response) => {
@@ -121,31 +121,32 @@ export default function EditForm() {
     let formData = new FormData();
     formData.append("file", fileName);
     // event.preventDefault();
-    const fetchUser = {
-      userName: user.userName,
-      email: user.email,
-      password: user.password,
-      urlAvatar: image
-    }
     if (user.email) {
-      dispatch(fetchEdit( fetchUser ))
+      dispatch(fetchEdit( user ))
       .unwrap()
       .then( () => {
-        dispatch(addUser(fetchUser))
-      })
-      .then( () => {
-        dispatch(fetchAddAvatar(formData))
+        if (oldAvatar!=image) {
+          dispatch(fetchAddAvatar(formData))
+        }
       })
     };
   };
 
   const onClickDelete = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    // dispatch(fetchDelete( user.email ));
-    // dispatch(clearUser());
-    dispatch(fetchDel(stateUser.email));
+    const fetchUser = {
+      userName: formik.values.userName,
+      email: formik.values.email,
+      password: formik.values.password,
+      urlAvatar: '',
+      role: 2
+    }
+    dispatch(fetchDel(fetchUser))
+    .unwrap()
+    .then( () => {
     localStorage.removeItem('token');
     history.push("/");
+    })
   }
 
   const onClickLogOut = (event: { preventDefault: () => void; }) => {
@@ -181,6 +182,7 @@ export default function EditForm() {
       userName: stateUser.userName,
       email: stateUser.email,
       password: '',
+      role: stateUser.role,
       urlAvatar: image,
     },
     validationSchema: validationSchema,
@@ -227,9 +229,7 @@ export default function EditForm() {
                     fullWidth
                     id="userName"
                     label="User Name"
-                    // autoFocus
-                    // value={user.userName}
-                    // onChange={onChange}
+                    autoFocus
                     value={formik.values.userName}
                     onChange={formik.handleChange}
                     error={formik.touched.userName && Boolean(formik.errors.userName)}
@@ -245,8 +245,6 @@ export default function EditForm() {
                     label="Email Address"
                     name="email"
                     autoComplete="email"
-                    // value={user.email}
-                    // onChange={onChange}
                     value={formik.values.email}
                     onChange={formik.handleChange}
                     error={formik.touched.email && Boolean(formik.errors.email)}
@@ -263,8 +261,6 @@ export default function EditForm() {
                     type="password"
                     id="password"
                     autoComplete="current-password"
-                    // value={user.password}
-                    // onChange={onChange}
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     error={formik.touched.password && Boolean(formik.errors.password)}

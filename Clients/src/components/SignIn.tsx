@@ -56,8 +56,6 @@ const SignIn: React.FC<Props> = (props) => {
     // event.preventDefault();
   
     if (user.email) {
-      console.log('LOGIN');
-      console.log(user);
         dispatch(fetchLogin( user ))
           .unwrap()
           .then(res => {
@@ -94,6 +92,7 @@ const SignIn: React.FC<Props> = (props) => {
       userName: '',
       email: '',
       password: '',
+      role: 2,
       urlAvatar: '',
     },
     validationSchema: validationSchema,

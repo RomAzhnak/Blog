@@ -6,7 +6,8 @@ export interface User {
 	userName: string,
 	email: string,
 	urlAvatar: string,
-	password: string
+	role: number,
+	password: string,	
 };
 export interface UserState {
 	userFields: User,
@@ -18,7 +19,9 @@ const initialState: UserState = {
 		userName: '',
 		email: '',
 		urlAvatar: '',
-		password: ''
+		role: 2,
+		password: '',
+
 	},
 	error: ''
 };
@@ -26,6 +29,8 @@ const initialState: UserState = {
 interface UserLogin {
 	userName: string,
 	email: string,
+	role: number,
+	urlAvatar: string,
 	accessToken: string
 }
 
@@ -61,7 +66,7 @@ export const fetchEdit = createAsyncThunk<UserLogin, User, { state: RootState }>
 	}
 );
 
-export const fetchDel = createAsyncThunk<UserLogin, string, { state: RootState }>(
+export const fetchDel = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchDel',
 	async (user, thankApi) => {
 		const resp = await fetchDelUser(user);
@@ -75,7 +80,9 @@ export const userSlice = createSlice({
 	reducers: {
 		addUser: (state, action) => {
 			state.userFields.email = action.payload.email;
-			state.userFields.userName = action.payload.username;
+			state.userFields.userName = action.payload.userName;
+			state.userFields.role = action.payload.role;
+			state.userFields.urlAvatar = action.payload.urlAvatar;			
 			// state.userFields = action.payload;
 
 		},
@@ -83,7 +90,7 @@ export const userSlice = createSlice({
 			// fetchDelUser(state.userFields.email);
 			state.userFields.userName = '';
 			state.userFields.email = '';
-			state.userFields.password = '';
+			state.userFields.role = 2;
 		},
 	}
 	,
@@ -103,6 +110,8 @@ export const userSlice = createSlice({
 			.addCase(fetchLogin.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
 				state.userFields.userName = action.payload.userName;
+				state.userFields.role = action.payload.role;
+				state.userFields.urlAvatar = action.payload.urlAvatar;				
 				localStorage.setItem('token', action.payload.accessToken);
 			})
 			.addCase(fetchLogin.rejected, (state, action) => {
@@ -113,6 +122,8 @@ export const userSlice = createSlice({
 			.addCase(fetchEdit.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
 				state.userFields.userName = action.payload.userName;
+				state.userFields.role = action.payload.role;
+				state.userFields.urlAvatar = action.payload.urlAvatar;
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
 				state.error = 'error';
@@ -122,6 +133,8 @@ export const userSlice = createSlice({
 			.addCase(fetchDel.fulfilled, (state, action) => {
 				state.userFields.email = '';
 				state.userFields.userName = '';
+				state.userFields.role = 2;
+				state.userFields.urlAvatar = '';
 			})
 			.addCase(fetchDel.rejected, (state, action) => {
 				state.error = 'error';

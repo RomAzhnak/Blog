@@ -8,7 +8,6 @@ var bcrypt = require("bcryptjs");
 
 exports.allUser = (req, res) => {
   User.findAll({
-
   })
     .then(user => {
       res.json(user)
@@ -16,36 +15,76 @@ exports.allUser = (req, res) => {
 };
 
 exports.edit = async (req, res) => {
-  const email = req.body.email;
   try {
-    User.update({username: req.body.userName},
-      { where: { email: email }
-    })
-    res.send({ message: "User was updated successfully." });
-      } catch(err) {
-      res.status(500).send({ message: "Error updating user with email=" + email });
+    const user = await User.findOne({
+      where: { email: req.body.email }
+    });
+    if (!user) {
+      throw new Error("Failed! User Not found!");
     };
+    const passwordIsValid = bcrypt.compareSync(
+      req.body.password,
+      user.password
+    );
+    if (!passwordIsValid) {
+      throw new Error("Failed! Invalid Password!");
+    };
+    const result =  await User.update({
+      userName: req.body.userName, 
+      roleId: req.body.role,
+    },
+      { where: { email: req.body.email }
+    });
+    if (!result) {
+      throw new Error("Failed update!");
+    };
+    res.status(200).send({
+      userName: req.body.userName,
+      email: req.body.email,
+      role: req.body.roleId,
+      urlAvatar: req.body.urlAvatar,
+      accessToken: ''
+    });
+    // res.send({ message: "User was updated successfully." });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
 exports.delete = async (req, res) => {
-  
   const email = req.query.email;
-  console.log(`email ${email}`);
   try {
-    await User.destroy({
-      where: { email: email }
-    })
-    res.send({ message: "User was deleted successfully!" });
-      } catch(err) {
-      res.status(500).send({ message: "Could not delete user with email=" + email });
+    const user = await User.findOne({
+      where: { email: req.query.email }
+    });
+    if (!user) {
+      throw new Error("Failed! User Not found!");
     };
+    const passwordIsValid = bcrypt.compareSync(
+      req.query.password,
+      user.password
+    );
+    if (!passwordIsValid) {
+      throw new Error("Failed! Invalid Password!");
+    };
+    const result = await User.destroy({
+      where: { email: req.query.email }
+    })
+    if (!result) {
+      throw new Error("Failed delete!");
+    };
+    res.send({ message: "User was deleted successfully!" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
 exports.signup = async (req, res) => {
   try {
     await User.create({
-      username: req.body.userName,
+      userName: req.body.userName,
       email: req.body.email,
+      role: req.body.role,
       password: bcrypt.hashSync(req.body.password, 8)
     })
     res.send({ message: "User registered successfully!" })
@@ -66,8 +105,10 @@ exports.getUser = async (req, res) => {
       throw new Error("Failed! User Not found!");
     }
     res.status(200).send({
-      username: user.username,
+      userName: user.userName,
       email: user.email,
+      role: user.roleId,
+      urlAvatar: user.urlAvatar
       // accessToken: token
     });
   } catch (err) {
@@ -96,8 +137,10 @@ exports.signin = async (req, res) => {
       expiresIn: 86400 // 60*60*24
     });
     res.status(200).send({
-      username: user.username,
+      userName: user.userName,
       email: user.email,
+      role: user.roleId,
+      urlAvatar: user.urlAvatar,
       accessToken: token
     });
   } catch (err) {

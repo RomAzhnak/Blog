@@ -13,9 +13,9 @@ import IconButton from '@material-ui/core/IconButton';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { User, addUser } from '../redux/userSlice'
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 // import Typography from '@material-ui/core/Typography';
 // import pict from '../img/i4.jpg';
-// import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -52,30 +52,29 @@ type Props = {
 const SignUp: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const [image, _setImage] = useState('');
-  const [fileName, setFileName] = useState('');
+  // const [image, _setImage] = useState('');
+  // const [fileName, setFileName] = useState('');
 
+  // const cleanup = () => {
+  //   URL.revokeObjectURL(image);
+  // };
 
-  const cleanup = () => {
-    URL.revokeObjectURL(image);
-  };
+  // const setImage = (newImage: any) => {
+  //   if (image) {
+  //     cleanup();
+  //   }
+  //   _setImage(newImage);
+  // };
 
-  const setImage = (newImage: any) => {
-    if (image) {
-      cleanup();
-    }
-    _setImage(newImage);
-  };
+  // const handleOnChange = (event: any) => {
+  //   const newImage = event.target?.files?.[0];
 
-  const handleOnChange = (event: any) => {
-    const newImage = event.target?.files?.[0];
-
-    if (newImage) {
-      // console.log(newImage);
-      setImage(URL.createObjectURL(newImage));
-      setFileName(newImage);
-    }
-  };
+  //   if (newImage) {
+  //     // console.log(newImage);
+  //     setImage(URL.createObjectURL(newImage));
+  //     setFileName(newImage);
+  //   }
+  // };
 
     let history = useHistory();
   // const [user, setUser] = useState({
@@ -91,26 +90,27 @@ const SignUp: React.FC<Props> = (props) => {
   const onSubmitForm = (user: User) => {
     // event.preventDefault();
 
-    let formData = new FormData();
-    formData.append("file", fileName);
+    // let formData = new FormData();
+    // formData.append("file", fileName);
     // formData.append("userName", user.userName);
     // formData.append("email", user.email);
     // formData.append("password", user.password);
-    const fetchUser = {
-      userName: user.userName,
-      email: user.email,
-      password: user.password,
-      urlAvatar: image
-    }
+    // const fetchUser = {
+    //   userName: user.userName,
+    //   email: user.email,
+    //   role: 2,
+    //   urlAvatar: '',
+    //   password: user.password
+    // }
     // if (user.email) {
-      dispatch(fetchAdd( fetchUser ))
+      dispatch(fetchAdd( user ))
       .unwrap()
-      .then( () => {
-        dispatch(addUser(fetchUser))
-      })
-      .then( () => {
-        dispatch(fetchAddAvatar(formData))
-      })
+      // .then( () => {
+      //   dispatch(addUser(fetchUser))
+      // })
+      // .then( () => {
+      //   dispatch(fetchAddAvatar(formData))
+      // })
       .then( () => history.push("/login"))
       // setUser(
       //   {
@@ -147,7 +147,8 @@ const SignUp: React.FC<Props> = (props) => {
       userName: '',
       email: '',
       password: '',
-      urlAvatar: image,
+      urlAvatar: '',
+      role: 2
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -166,7 +167,7 @@ const SignUp: React.FC<Props> = (props) => {
           onSubmit={formik.handleSubmit}
           noValidate> 
 
-        <input accept="image/*"
+        {/* <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
           type="file" 
@@ -177,13 +178,13 @@ const SignUp: React.FC<Props> = (props) => {
           <IconButton color="primary" component="span">
             <Avatar src={image} className={classes.large} />
           </IconButton>
-        </label>
-        {/* <Avatar className={classes.avatar}>
+        </label> */}
+        <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
-        </Avatar> */}
+        </Avatar>
         {/* <Typography component="h1" variant="h5">
           Sign up
-        </Typography> */}
+        </Typography>
         {/* <form className={classes.form}
           // onSubmit={onSubmitForm}
           onSubmit={formik.handleSubmit}

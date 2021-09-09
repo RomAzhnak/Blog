@@ -24,7 +24,7 @@ app.get('/test', (req, res) => {
 
 app.use("/auth", userReq);
 
-app.get("/all", controllerAuth.allUser);
+// app.get("/all", controllerAuth.allUser);
 
 const port = 4000;
 app.listen(port, () => {
