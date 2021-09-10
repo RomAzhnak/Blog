@@ -11,7 +11,7 @@ import EditForm from './components/EditForm';
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from './app/hooks';
 import { fetchGet } from './api/userApi';
-import { addUser, fetchLogin } from './redux/userSlice';
+import { addUser } from './redux/userSlice';
 
 function App() {
   const dispatch = useAppDispatch();

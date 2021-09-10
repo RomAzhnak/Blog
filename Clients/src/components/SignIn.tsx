@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -41,12 +41,12 @@ type Props = {
 const SignIn: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const [user, setUser] = useState({
-    userName: '',
-    email: '',
-    urlAvatar: '',
-    password: ''
-  });
+  // const [user, setUser] = useState({
+  //   userName: '',
+  //   email: '',
+  //   urlAvatar: '',
+  //   password: ''
+  // });
   let history = useHistory();
   // const onChange = (event: { target: { name: string; value: string; }; }) => {
   //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
@@ -69,8 +69,8 @@ const SignIn: React.FC<Props> = (props) => {
             // );
           history.push("/protected");  
           })
-          .catch(e => {
-
+          .catch( e => {
+            console.log(e)
           })
     };
   };

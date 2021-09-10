@@ -21,15 +21,7 @@ export const fetchGet = (): Promise<any> => {
   return instance.get('/auth');
 }
 
-export const fetchAvatar = (file: FormData): Promise<any> => {
-  return instance.post("/auth/upload", file, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-}
-
-export const getFiles = ()  => {
+export const getFiles = (): Promise<any>  => {
   return instance.get("/auth/files");
 }
 
@@ -52,11 +44,29 @@ export const fetchLoginUser = (user: User): Promise<any> => {
   // })
 }
 
-export const fetchEditUser = (user: User): Promise<any> => {
-  return instance.post("/auth/edit", user);
+export const fetchAvatar = (file: FormData): Promise<any> => {
+  return instance.post("/auth/upload", file, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "user": file.get('user')
+    },
+  });
 }
 
-export const fetchDelUser = (user: User) => {
+export const fetchEditUser = (file: FormData): Promise<any> => {
+  return instance.post("/auth/edit", file, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      "userName": file.get('userName'),
+      "email": file.get('email'),
+      "password": file.get('password'),
+      "urlAvatar": file.get('urlAvatar'),
+      "role": 2
+    },
+  });
+}
+
+export const fetchDelUser = (user: User): Promise<any> => {
   return instance.delete('/auth', {
     params: {
       email: user.email,

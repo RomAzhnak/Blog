@@ -1,10 +1,12 @@
 const db = require("../models");
 const config = require("../config/auth.config");
+const uploadFile = require("../middleware/upload");
 const User = db.User;
 const Op = db.Sequelize.Op;
-
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
+const baseUrl = 'http://localhost:4000/auth/files/';
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+// const { upload } = require("./file.controller");
 
 exports.allUser = (req, res) => {
   User.findAll({
@@ -15,34 +17,60 @@ exports.allUser = (req, res) => {
 };
 
 exports.edit = async (req, res) => {
+  const { username, email, password, role, urlavatar } = req.headers;
+
   try {
     const user = await User.findOne({
-      where: { email: req.body.email }
+      where: { email: email }
     });
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
     const passwordIsValid = bcrypt.compareSync(
-      req.body.password,
+      password,
       user.password
     );
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     };
-    const result =  await User.update({
-      userName: req.body.userName, 
-      roleId: req.body.role,
-    },
-      { where: { email: req.body.email }
+
+    const avatar = await User.findOne({
+      where: {
+        email: email
+      }
     });
+    if ((avatar.urlAvatar !== urlavatar) && (avatar.urlAvatar !== null)) {
+      await uploadFile(req, res);
+      const filename = req.file.originalname;
+
+      if (req.file == undefined) {
+        return res.status(400).send({ message: "Please upload a file!" });
+      }
+      const resp = await User.update({
+        urlAvatar: baseUrl + filename,
+      },
+        {
+          where: { email: email }
+        });
+      if (!resp) {
+        throw new Error("Failed update!");
+      };
+    }
+    const result = await User.update({
+      userName: username,
+      roleId: role,
+    },
+      {
+        where: { email: email }
+      });
     if (!result) {
       throw new Error("Failed update!");
     };
     res.status(200).send({
-      userName: req.body.userName,
-      email: req.body.email,
-      role: req.body.roleId,
-      urlAvatar: req.body.urlAvatar,
+      userName: username,
+      email: email,
+      role: role,
+      urlAvatar: urlavatar,
       accessToken: ''
     });
     // res.send({ message: "User was updated successfully." });
@@ -50,6 +78,17 @@ exports.edit = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+exports.getListFiles = async (req, res) => {
+
+  try {
+    const { QueryTypes, or } = require('sequelize');
+    const users = await db.sequelize.query('SELECT userName, urlAvatar From `Users`', { type: QueryTypes.SELECT });
+    res.status(200).send(users);;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
 
 exports.delete = async (req, res) => {
   const email = req.query.email;
@@ -80,11 +119,12 @@ exports.delete = async (req, res) => {
 };
 
 exports.signup = async (req, res) => {
+  console.log(req.body);
   try {
     await User.create({
       userName: req.body.userName,
       email: req.body.email,
-      role: req.body.role,
+      roleId: req.body.role,
       password: bcrypt.hashSync(req.body.password, 8)
     })
     res.send({ message: "User registered successfully!" })
@@ -148,21 +188,21 @@ exports.signin = async (req, res) => {
   }
 };
 
-exports.findAll = (req, res) => {
-  const title = req.query.title;
-  const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+// exports.findAll = (req, res) => {
+//   const title = req.query.title;
+//   const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
 
-  User.findAll({ where: condition })
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving user."
-      });
-    });
-};
+//   User.findAll({ where: condition })
+//     .then(data => {
+//       res.send(data);
+//     })
+//     .catch(err => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Some error occurred while retrieving user."
+//       });
+//     });
+// };
 
 exports.findOne = (req, res) => {
   const id = req.params.id;

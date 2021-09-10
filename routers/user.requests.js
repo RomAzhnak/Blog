@@ -30,9 +30,9 @@ router.get('/', verifyToken, controllerAuth.getUser);
 router.post("/signin", controllerAuth.signin);
 router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);
-
+router.get("/files", controllerAuth.getListFiles);
 router.post("/upload", controllerFile.upload);
-router.get("/files", controllerFile.getListFiles);
+// router.get("/files", controllerFile.getListFiles);
 router.get("/files/:name", controllerFile.download);
 
 module.exports = router;

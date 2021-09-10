@@ -58,7 +58,7 @@ export const fetchLogin = createAsyncThunk<UserLogin, User, { state: RootState }
 	}
 );
 
-export const fetchEdit = createAsyncThunk<UserLogin, User, { state: RootState }>(
+export const fetchEdit = createAsyncThunk<UserLogin, FormData, { state: RootState }>(
 	'user/fetchEdit',
 	async (user, thankApi) => {
 		const resp = await fetchEditUser(user);
@@ -91,6 +91,7 @@ export const userSlice = createSlice({
 			state.userFields.userName = '';
 			state.userFields.email = '';
 			state.userFields.role = 2;
+			state.userFields.urlAvatar = '';
 		},
 	}
 	,

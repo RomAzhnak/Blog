@@ -3,16 +3,24 @@ fs = require('fs');
 const baseUrl = 'http://localhost:4000/auth/files/';
 
 const upload = async (req, res) => {
+  console.log(req.headers.email);
   try {
     await uploadFile(req, res);
     
     if (req.file == undefined) {
       return res.status(400).send({ message: "Please upload a file!" });
     }
-
-    res.status(200).send({
-      message: "Uploaded the file successfully: " + req.file.originalname,
+    const result =  await User.update({
+      urlAvatar: baseUrl + req.headers.userName, 
+    },
+      { where: { email: req.headers.email }
     });
+    if (!result) {
+      throw new Error("Failed update!");
+    };
+    // res.status(200).send({
+    //   message: "Uploaded the file successfully: " + req.file.originalname,
+    // });
   } catch (err) {
     res.status(500).send({
       message: `Could not upload the file: ${req.file.originalname}. ${err}`,
