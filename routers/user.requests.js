@@ -27,11 +27,12 @@ router.post(
   controllerAuth.signup
 );
 router.get('/', verifyToken, controllerAuth.getUser);
+router.get('/user/:id', verifyToken, controllerAuth.getUserById);
 router.post("/signin", controllerAuth.signin);
 router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);
-router.get("/files", controllerAuth.getListFiles);
-router.post("/upload", controllerFile.upload);
+router.get("/users", controllerAuth.getListUsers);
+// router.post("/edit", controllerFile.upload);
 // router.get("/files", controllerFile.getListFiles);
 router.get("/files/:name", controllerFile.download);
 

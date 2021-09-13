@@ -3,24 +3,52 @@ fs = require('fs');
 const baseUrl = 'http://localhost:4000/auth/files/';
 
 const upload = async (req, res) => {
-  console.log(req.headers.email);
   try {
     await uploadFile(req, res);
-    
-    if (req.file == undefined) {
-      return res.status(400).send({ message: "Please upload a file!" });
-    }
-    const result =  await User.update({
-      urlAvatar: baseUrl + req.headers.userName, 
-    },
-      { where: { email: req.headers.email }
+    const { userName, email, password, role, urlAvatar } = req.body;
+    console.log(req.body, userName, email, password, role, urlAvatar);
+    const user = await User.findOne({
+      where: { email: email }
     });
+    if (!user) {
+      throw new Error("Failed! User Not found!");
+    };
+    const passwordIsValid = bcrypt.compareSync(
+      password,
+      user.password
+    );
+    if (!passwordIsValid) {
+      throw new Error("Failed! Invalid Password!");
+    };
+    if ((user.urlAvatar !== urlAvatar) && (req.file !== undefined)) {
+      const filename = req.file.originalname;
+      const result = await User.update({
+        urlAvatar: baseUrl + filename,
+      },
+        {
+          where: { email: email }
+        });
+      if (!result) {
+        throw new Error("Failed update!");
+      };
+    }
+    const result = await User.update({
+      userName: userName,
+      roleId: role,
+    },
+      {
+        where: { email: email }
+      });
     if (!result) {
       throw new Error("Failed update!");
     };
-    // res.status(200).send({
-    //   message: "Uploaded the file successfully: " + req.file.originalname,
-    // });
+    res.status(200).send({
+      userName: userName,
+      email: email,
+      role: role,
+      urlAvatar: urlAvatar,
+      accessToken: ''
+    })
   } catch (err) {
     res.status(500).send({
       message: `Could not upload the file: ${req.file.originalname}. ${err}`,
@@ -30,7 +58,7 @@ const upload = async (req, res) => {
 
 const getListFiles = (req, res) => {
   const directoryPath = __basedir + "/resources/static/";
-  
+
   fs.readdir(directoryPath, function (err, files) {
     if (err) {
       res.status(500).send({

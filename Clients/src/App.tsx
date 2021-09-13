@@ -5,13 +5,14 @@ import { ProtectedPage } from './components/ProtectedPage';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
 } from "react-router-dom";
 import EditForm from './components/EditForm';
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from './app/hooks';
 import { fetchGet } from './api/userApi';
 import { addUser } from './redux/userSlice';
+import Users from './components/Users';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -31,6 +32,7 @@ function App() {
         setInitialized(true);
       })
   },[]);
+
   return (
     <>
       {initialized
@@ -45,6 +47,9 @@ function App() {
             <Route path="/login">
               <SignIn />
             </Route>
+            <PrivateRoute path="/users/:id">
+              <Users />
+            </PrivateRoute>
             <PrivateRoute path="/edituser">
               <EditForm />
             </PrivateRoute>

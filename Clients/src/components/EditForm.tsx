@@ -11,9 +11,10 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useHistory } from 'react-router-dom';
-import { getFiles } from '../api/userApi';
+import { useHistory, Link } from 'react-router-dom';
+import { getUserList } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
+
 
 const validationSchema = yup.object({
   userName: yup
@@ -49,7 +50,7 @@ const EditForm: React.FC<Props> = (props) => {
   const [fileName, setFileName] = useState<File | undefined>();
 
   useEffect(() => {
-    getFiles()
+    getUserList()
       .then((response) => {
         setAvatar(response.data);
       })
@@ -190,6 +191,7 @@ const EditForm: React.FC<Props> = (props) => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    // disabled
                     variant="outlined"
                     required
                     fullWidth
@@ -274,15 +276,16 @@ const EditForm: React.FC<Props> = (props) => {
           {imageInfos &&
             imageInfos.map((image: any, index) => (
               <ListItem
-                className={classes.list}
                 divider
                 key={index}>
-                <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
-                {image.userName}
+                {/* <Link to={`/users/${image.id}`} > */}
+                <Link to={`/users/:${image.id}`} className={classes.list}>
+                  <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
+                  {image.userName}
+                </Link>
               </ListItem>
             ))}
         </ul>
-
       </Grid>
     </Grid>
   );
@@ -308,7 +311,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 0
     },
     list: {
-      alignItems: 'right',
+      alignItems: 'center',
       display: 'flex',
       padding: 1,
       justifyContent: 'flex-start',
@@ -344,8 +347,8 @@ const useStyles = makeStyles((theme: Theme) =>
     middle: {
       width: theme.spacing(5),
       height: theme.spacing(5),
-      margin: 1,
+      marginRight: 5,
     }
   }));
 
-  export default EditForm;
+export default EditForm;
