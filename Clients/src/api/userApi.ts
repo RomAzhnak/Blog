@@ -21,8 +21,12 @@ export const fetchGet = (): Promise<any> => {
   return instance.get('/auth');
 }
 
-export const getUserList = (): Promise<any>  => {
-  return instance.get("/auth/users");
+export const getUserList = (email: string): Promise<any>  => {
+  return instance.get(`/auth/users?email=${email}`);
+}
+
+export const getPosts = (id: string): Promise<any>  => {
+  return instance.get(`/auth/user/posts/${id}`);
 }
 
 export const getUser = (id: string): Promise<any>  => {
@@ -85,6 +89,10 @@ export const fetchDelUser = (user: User): Promise<any> => {
 
 export default instance;
 
+
+function params(arg0: string, params: any, arg2: { email: string; }): Promise<any> {
+  throw new Error("Function not implemented.");
+}
 // export const userReLogin = async () => {
 //   const token = localStorage.getItem('token');
 //   if (token) {

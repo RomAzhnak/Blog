@@ -12,6 +12,10 @@ db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 // });
+// ({ alter: true }) - This checks what is the current state of 
+// the table in the database (which columns it has, what are their 
+//   data types, etc), and then performs the necessary changes in 
+//   the table to make it match the model.
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));

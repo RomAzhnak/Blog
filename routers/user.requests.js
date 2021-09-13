@@ -28,6 +28,7 @@ router.post(
 );
 router.get('/', verifyToken, controllerAuth.getUser);
 router.get('/user/:id', verifyToken, controllerAuth.getUserById);
+router.get('/user/posts/:id', verifyToken, controllerAuth.getUserPosts);
 router.post("/signin", controllerAuth.signin);
 router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);

@@ -50,7 +50,7 @@ const EditForm: React.FC<Props> = (props) => {
   const [fileName, setFileName] = useState<File | undefined>();
 
   useEffect(() => {
-    getUserList()
+    getUserList(stateUser.email)
       .then((response) => {
         setAvatar(response.data);
       })
@@ -253,8 +253,6 @@ const EditForm: React.FC<Props> = (props) => {
                 <Grid >
                   <Button
                     type="submit"
-                    // size='medium'
-                    // fullWidth
                     variant="contained"
                     color="primary"
                     className={classes.submit}

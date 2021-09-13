@@ -13,9 +13,6 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { User } from '../redux/userSlice'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-// import Typography from '@material-ui/core/Typography';
-// import pict from '../img/i4.jpg';
-// import IconButton from '@material-ui/core/IconButton';
 
 const validationSchema = yup.object({
   userName: yup
