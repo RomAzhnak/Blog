@@ -8,6 +8,7 @@ const Op = db.Sequelize.Op;
 const baseUrl = 'http://localhost:4000/auth/files/';
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
 // const { upload } = require("./file.controller");
 
 exports.allUser = (req, res) => {
@@ -18,8 +19,48 @@ exports.allUser = (req, res) => {
     });
 };
 
+exports.changeLike = async (req, res) => {
+  // try {
+    const idAuthor = Number(req.body.idAuthor.slice(1));
+    const idPost = req.body.idPost;
+    const token = req.headers.authorization.split(' ')[1];
+    jwt.verify(token, config.secret, (err, decoded) => {
+      idLiker = decoded.id;
+    });
+    const result = await UserLike.destroy({
+      where: { userId: idLiker, postId: idPost, postAuthorId: idAuthor }
+    })
+    if (!result) {
+      await UserLike.create({
+        userId: idLiker, 
+        postId: idPost, 
+        postAuthorId: idAuthor
+      })
+      await Post.update({
+        likes: db.sequelize.literal('likes+1')
+      },
+        {
+          where: { id: idPost, userId: idAuthor }
+        }); 
+    } else {
+      await Post.update({
+        likes: db.sequelize.literal('likes-1')
+      },
+        {
+          where: { id: idPost, userId: idAuthor }
+        });      
+    }
+   
+  // } 
+  // catch(err) {
+  //   res.status(500).send({
+  //     message: `Failed! : ${err}`,
+  //   });
+  // }
+}
+
 exports.getUserPosts = async (req, res) => {
-  let idLiker = 0;
+  // let idLiker = 0;
   try {
     const token = req.headers.authorization.split(' ')[1];
     jwt.verify(token, config.secret, (err, decoded) => {
@@ -59,7 +100,7 @@ exports.getUserById = async (req, res) => {
       email: user.email,
       role: user.role,
       urlAvatar: user.urlAvatar,
-  
+      id: user.id,  
     })
   } catch(err) {
     res.status(500).send({

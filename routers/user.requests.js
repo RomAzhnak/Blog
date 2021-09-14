@@ -30,6 +30,7 @@ router.get('/', verifyToken, controllerAuth.getUser);
 router.get('/user/:id', verifyToken, controllerAuth.getUserById);
 router.get('/user/posts/:id', verifyToken, controllerAuth.getUserPosts);
 router.post("/signin", controllerAuth.signin);
+router.post("/like", controllerAuth.changeLike);
 router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);
 router.get("/users", controllerAuth.getListUsers);

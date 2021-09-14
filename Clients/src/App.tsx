@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       return setInitialized(true);
-    }     
+    }
     fetchGet()
       .then((res) => {
         dispatch(addUser(res.data));

@@ -10,11 +10,12 @@ module.exports = {
       },
       post: {
         type: Sequelize.STRING,
-        allowNull: false,
-        defaultValue: 0
+
       },
       likes: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0       
       },
       userId: {
         type: Sequelize.INTEGER,
