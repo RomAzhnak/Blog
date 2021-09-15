@@ -20,7 +20,8 @@ exports.allUser = (req, res) => {
 };
 
 exports.changeLike = async (req, res) => {
-  // try {
+  let statusLike = true;
+  try {
     const idAuthor = Number(req.body.idAuthor.slice(1));
     const idPost = req.body.idPost;
     const token = req.headers.authorization.split(' ')[1];
@@ -32,8 +33,8 @@ exports.changeLike = async (req, res) => {
     })
     if (!result) {
       await UserLike.create({
-        userId: idLiker, 
-        postId: idPost, 
+        userId: idLiker,
+        postId: idPost,
         postAuthorId: idAuthor
       })
       await Post.update({
@@ -41,22 +42,27 @@ exports.changeLike = async (req, res) => {
       },
         {
           where: { id: idPost, userId: idAuthor }
-        }); 
+        });
     } else {
       await Post.update({
         likes: db.sequelize.literal('likes-1')
       },
         {
           where: { id: idPost, userId: idAuthor }
-        });      
+        });
+        statusLike = false;
     }
-   
-  // } 
-  // catch(err) {
-  //   res.status(500).send({
-  //     message: `Failed! : ${err}`,
-  //   });
-  // }
+    const numberLikes = await Post.findOne({
+        where: { id: idPost, userId: idAuthor },
+        attributes: ['likes',]
+      });
+    res.status(200).send({ statusLike: statusLike, numberLikes: numberLikes.likes });
+  }
+  catch (err) {
+    res.status(500).send({
+      message: `Failed! : ${err}`,
+    });
+  }
 }
 
 exports.getUserPosts = async (req, res) => {
@@ -67,26 +73,28 @@ exports.getUserPosts = async (req, res) => {
       idLiker = decoded.id;
     });
     const idAuthor = Number(req.params.id.slice(1));
-    const userLike = await UserLike.findAll({ where: {userId: idLiker, postAuthorId: idAuthor}, 
-      attributes: ['postId', ]
-    } );
+    const userLike = await UserLike.findAll({
+      where: { userId: idLiker, postAuthorId: idAuthor },
+      attributes: ['postId',]
+    });
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
     // const { QueryTypes, or } = require('sequelize');
     // const posts = await db.sequelize.query('SELECT post, likes, createdAt From `Posts` WHERE userid = `id`', { type: QueryTypes.SELECT });
-    const posts = await Post.findAll({ where: {userId: idAuthor},
-    //  attributes: ['id', ]
-    }) 
-      if (!posts) {
-        throw new Error("Failed! User Not found!");
-      }
-        res.status(200).send({posts:posts, userLikes: userLikes});
+    const posts = await Post.findAll({
+      where: { userId: idAuthor },
+      //  attributes: ['id', ]
+    })
+    if (!posts) {
+      throw new Error("Failed! User Not found!");
+    }
+    res.status(200).send({ posts: posts, userLikes: userLikes });
   } catch (err) {
     res.status(500).send({
       message: `Failed! : ${err}`,
     });
   }
-  }
+}
 
 exports.getUserById = async (req, res) => {
   try {
@@ -100,9 +108,9 @@ exports.getUserById = async (req, res) => {
       email: user.email,
       role: user.role,
       urlAvatar: user.urlAvatar,
-      id: user.id,  
+      id: user.id,
     })
-  } catch(err) {
+  } catch (err) {
     res.status(500).send({
       message: `Failed! : ${err}`,
     });
@@ -169,7 +177,7 @@ exports.getListUsers = async (req, res) => {
     // const { QueryTypes, or } = require('sequelize');
     // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
     const users = await User.findAll({
-      where: { email: {[Op.ne]: [email] } }
+      where: { email: { [Op.ne]: [email] } }
     });
     res.status(200).send(users);;
   } catch (err) {

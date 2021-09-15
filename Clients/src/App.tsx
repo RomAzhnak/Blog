@@ -1,3 +1,4 @@
+import MainPage from './components/MainPage';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import PrivateRoute from './components/PrivateRoute';
@@ -39,7 +40,8 @@ function App() {
         ? <Router>
           <Switch>
             <Route path="/" exact={true} >
-              <SignUp />
+              {/* <SignUp /> */}
+              <MainPage />
             </Route>
             <Route path="/register">
               <SignUp />

@@ -8,9 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+       title: {
+        type: Sequelize.STRING,
+      },     
       post: {
         type: Sequelize.STRING,
-
       },
       likes: {
         type: Sequelize.INTEGER,
