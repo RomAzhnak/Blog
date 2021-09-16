@@ -34,6 +34,7 @@ router.post("/like", controllerAuth.changeLike);
 router.delete("/", controllerAuth.delete);
 router.post("/edit", controllerAuth.edit);
 router.get("/users", controllerAuth.getListUsers);
+router.get("/postlist", controllerAuth.getListPost);
 // router.post("/edit", controllerFile.upload);
 // router.get("/files", controllerFile.getListFiles);
 router.get("/files/:name", controllerFile.download);

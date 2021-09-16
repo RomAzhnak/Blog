@@ -13,6 +13,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { User } from '../redux/userSlice'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Typography } from "@material-ui/core";
 
 const validationSchema = yup.object({
   userName: yup
@@ -69,7 +70,12 @@ const SignUp: React.FC<Props> = (props) => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-
+          <Avatar className={classes.avatar}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
         <form className={classes.form}
           onSubmit={formik.handleSubmit}
           noValidate>
@@ -86,9 +92,7 @@ const SignUp: React.FC<Props> = (props) => {
             <Avatar src={image} className={classes.large} />
           </IconButton>
         </label> */}
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
+
           {/* <Typography component="h1" variant="h5">
           Sign up
         </Typography>

@@ -17,6 +17,10 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
+export const getUserPostList = (): Promise<any> => {
+  return instance.get('/auth/postlist'); 
+}
+
 export const changeLike = (data: any): Promise<any> => {
   return instance.post('/auth/like', data); 
 }

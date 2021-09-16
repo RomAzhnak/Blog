@@ -171,13 +171,48 @@ exports.edit = async (req, res) => {
   }
 };
 
+exports.getListPost = async (req, res) => {
+  try {
+    // const { QueryTypes, or } = require('sequelize');
+    // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
+    // const users = await 
+    Post.findAll({ 
+      attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
+      group: ["userId"],
+      raw: true,
+  })
+  .then(function(minIds){
+      return Post.findAll({
+        // attributes: ['title', 'post', 'createdAt', 'userId', 'User.urlAvatar'],
+        include: [{
+          model: User,
+          where: {state: db.Sequelize.col('Post.userId')}
+        }],
+          where: {
+              id: { [Op.in]: minIds.map(item => item.minid) }
+          },
+      })
+  })
+  .then(function(result){
+    console.log(result);
+
+    res.status(200).send(result);
+    return Promise.resolve(result);
+  })
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
+
 exports.getListUsers = async (req, res) => {
   try {
     const email = req.query.email;
     // const { QueryTypes, or } = require('sequelize');
     // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
     const users = await User.findAll({
-      where: { email: { [Op.ne]: [email] } }
+      where: { 
+        email: { [Op.ne]: [email] } 
+      }
     });
     res.status(200).send(users);;
   } catch (err) {
