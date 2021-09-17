@@ -8,7 +8,7 @@ const cors = require('cors');
 global.__basedir = __dirname;
 // global.baseURL = 'http://localhost:4000/'
 
-db.sequelize.sync({ alter: true });
+db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 // });

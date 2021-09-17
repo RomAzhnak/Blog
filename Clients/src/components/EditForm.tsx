@@ -96,6 +96,7 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("userName", user.userName);
     formData.append("email", user.email);
     formData.append("password", user.password);
+    formData.append("id", String(stateUser.id));
     formData.append("urlAvatar", image);
     if (user.email) {
       dispatch(fetchEdit(formData))
@@ -113,7 +114,8 @@ const EditForm: React.FC<Props> = (props) => {
       email: formik.values.email,
       password: formik.values.password,
       urlAvatar: '',
-      role: 2
+      role: 2,
+      id: 0
     }
     dispatch(fetchDel(fetchUser))
       .unwrap()
@@ -138,6 +140,7 @@ const EditForm: React.FC<Props> = (props) => {
       password: '',
       role: stateUser.role,
       urlAvatar: image,
+      id: 0
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -145,9 +148,10 @@ const EditForm: React.FC<Props> = (props) => {
     },
   });
 
+
   return (
-    <Grid className={classes.image} xs={12}>
-      <Grid container component="main" className={classes.root} xs={6}>
+    <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
+      <Grid component="main" className={classes.root} xs={6} md={5}>
         {/* <Grid item xs={6} sm={6} 
         className={classes.image} > */}
 
@@ -163,9 +167,7 @@ const EditForm: React.FC<Props> = (props) => {
           </IconButton>
         </label>
 
-        {/* <Avatar alt="Photo" src={pict} className={classes.large} /> */}
-        {/* </Grid> */}
-        <Grid item xs={8} component={Paper} elevation={6} square>
+        <Grid item xs={7} component={Paper} elevation={6}>
           <div className={classes.paper}>
             <Typography component="h1" variant="h5">
               Edit
@@ -227,7 +229,7 @@ const EditForm: React.FC<Props> = (props) => {
                 direction="row"
                 justifyContent="space-around"
                 alignItems="center">
-                <Grid  >
+                <Grid >
                   <Button
                     type="submit"
                     variant="contained"
@@ -247,7 +249,7 @@ const EditForm: React.FC<Props> = (props) => {
                     color="primary"
                     className={classes.submit}
                   >
-                    Edit
+                    Save
                   </Button>
                 </Grid>
                 <Grid >
@@ -262,28 +264,46 @@ const EditForm: React.FC<Props> = (props) => {
                   </Button>
                 </Grid>
               </Grid>
+
             </form>
+              <Grid >
+
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                // className={classes.submit}
+                >
+                  <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+                    Main page
+                  </Link>
+                </Button>
+
+              </Grid>
           </div>
         </Grid>
       </Grid>
-      <Grid className={classes.root}>
-        <Typography variant="h6" className="list-header">
-          List of Users
-        </Typography>
-        <ul className={classes.ul}>
-          {imageInfos &&
-            imageInfos.map((image: any, index) => (
-              <ListItem
-                divider
-                key={index}>
-                {/* <Link to={`/users/${image.id}`} > */}
-                <Link to={`/users/:${image.id}`} className={classes.list}>
-                  <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
-                  {image.userName}
-                </Link>
-              </ListItem>
-            ))}
-        </ul>
+      <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '100%', overflow: 'auto' }}>
+        <Grid >
+          <Typography variant="h6" className="list-header">
+            List of Users
+          </Typography>
+          <ul className={classes.ul}>
+            {imageInfos &&
+              imageInfos.map((image: any, index) => (
+                <ListItem
+                  divider
+                  key={index}>
+                  {/* <Link to={`/users/${image.id}`} > */}
+                  <Link to={`/users/:${image.id}`} className={classes.list}>
+                    <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
+                    {image.userName}
+                  </Link>
+                </ListItem>
+              ))}
+          </ul>
+        </Grid>
       </Grid>
     </Grid>
   );
@@ -297,7 +317,8 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'center',
       flexDirection: 'column',
       // height: '100vh',
-      margin: 'auto',
+      // margin: 'auto',
+      // marginRight: 100,
     },
     '& > *': {
       margin: theme.spacing(1),
@@ -309,21 +330,25 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 0
     },
     list: {
-      alignItems: 'center',
+      // alignItems: 'center',
       display: 'flex',
       padding: 1,
-      justifyContent: 'flex-start',
-
+      // justifyContent: 'flex-start',
+      justifyContent: 'center',
+      marginTop: 20,
     },
-    image: {
-      display: 'flex',
-      alignSelf: 'center',
+    mainpage: {
+      // display: 'flex',
+      // alignSelf: 'center',
+      // margin: 'auto', 
+      // flex: 1,
     },
     paper: {
       margin: theme.spacing(8, 4),
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
+      // justifyContent: 'center',
     },
     avatar: {
       margin: theme.spacing(1),
@@ -332,15 +357,18 @@ const useStyles = makeStyles((theme: Theme) =>
     form: {
       width: '100%', // Fix IE 11 issue.
       marginTop: theme.spacing(1),
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     submit: {
-      margin: theme.spacing(3),
-      width: theme.spacing(10),
+      margin: theme.spacing(2),
+      width: theme.spacing(8),
     },
     large: {
       width: theme.spacing(35),
       height: theme.spacing(35),
-      margin: 'auto',
+      marginTop: 10,
     },
     middle: {
       width: theme.spacing(5),

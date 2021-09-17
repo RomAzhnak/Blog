@@ -47,7 +47,8 @@ const SignIn: React.FC<Props> = (props) => {
             //     urlAvatar: ''
             //   }
             // );
-          history.push("/protected");  
+          history.push("/");  // /protected
+
           })
           .catch( e => {
             console.log(e)
@@ -74,6 +75,7 @@ const SignIn: React.FC<Props> = (props) => {
       password: '',
       role: 2,
       urlAvatar: '',
+      id: 0
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -142,6 +144,19 @@ const SignIn: React.FC<Props> = (props) => {
           >
             Sign In
           </Button>
+          <Grid >
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Main page
+              </Button>
+            </Link>
+          </Grid>
           <Grid container justifyContent="flex-end">
             <Grid item>
               <Link to="/register">

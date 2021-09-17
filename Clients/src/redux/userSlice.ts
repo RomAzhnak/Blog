@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { number } from 'yup/lib/locale';
 import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, fetchAvatar } from '../api/userApi';
 import { RootState } from './store';
 
@@ -7,6 +8,7 @@ export interface User {
 	email: string,
 	urlAvatar: string,
 	role: number,
+	id: number,
 	password: string,	
 };
 export interface UserState {
@@ -21,7 +23,7 @@ const initialState: UserState = {
 		urlAvatar: '',
 		role: 2,
 		password: '',
-
+		id: 0,
 	},
 	error: ''
 };
@@ -31,6 +33,7 @@ interface UserLogin {
 	email: string,
 	role: number,
 	urlAvatar: string,
+	id: number,
 	accessToken: string
 }
 
@@ -82,8 +85,8 @@ export const userSlice = createSlice({
 			state.userFields.email = action.payload.email;
 			state.userFields.userName = action.payload.userName;
 			state.userFields.role = action.payload.role;
-			state.userFields.urlAvatar = action.payload.urlAvatar;			
-			// state.userFields = action.payload;
+			state.userFields.urlAvatar = action.payload.urlAvatar;
+			state.userFields.id = action.payload.id;
 
 		},
 		clearUser: (state) => {
@@ -92,6 +95,7 @@ export const userSlice = createSlice({
 			state.userFields.email = '';
 			state.userFields.role = 2;
 			state.userFields.urlAvatar = '';
+			state.userFields.id = 0;
 		},
 	}
 	,
@@ -112,7 +116,8 @@ export const userSlice = createSlice({
 				state.userFields.email = action.payload.email;
 				state.userFields.userName = action.payload.userName;
 				state.userFields.role = action.payload.role;
-				state.userFields.urlAvatar = action.payload.urlAvatar;				
+				state.userFields.urlAvatar = action.payload.urlAvatar;
+				state.userFields.id = action.payload.id;
 				localStorage.setItem('token', action.payload.accessToken);
 			})
 			.addCase(fetchLogin.rejected, (state, action) => {
@@ -125,6 +130,7 @@ export const userSlice = createSlice({
 				state.userFields.userName = action.payload.userName;
 				state.userFields.role = action.payload.role;
 				state.userFields.urlAvatar = action.payload.urlAvatar;
+				state.userFields.id = action.payload.id;
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
 				state.error = 'error';
@@ -136,6 +142,7 @@ export const userSlice = createSlice({
 				state.userFields.userName = '';
 				state.userFields.role = 2;
 				state.userFields.urlAvatar = '';
+				state.userFields.id = 0
 			})
 			.addCase(fetchDel.rejected, (state, action) => {
 				state.error = 'error';

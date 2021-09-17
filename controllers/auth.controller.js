@@ -120,11 +120,12 @@ exports.getUserById = async (req, res) => {
 exports.edit = async (req, res) => {
   try {
     await uploadFile(req, res);
-    const { userName, email, password, role, urlAvatar } = req.body;
+    const { userName, email, password, role, urlAvatar, id } = req.body;
     // console.log(req.body, userName, email, password, role, urlAvatar);
     const user = await User.findOne({
       where: { email: email }
     });
+    // console.log(user);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
@@ -162,6 +163,7 @@ exports.edit = async (req, res) => {
       email: email,
       role: role,
       urlAvatar: urlAvatar,
+      id: id,
       accessToken: ''
     })
   } catch (err) {
@@ -276,7 +278,8 @@ exports.getUser = async (req, res) => {
       userName: user.userName,
       email: user.email,
       role: user.roleId,
-      urlAvatar: user.urlAvatar
+      urlAvatar: user.urlAvatar,
+      id: user.id,
       // accessToken: token
     });
   } catch (err) {
@@ -309,6 +312,7 @@ exports.signin = async (req, res) => {
       email: user.email,
       role: user.roleId,
       urlAvatar: user.urlAvatar,
+      id: user.id,
       accessToken: token
     });
   } catch (err) {

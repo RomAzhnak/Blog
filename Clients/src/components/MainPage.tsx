@@ -7,6 +7,7 @@ import Pagination from '@material-ui/lab/Pagination';
 import { Container, CssBaseline, Grid } from '@material-ui/core';
 import { useEffect } from 'react';
 import { getUserPostList } from '../api/userApi';
+
 // import MainFeaturedPost from './MainFeaturedPost';
 // import Main from './Main';
 // import Sidebar from './Sidebar';
@@ -18,8 +19,14 @@ type Props = {
 };
 
 const MainPage: React.FC<Props> = (props) => {
+
   const classes = useStyles();
   const [featuredPosts, setFeaturedPosts] = useState<any[]>([]);
+  const [page, setPage] = useState(1);
+
+  const handleChange = (event: object, page: number) => {
+    setPage(page);
+  };
 
   useEffect(() => {
     getUserPostList()
@@ -36,25 +43,32 @@ const MainPage: React.FC<Props> = (props) => {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" className={classes.container}>
-               
         <Header title="Blog" />
-        <Grid className={classes.main} > 
-        {/* <Grid> */}
-          <Grid container spacing={1} direction='column' alignItems='center'>
-            {featuredPosts.map((post) => (
-              <FeaturedPost key={post.title} post={post} />
-            ))}
+        <Grid className={classes.main} >
+          {/* <Grid> */}
+          <Grid container spacing={1} direction='column' alignItems='center' >
+          {/* <Grid style={{ maxHeight: '70vh', overflow: 'auto' }}> */}
+            {featuredPosts
+              ? featuredPosts.map((post) => (
+                <FeaturedPost key={post.title} post={post} />
+              )) : <h1>Empty...</h1>
+            }
+          {/* </Grid> */}
           </Grid>
           <Grid className={classes.pagination}>
-            <Pagination count={10} color="primary" />
+            <Pagination 
+            count={Math.ceil(featuredPosts.length/3)} 
+            color="primary" 
+            onChange={handleChange}
+            />
           </Grid>
-        {/* </Grid>  */}
+          {/* </Grid>  */}
 
         </Grid>
         <Footer
           title="Footer"
           description="Something here to give the footer a purpose!"
-        />             
+        />
       </Container>
     </ThemeProvider>
   );
@@ -65,9 +79,10 @@ export default MainPage;
 const useStyles = makeStyles((theme) => ({
   container: {
     minHeight: '100vh',
-    margin: 0,
+    // margin: 0,
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
   },
   main: {
     flexGrow: 1,
@@ -77,23 +92,4 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
   },
-  // avatar: {
-  //   margin: theme.spacing(1),
-  //   backgroundColor: theme.palette.secondary.main,
-  // },
-  // form: {
-  //   width: '100%', // Fix IE 11 issue.
-  //   marginTop: theme.spacing(3),
-  // },
-  // submit: {
-  //   margin: theme.spacing(3, 0, 2),
-  // },
-  // input: {
-  //   display: "none",
-  // },
-  // large: {
-  //   width: theme.spacing(25),
-  //   height: theme.spacing(25),
-  //   margin: 'auto',
-  // }
 }));

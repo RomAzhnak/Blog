@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUser, getPosts, changeLike } from "../api/userApi";
 import Avatar from '@material-ui/core/Avatar';
-import { Checkbox, FormControlLabel, Grid, ListItem, Paper, Typography } from "@material-ui/core";
+import { Button, Checkbox, FormControlLabel, Grid, ListItem, Paper, Typography } from "@material-ui/core";
 import Container from '@material-ui/core/Container';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
+import { Link } from 'react-router-dom';
 
 type Value = {
   id: number,
@@ -85,14 +86,26 @@ const Users: React.FC<Props> = (props) => {
   }
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Grid container spacing={5}>
+    <Container component="main" maxWidth="sm" >
+      <Grid container spacing={8} justifyContent='center' >
         <Grid item>
           <Avatar src={urlAvatar} className={classes.large} />
         </Grid>
         <Grid item>
           <Typography>User Name:{` ${userName}`}</Typography>
           <Typography>Email:{` ${email}`}</Typography>
+              <Grid className={classes.button}>
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                  >
+                    Main page
+                  </Button>
+                </Link>
+              </Grid>
+              { posts?.length ? <></> : <h2> No posts </h2> }
         </Grid>
       </Grid>
 
@@ -112,7 +125,6 @@ const Users: React.FC<Props> = (props) => {
               </Paper>
               <FormControlLabel
                 onChange={() => { handlePostLike(post) }}
-                // checked={posts.userLikes.indexOf(post.id) != -1}
                 checked={handleGetStatusLike(post)}
                 control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} name="checkedH" />}
                 label={post.likes + " " + post.createdAt.slice(0, 10)}
@@ -148,9 +160,12 @@ const useStyles = makeStyles((theme: Theme) =>
       height: theme.spacing(15),
     },
     paper: {
-      maxWidth: 400,
+      maxWidth: 500,
       margin: `${theme.spacing(1)}px auto`,
       padding: theme.spacing(2),
+    },
+    button: {
+    marginTop: 10,
     },
   }),
 );

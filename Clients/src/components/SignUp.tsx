@@ -58,7 +58,8 @@ const SignUp: React.FC<Props> = (props) => {
       email: '',
       password: '',
       urlAvatar: '',
-      role: 2
+      role: 2,
+      id: 0
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -66,15 +67,16 @@ const SignUp: React.FC<Props> = (props) => {
     },
   });
 
+
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-          Sign in
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign up
         </Typography>
         <form className={classes.form}
           onSubmit={formik.handleSubmit}
@@ -159,6 +161,19 @@ const SignUp: React.FC<Props> = (props) => {
           >
             Sign Up
           </Button>
+          <Grid >
+            <Link to="/" style={{ textDecoration: 'none' }}>
+              <Button
+                fullWidth
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Main page
+              </Button>
+            </Link>
+          </Grid>
           <Grid container justifyContent="flex-end">
             <Grid item>
               <Link to="/login" >
