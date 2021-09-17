@@ -11,9 +11,9 @@ import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link } from 'react-router-dom';
+import { red } from '@material-ui/core/colors';
 // import MoreVertIcon from '@material-ui/icons/MoreVert';
 // import FavoriteIcon from '@material-ui/icons/Favorite';
 // import ShareIcon from '@material-ui/icons/Share';
@@ -44,8 +44,6 @@ export default function FeaturedPost(props: FeaturedPostProps) {
   return (
     <Card className={classes.root}>
       <CardHeader
-      // variant="h1" 
-      // component="h5"
       className={classes.card}
         action={
           <Link to={`/users/:${post.userId}`} >

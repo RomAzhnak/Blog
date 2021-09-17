@@ -1,20 +1,19 @@
-import { Button, createStyles, IconButton, makeStyles, Toolbar, Typography, Theme } from '@material-ui/core';
+import { Button, createStyles, IconButton, makeStyles, Toolbar, Typography, Theme, TextField, InputAdornment } from '@material-ui/core';
 import SearchSharpIcon from '@material-ui/icons/SearchSharp';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
 
 
 interface HeaderProps {
-  sections: ReadonlyArray<{
-    title: string;
-    url: string;
-  }>;
   title: string;
 }
 
 const Header = (props: HeaderProps) => {
-  const { sections, title } = props;
+  const { title } = props;
   const classes = useStyles();
+  const handleClick = () => {
+  return
+}
 
   return (
     <React.Fragment >
@@ -31,20 +30,34 @@ const Header = (props: HeaderProps) => {
         >
           {/* {title} */}
         </Typography>
-        <IconButton>
+
+        <TextField
+        label="Search"
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={handleClick}>
+              <SearchSharpIcon />
+              </IconButton>
+            </InputAdornment>
+          )
+        }}
+      />
+ 
+        {/* <IconButton>
           <SearchSharpIcon />
-        </IconButton>
+        </IconButton> */}
         <Link to="/register" style={{ textDecoration: 'none', marginRight: 5 }} >
           <Button variant="contained" size="small" color="primary">
             Sign up
           </Button>
         </Link>
-        <Link to="/login" style={{ textDecoration: 'none' }}>        
+        <Link to="/login" style={{ textDecoration: 'none' }}>
           <Button variant="contained" size="small" color="primary">
-            Sign in 
+            Sign in
           </Button>
-         </Link>   
-              
+        </Link>
+
       </Toolbar>
       {/* <Toolbar
         component="nav"

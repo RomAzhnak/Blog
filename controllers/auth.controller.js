@@ -194,7 +194,7 @@ exports.getListPost = async (req, res) => {
       })
   })
   .then(function(result){
-    console.log(result);
+    // console.log(result);
 
     res.status(200).send(result);
     return Promise.resolve(result);

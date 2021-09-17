@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Grid from '@material-ui/core/Grid';
-import Markdown from './Markdown';
+import Markdown from './1Markdown';
 import { Divider, Typography } from '@material-ui/core';
 
 interface MainProps {
