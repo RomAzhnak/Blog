@@ -29,10 +29,6 @@ const validationSchema = yup.object({
     .string()
     .required('Password is required')
     .min(6, 'Password should be of minimum 6 characters length'),
-  //   confirmPassword: Yup.string()
-  //   .required('Confirm Password is required')
-  //   .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
-  // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
 });
 
 type Props = {
@@ -58,7 +54,7 @@ const SignUp: React.FC<Props> = (props) => {
       email: '',
       password: '',
       urlAvatar: '',
-      role: 2,
+      roleId: 2,
       id: 0
     },
     validationSchema: validationSchema,
@@ -81,28 +77,6 @@ const SignUp: React.FC<Props> = (props) => {
         <form className={classes.form}
           onSubmit={formik.handleSubmit}
           noValidate>
-
-          {/* <input accept="image/*"
-          className={classes.input}
-          id="icon-button-file"
-          type="file" 
-          name="file"
-          onChange={handleOnChange}
-        />
-        <label htmlFor="icon-button-file">
-          <IconButton color="primary" component="span">
-            <Avatar src={image} className={classes.large} />
-          </IconButton>
-        </label> */}
-
-          {/* <Typography component="h1" variant="h5">
-          Sign up
-        </Typography>
-        {/* <form className={classes.form}
-          // onSubmit={onSubmitForm}
-          onSubmit={formik.handleSubmit}
-          noValidate>  */}
-
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField

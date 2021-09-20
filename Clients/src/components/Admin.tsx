@@ -4,31 +4,27 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { useHistory } from 'react-router-dom';
 import { getUserList } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
 import Container from '@material-ui/core/Container';
-import IconButton from '@material-ui/core/IconButton';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
 import Link from '@material-ui/core/Link';
 import { CssBaseline } from '@material-ui/core';
 import AdminEditForm from './AdminEditForm';
+import { userEditAdmin } from "../redux/userSlice";
 
 type Props = {
 
 };
 
 const EditForm: React.FC<Props> = (props) => {
+  const dispatch = useAppDispatch();
   const classes = useStyles();
   const stateUser = useAppSelector(({ user }) => user.userFields);
+  const stateUsersForAdmin = useAppSelector(( user ) => user);
   const [userInfos, setUserInfos] = useState<any[]>([]);
   const [editUser, setEditUser] = useState<boolean>(false);
-  const [userItem, setUserItem] = useState<any>();
+  const [userProp, setUserProp] = useState<any>();
 
   useEffect(() => {
     getUserList(stateUser.id)
@@ -38,17 +34,14 @@ const EditForm: React.FC<Props> = (props) => {
       .catch((err) =>
         console.log(`Failed request ${err}`)
       )
-  }, [stateUser])
-
+  }, [stateUsersForAdmin]);
   
   return (
     <Container maxWidth="lg">
       <CssBaseline />
       <Header title="Blog" />
       <Grid container
-        style={{ marginTop: 25 }}
-        // className={classes.mainpage}
-        // spacing={10} 
+        style={{ marginTop: 25 }} 
         justifyContent='center'
       >
         <Grid item
@@ -59,23 +52,15 @@ const EditForm: React.FC<Props> = (props) => {
         >
           <Grid item
             className={classes.list}>
-            {/* <Grid>
-              <Typography variant="h6" className="list-header">
-                List of Users
-              </Typography>
-            </Grid> */}
             <Grid container >
               <ul className={classes.ul} >
                 {userInfos &&
                   userInfos.map((userValue: any, index) => (
                     <ListItem
                       key={index}>
-                      <Link onClick={ ()=>{ setUserItem(userValue); setEditUser(true); console.log(userValue) }}>
-                      {/* <Link to={`/admineditform/:${userValue}`}
-                        className={classes.listUl}> */}
+                      <Link onClick={ ()=>{ dispatch(userEditAdmin(userValue)); setEditUser(true); }}>
                         <Avatar src={userValue.urlAvatar} alt={userValue.userName}
                           className={classes.middle} 
-                          
                           />
                         {userValue.userName}
                       </Link>
@@ -86,7 +71,7 @@ const EditForm: React.FC<Props> = (props) => {
           </Grid>
         </Grid>
       </Grid >
-      {editUser ? <AdminEditForm user={userItem}/> : <></>}
+      {editUser ? <AdminEditForm /> : <></>}
     </Container>
   );
 }
@@ -98,9 +83,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       flexDirection: 'column',
-      // height: '100vh',
-      // margin: 'auto',
-      // marginRight: 100,
     },
     '& > *': {
       margin: theme.spacing(1),
@@ -111,7 +93,6 @@ const useStyles = makeStyles((theme: Theme) =>
     ul: {
       padding: 5,
       display: "flex",
-      // justifyContent: 'space-around',
     },
     listUl: {
       display: 'flex',
@@ -124,24 +105,18 @@ const useStyles = makeStyles((theme: Theme) =>
     list: {
       display: 'flex',
       flexDirection: 'column',
-      // padding: 15, 
       alignItems: 'center',
 
       marginTop: 20,
     },
     mainpage: {
-      // display: 'flex',
-      // alignSelf: 'center',
-      // margin: 'auto', 
-      // flex: 1,
     },
     paper: {
       margin: theme.spacing(2, 3, 0, 3),
       padding: theme.spacing(2),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      // justifyContent: 'center', 
+      alignItems: 'center', 
     },
     avatar: {
       margin: theme.spacing(1),

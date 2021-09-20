@@ -32,6 +32,7 @@ router.get('/user/posts/:id', verifyToken, controllerAuth.getUserPosts);
 router.post("/signin", controllerAuth.signin);
 router.post("/like", controllerAuth.changeLike);
 router.delete("/", controllerAuth.delete);
+router.delete("/admin", controllerAuth.deleteAdmin);
 router.post("/edit", controllerAuth.edit);
 router.get("/users", controllerAuth.getListUsers);
 router.get("/postlist", controllerAuth.getListPost);

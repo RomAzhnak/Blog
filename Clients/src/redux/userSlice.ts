@@ -1,18 +1,21 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, fetchAvatar } from '../api/userApi';
+import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, 
+	fetchAvatar, fetchEditUserAdmin, fetchDelUserAdmin } from '../api/userApi';
 import { RootState } from './store';
 
 export interface User {
 	userName: string,
 	email: string,
 	urlAvatar: string,
-	role: number,
+	roleId: number,
 	id: number,
 	password: string,	
 };
+
 export interface UserState {
 	userFields: User,
-	error: string
+	error: string,
+	userEditAdmin: User,
 };
 
 const initialState: UserState = {
@@ -20,17 +23,25 @@ const initialState: UserState = {
 		userName: '',
 		email: '',
 		urlAvatar: '',
-		role: 2,
+		roleId: 2,
 		password: '',
 		id: 0,
 	},
-	error: ''
+	error: '',
+	userEditAdmin: {
+		userName: '',
+		email: '',
+		urlAvatar: '',
+		roleId: 2,
+		password: '',
+		id: 0,
+	},
 };
 
 interface UserLogin {
 	userName: string,
 	email: string,
-	role: number,
+	roleId: number,
 	urlAvatar: string,
 	id: number,
 	accessToken: string
@@ -68,10 +79,26 @@ export const fetchEdit = createAsyncThunk<UserLogin, FormData, { state: RootStat
 	}
 );
 
+export const fetchEditAdmin = createAsyncThunk<UserLogin, FormData, { state: RootState }>(
+	'user/fetchEditAdmin',
+	async (user, thankApi) => {
+		const resp = await fetchEditUserAdmin(user);
+		return resp.data
+	}
+);
+
 export const fetchDel = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchDel',
 	async (user, thankApi) => {
 		const resp = await fetchDelUser(user);
+		return resp.data
+	}
+);
+
+export const fetchDelAdmin = createAsyncThunk<UserLogin, User, { state: RootState }>(
+	'user/fetchDel',
+	async (user, thankApi) => {
+		const resp = await fetchDelUserAdmin(user);
 		return resp.data
 	}
 );
@@ -83,16 +110,22 @@ export const userSlice = createSlice({
 		addUser: (state, action) => {
 			state.userFields.email = action.payload.email;
 			state.userFields.userName = action.payload.userName;
-			state.userFields.role = action.payload.role;
+			state.userFields.roleId = action.payload.roleId;
 			state.userFields.urlAvatar = action.payload.urlAvatar;
 			state.userFields.id = action.payload.id;
-
+		},
+		userEditAdmin: (state, action) => {
+			state.userEditAdmin.email = action.payload.email;
+			state.userEditAdmin.userName = action.payload.userName;
+			state.userEditAdmin.roleId = action.payload.roleId;
+			state.userEditAdmin.urlAvatar = action.payload.urlAvatar;
+			state.userEditAdmin.id = action.payload.id;
+			state.userEditAdmin.password = action.payload.password;
 		},
 		clearUser: (state) => {
-			// fetchDelUser(state.userFields.email);
 			state.userFields.userName = '';
 			state.userFields.email = '';
-			state.userFields.role = 2;
+			state.userFields.roleId = 2;
 			state.userFields.urlAvatar = '';
 			state.userFields.id = 0;
 		},
@@ -114,7 +147,7 @@ export const userSlice = createSlice({
 			.addCase(fetchLogin.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
 				state.userFields.userName = action.payload.userName;
-				state.userFields.role = action.payload.role;
+				state.userFields.roleId = action.payload.roleId;
 				state.userFields.urlAvatar = action.payload.urlAvatar;
 				state.userFields.id = action.payload.id;
 				localStorage.setItem('token', action.payload.accessToken);
@@ -127,11 +160,23 @@ export const userSlice = createSlice({
 			.addCase(fetchEdit.fulfilled, (state, action) => {
 				state.userFields.email = action.payload.email;
 				state.userFields.userName = action.payload.userName;
-				state.userFields.role = action.payload.role;
+				state.userFields.roleId = action.payload.roleId;
 				state.userFields.urlAvatar = action.payload.urlAvatar;
 				state.userFields.id = action.payload.id;
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
+				state.error = 'error';
+			})
+			.addCase(fetchEditAdmin.pending, (state, action) => {
+			})
+			.addCase(fetchEditAdmin.fulfilled, (state, action) => {
+				state.userEditAdmin.email = action.payload.email;
+				state.userEditAdmin.userName = action.payload.userName;
+				state.userEditAdmin.roleId = action.payload.roleId;
+				state.userEditAdmin.urlAvatar = action.payload.urlAvatar;
+				state.userEditAdmin.id = action.payload.id;
+			})
+			.addCase(fetchEditAdmin.rejected, (state, action) => {
 				state.error = 'error';
 			})
 			.addCase(fetchDel.pending, (state, action) => {
@@ -139,7 +184,7 @@ export const userSlice = createSlice({
 			.addCase(fetchDel.fulfilled, (state, action) => {
 				state.userFields.email = '';
 				state.userFields.userName = '';
-				state.userFields.role = 2;
+				state.userFields.roleId = 2;
 				state.userFields.urlAvatar = '';
 				state.userFields.id = 0
 			})
@@ -149,29 +194,9 @@ export const userSlice = createSlice({
 	}
 });
 
-
-// const getUserThunk = (id: number) => async (dispatch: any) => {
-// 	try {
-// 		dispatch({
-// 			type: 'START_LOADING'
-// 		});
-// 		await dispatch(newThunk())
-// 		const user = await getUser(id);
-// 		dispatch(addUser(user))
-// 	} catch (e) {
-// 		dispatch({
-// 			type: "SET_ERROR",
-// 			err: e.message
-// 		})
-// 	} finally {
-// 		dispatch({
-// 			type: 'STOP_LOADING'
-// 		})
-// 	}
-// }
-
 export const {
 	addUser,
+	userEditAdmin,
 	clearUser
 } = userSlice.actions;
 

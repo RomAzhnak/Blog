@@ -60,13 +60,11 @@ const MainPage: React.FC<Props> = (props) => {
           />
         </Grid>
         <Grid className={classes.main} style={{ maxHeight: '65vh', overflow: 'auto' }}>
-          {/* <Grid spacing={1} direction='column' alignItems='center' > */}
           {featuredPosts
             ? featuredPosts.slice((page - 1) * postsOnPage, page * postsOnPage).map((post) => (
               <FeaturedPost key={post.title} post={post} />
             )) : <h1>Empty...</h1>
           }
-          {/* </Grid> */}
         </Grid>
         <Grid className={classes.pagination}>
           <Pagination
@@ -89,13 +87,11 @@ export default MainPage;
 const useStyles = makeStyles((theme) => ({
   container: {
     minHeight: '100vh',
-    // margin: 0,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
   },
   main: {
-    // flexGrow: 1,
     alignSelf: 'center',
     marginTop: theme.spacing(2),
   },

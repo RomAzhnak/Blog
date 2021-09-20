@@ -81,7 +81,24 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
     //   "email": file.get('email'),
     //   "password": file.get('password'),
     //   "urlAvatar": file.get('urlAvatar'),
-    //   "role": 2
+    //   "roleId": 2
+    // },
+  });
+}
+
+export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
+  return instance.post("/auth/edit", formData
+  , {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+    // headers: {
+    //   "Content-Type": "multipart/form-data",
+    //   "userName": file.get('userName'),
+    //   "email": file.get('email'),
+    //   "password": file.get('password'),
+    //   "urlAvatar": file.get('urlAvatar'),
+    //   "roleId": 2
     // },
   });
 }
@@ -89,8 +106,18 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
 export const fetchDelUser = (user: User): Promise<any> => {
   return instance.delete('/auth', {
     params: {
-      email: user.email,
-      password: user.password
+      id: user.id,
+      roleId: user.roleId,
+      password: user.password,
+    }
+  })
+}
+
+export const fetchDelUserAdmin = (user: User): Promise<any> => {
+  return instance.delete('/auth/admin', {
+    params: {
+      id: user.id,
+      // password: user.password,
     }
   })
 }

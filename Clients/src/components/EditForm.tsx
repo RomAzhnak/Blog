@@ -80,15 +80,13 @@ const EditForm: React.FC<Props> = (props) => {
     if (fileName) {
       formData.append("file", fileName);
     }
-    //   for ( let key in user) {
-    //     formData.append(key, user[key]);
-    // }
     formData.append("userName", user.userName);
     formData.append("email", user.email);
     formData.append("password", user.password);
     formData.append("id", String(stateUser.id));
     formData.append("urlAvatar", image);
-    formData.append("role", String(user.role));
+    formData.append("roleId", String(user.roleId));
+    formData.append("admin", '0');
     if (user.email) {
       dispatch(fetchEdit(formData))
         .unwrap()
@@ -105,7 +103,7 @@ const EditForm: React.FC<Props> = (props) => {
       email: formik.values.email,
       password: formik.values.password,
       urlAvatar: '',
-      role: 2,
+      roleId: 2,
       id: 0
     }
     dispatch(fetchDel(fetchUser))
@@ -118,7 +116,6 @@ const EditForm: React.FC<Props> = (props) => {
 
   const onClickLogOut = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    // dispatch(fetchDelete( user.email ));
     dispatch(clearUser());
     localStorage.removeItem('token');
     history.push("/");
@@ -129,7 +126,7 @@ const EditForm: React.FC<Props> = (props) => {
       userName: stateUser.userName,
       email: stateUser.email,
       password: '',
-      role: stateUser.role,
+      roleId: stateUser.roleId,
       urlAvatar: image,
       id: 0
     },
@@ -142,7 +139,7 @@ const EditForm: React.FC<Props> = (props) => {
 
   return (
     <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
-      <Grid component="main" className={classes.root} md={5}> 
+      <Grid component="main" className={classes.root} > 
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
@@ -229,8 +226,6 @@ const EditForm: React.FC<Props> = (props) => {
                 <Grid >
                   <Button
                     type="submit"
-                    // size='medium'
-                    // fullWidth
                     variant="contained"
                     color="primary"
                     className={classes.submit}
@@ -254,17 +249,14 @@ const EditForm: React.FC<Props> = (props) => {
               <Grid >
                 <Button
                   fullWidth
-                  // type="submit"
                   variant="contained"
                   color="primary"
-                // className={classes.submit}
                 >
                   <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
                     Main page
                   </Link>
                 </Button>
               </Grid>
-          {/* </Grid> */}
         </Grid>
       </Grid>
       <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '95vh', overflow: 'auto' }}>
@@ -278,7 +270,6 @@ const EditForm: React.FC<Props> = (props) => {
                 <ListItem
                   divider
                   key={index}>
-                  {/* <Link to={`/users/${image.id}`} > */}
                   <Link to={`/users/:${image.id}`} className={classes.list}>
                     <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
                     {image.userName}
@@ -299,9 +290,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       flexDirection: 'column',
-      // height: '100vh',
-      // margin: 'auto',
-      // marginRight: 100,
     },
     '& > *': {
       margin: theme.spacing(1),
@@ -313,26 +301,19 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 0
     },
     list: {
-      // alignItems: 'center',
       display: 'flex',
       padding: 1,
-      // justifyContent: 'flex-start',
       justifyContent: 'center',
       marginTop: 20,
     },
     mainpage: {
-      // display: 'flex',
-      // alignSelf: 'center',
-      // margin: 'auto', 
-      // flex: 1,
     },
     paper: {
       margin: theme.spacing(2, 3, 0, 3),
       padding: theme.spacing(2),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
-      // justifyContent: 'center', 
+      alignItems: 'center', 
     },
     avatar: {
       margin: theme.spacing(1),

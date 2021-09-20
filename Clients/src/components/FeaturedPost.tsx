@@ -56,7 +56,6 @@ export default function FeaturedPost(props: FeaturedPostProps) {
           })}
           onClick={handleExpandClick}
           aria-expanded={expanded}
-        // aria-label="show more"
         >
           <ExpandMoreIcon />
         </IconButton>
@@ -74,14 +73,9 @@ export default function FeaturedPost(props: FeaturedPostProps) {
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    // maxWidth: 900,
     width: 600,
     marginTop: 5,
   },
-  // media: {
-  //   height: 0,
-  //   paddingTop: '56.25%', // 16:9
-  // },
   card: {
     paddingBottom: 0 
   },

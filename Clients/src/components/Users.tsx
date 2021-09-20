@@ -54,7 +54,7 @@ const Users: React.FC<Props> = (props) => {
         setUserLikes(new Set(response.data.userLikes));
       })
       .catch((err) =>
-        console.log(`Failed request ${err}`)
+        console.log(`Failed request! ${err}`)
       )
   }, [id]);
 

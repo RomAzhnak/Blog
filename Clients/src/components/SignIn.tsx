@@ -21,34 +21,14 @@ type Props = {
 const SignIn: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  // const [user, setUser] = useState({
-  //   userName: '',
-  //   email: '',
-  //   urlAvatar: '',
-  //   password: ''
-  // });
   let history = useHistory();
-  // const onChange = (event: { target: { name: string; value: string; }; }) => {
-  //   setUser(user => ({ ...user, [event.target.name]: event.target.value }))
-  // }
 
   const onSubmitForm = (user: User) => {
-    // event.preventDefault();
-  
     if (user.email) {
         dispatch(fetchLogin( user ))
           .unwrap()
           .then(res => {
-            // setUser(
-            //   {
-            //     userName: '',
-            //     email: '',
-            //     password: '',
-            //     urlAvatar: ''
-            //   }
-            // );
-          history.push("/");  // /protected
-
+          history.push("/");
           })
           .catch( e => {
             console.log(e)
@@ -57,7 +37,6 @@ const SignIn: React.FC<Props> = (props) => {
   };
 
   const validationSchema = yup.object({
-
     email: yup
       .string()
       .email('Enter a valid email')
@@ -73,7 +52,7 @@ const SignIn: React.FC<Props> = (props) => {
       userName: '',
       email: '',
       password: '',
-      role: 2,
+      roleId: 2,
       urlAvatar: '',
       id: 0
     },
@@ -99,7 +78,6 @@ const SignIn: React.FC<Props> = (props) => {
           <Grid item xs={12}>
             <TextField
               variant="outlined"
-              // margin="normal"
               required
               fullWidth
               id="email"
@@ -107,8 +85,6 @@ const SignIn: React.FC<Props> = (props) => {
               name="email"
               autoComplete="email"
               autoFocus
-              // value={user.email}
-              // onChange={onChange}
               value={formik.values.email}
               onChange={formik.handleChange}
               error={formik.touched.email && Boolean(formik.errors.email)}
@@ -126,8 +102,6 @@ const SignIn: React.FC<Props> = (props) => {
               type="password"
               id="password"
               autoComplete="current-password"
-              // value={user.password}
-              // onChange={onChange}
               value={formik.values.password}
               onChange={formik.handleChange}
               error={formik.touched.password && Boolean(formik.errors.password)}

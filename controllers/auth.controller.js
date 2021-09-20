@@ -38,14 +38,10 @@ exports.changeLike = async (req, res) => {
       });
       statusLike = true;
     }
-    // const countLikes = await UserLike.findAll({
-    //   where: { postId: idPost },
-    //   attributes: [
-    //     [db.sequelize.fn('COUNT', db.sequelize.col('postId')), 'likes']
-    //   ],
-    // });
     const { QueryTypes } = require('sequelize');
-    const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes FROM UserLikes WHERE postId = ${idPost} GROUP BY postId`, { type: QueryTypes.SELECT });
+    const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes 
+    FROM UserLikes WHERE postId = ${idPost} 
+    GROUP BY postId`, { type: QueryTypes.SELECT });
     const likes = (countLikes.length != 0) ? countLikes[0].likes : 0;
     res.status(200).send({ statusLike: statusLike, countLikes: likes });
   }
@@ -64,14 +60,19 @@ exports.getUserPosts = async (req, res) => {
       idLiker = decoded.id;
     });
     const idAuthor = Number(req.params.id.slice(1));
+
     const userLike = await UserLike.findAll({
       where: { userId: idLiker, postAuthorId: idAuthor },
       attributes: ['postId',]
     });
+    console.log(idLiker, idAuthor);
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
     const { QueryTypes } = require('sequelize');
-    const posts = await db.sequelize.query(`SELECT count(postid) AS likes, Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, UserLikes.postAuthorId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId WHERE Posts.userId = ${idAuthor} GROUP BY Posts.id`, { type: QueryTypes.SELECT });
+    const posts = await db.sequelize.query(`SELECT count(UserLikes.id) AS likes, 
+    Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, 
+    UserLikes.postId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId 
+    WHERE Posts.userId = ${idAuthor} GROUP BY Posts.id`, { type: QueryTypes.SELECT });
     if (!posts) {
       throw new Error("Failed! Author Not found!");
     }
@@ -93,12 +94,11 @@ exports.getUserById = async (req, res) => {
     res.status(200).send({
       userName: user.userName,
       email: user.email,
-      role: user.roleId,
+      roleId: user.roleId,
       urlAvatar: user.urlAvatar,
       id: user.id,
       password: '',
     })
-    // console.log(user);
   } catch (err) {
     res.status(500).send({
       message: `Failed! : ${err}`,
@@ -111,23 +111,27 @@ exports.edit = async (req, res) => {
     await uploadFile(req, res);
     const { userName, email, password, urlAvatar, id } = req.body;
     const idUser = Number(id);
-    const role = Number(req.body.role);
+    const roleId = Number(req.body.roleId);
+    const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
+    console.log(idUser, roleId);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
-    const passwordIsValid = bcrypt.compareSync(
-      password,
-      user.password
-    );
-    if (!passwordIsValid) {
-      throw new Error("Failed! Invalid Password!");
+    if (!admin) {
+      const passwordIsValid = bcrypt.compareSync(
+        password,
+        user.password
+      );
+      if (!passwordIsValid) {
+        throw new Error("Failed! Invalid Password!");
+      };
     };
     const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
       email: email,
-      roleId: role,
+      roleId: roleId,
       urlAvatar: fileName,
     },
       {
@@ -139,10 +143,9 @@ exports.edit = async (req, res) => {
     res.status(200).send({
       userName: userName,
       email: email,
-      role: role,
+      roleId: roleId,
       urlAvatar: urlAvatar,
       id: idUser,
-      accessToken: ''
     })
   } catch (err) {
     res.status(500).send({
@@ -152,10 +155,7 @@ exports.edit = async (req, res) => {
 };
 
 exports.getListPost = async (req, res) => {
-  try {
-    // const { QueryTypes, or } = require('sequelize');
-    // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
-    // const users = await 
+  try { 
     Post.findAll({
       attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
       group: ["userId"],
@@ -195,11 +195,24 @@ exports.getListUsers = async (req, res) => {
   }
 }
 
+exports.deleteAdmin = async (req, res) => {
+  try {
+    const result = await User.destroy({
+      where: { id: req.query.id }
+    })
+    if (!result) {
+      throw new Error("Failed delete!");
+    };
+    res.send({ message: "User was deleted successfully!" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
+
 exports.delete = async (req, res) => {
-  const email = req.query.email;
   try {
     const user = await User.findOne({
-      where: { email: req.query.email }
+      where: { id: req.query.id }
     });
     if (!user) {
       throw new Error("Failed! User Not found!");
@@ -212,7 +225,7 @@ exports.delete = async (req, res) => {
       throw new Error("Failed! Invalid Password!");
     };
     const result = await User.destroy({
-      where: { email: req.query.email }
+      where: { id: req.query.id }
     })
     if (!result) {
       throw new Error("Failed delete!");
@@ -228,7 +241,7 @@ exports.signup = async (req, res) => {
     await User.create({
       userName: req.body.userName,
       email: req.body.email,
-      roleId: req.body.role,
+      roleId: req.body.roleId,
       password: bcrypt.hashSync(req.body.password, 8)
     })
     res.send({ message: "User registered successfully!" })
@@ -250,10 +263,9 @@ exports.getUser = async (req, res) => {
     res.status(200).send({
       userName: user.userName,
       email: user.email,
-      role: user.roleId,
+      roleId: user.roleId,
       urlAvatar: user.urlAvatar,
       id: user.id,
-      // accessToken: token
     });
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -284,7 +296,7 @@ exports.signin = async (req, res) => {
     res.status(200).send({
       userName: user.userName,
       email: user.email,
-      role: user.roleId,
+      roleId: user.roleId,
       urlAvatar: user.urlAvatar,
       id: user.id,
       accessToken: token
@@ -307,32 +319,6 @@ exports.findOne = (req, res) => {
       });
     });
 };
-
-
-
-// exports.delete = (req, res) => {
-//   const id = req.params.id;
-
-//   User.destroy({
-//     where: { id: id }
-//   })
-//     .then(num => {
-//       if (num == 1) {
-//         res.send({
-//           message: "User was deleted successfully!"
-//         });
-//       } else {
-//         res.send({
-//           message: `Cannot delete user with id=${id}. Maybe user was not found!`
-//         });
-//       }
-//     })
-//     .catch(err => {
-//       res.status(500).send({
-//         message: "Could not delete user with id=" + id
-//       });
-//     });
-// };
 
 exports.deleteAll = (req, res) => {
   User.destroy({

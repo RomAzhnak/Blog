@@ -19,8 +19,6 @@ db.sequelize.sync();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true}));
-// app.use((req,res,next) => {console.log(req.query.email);
-//                 next()});
 app.get('/test', (req, res) => {
   res.json({
     message: 'Hello'
@@ -28,8 +26,6 @@ app.get('/test', (req, res) => {
 })
 
 app.use("/auth", userReq);
-
-// app.get("/all", controllerAuth.allUser);
 
 const port = 4000;
 app.listen(port, () => {

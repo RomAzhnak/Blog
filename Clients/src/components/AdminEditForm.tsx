@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -8,15 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
+import { User, fetchEditAdmin, fetchDelAdmin } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useHistory, Link, useParams } from 'react-router-dom';
-import { getUserList } from '../api/userApi';
-import ListItem from '@material-ui/core/ListItem';
-import { getUser } from "../api/userApi";
-import Header from './Header';
-import { Container } from '@material-ui/core';
+import { useHistory } from 'react-router-dom';
+import { Container, MenuItem, Select } from '@material-ui/core';
+import { userEditAdmin } from "../redux/userSlice";
 
 
 const validationSchema = yup.object({
@@ -25,9 +22,9 @@ const validationSchema = yup.object({
     .required('Username is required')
     .min(3, 'Username must be at least 6 characters')
     .max(20, 'Username must not exceed 20 characters'),
-  role: yup
-  .number()
-  .required('Role is required'),
+  roleId: yup
+    .number()
+    .required('Role is required'),
   email: yup
     .string()
     .email('Enter a valid email')
@@ -43,7 +40,7 @@ const validationSchema = yup.object({
 });
 
 type Props = {
-user: any,
+
 };
 
 
@@ -51,46 +48,62 @@ const init: User = {
   userName: '',
   email: '',
   urlAvatar: '',
-  role: 2,
+  roleId: 2,
   id: 0,
   password: '',
 }
 
 const EditForm: React.FC<Props> = (props) => {
-  // const {userValue}: any = useParams(); 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const stateUser = useAppSelector(({ user }) => user.userFields);
-  const [userInfos, setUserInfos] = useState<any>(init);
-  const [imageInfos, setAvatar] = useState<any[]>([]);
-  const [image, setImage] = useState<string>(props.user.urlAvatar);
+  const stateUser = useAppSelector(({ user }) => user.userEditAdmin);
+  const [image, setImage] = useState<string>(stateUser.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
-  let response: any; 
+
+  const formik = useFormik({
+    initialValues: {
+      userName: stateUser.userName,
+      email: stateUser.email,
+      password: stateUser.password,
+      roleId: stateUser.roleId,
+      urlAvatar: stateUser.urlAvatar,
+      id: stateUser.id,
+    },
+    validationSchema: validationSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      console.log(values);
+      onSubmitForm(values);
+    },
+  });
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target?.files?.[0];
     if (newImage) {
       setImage(URL.createObjectURL(newImage));
+      // formik.values.urlAvatar = URL.createObjectURL(newImage);
       setFileName(newImage);
+      dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(newImage)}));
     }
   };
-
+ 
   const onSubmitForm = (user: User) => {
-
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
     }
     formData.append("userName", user.userName);
     formData.append("email", user.email);
-    // formData.append("password", user.password);
     formData.append("id", String(stateUser.id));
-    formData.append("urlAvatar", image);
-    formData.append("role", String(user.role));
+    formData.append("roleId", String(stateUser.roleId));
+    formData.append("admin", "1");;
     if (user.email) {
-      dispatch(fetchEdit(formData))
+      dispatch(fetchEditAdmin(formData))
         .unwrap()
+        .then(() => {
+          history.push("/admin");
+        })
         .catch((err) => {
           console.log(`Failed request ${err}`);
         })
@@ -99,68 +112,45 @@ const EditForm: React.FC<Props> = (props) => {
 
   const onClickDelete = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
+    if (stateUser.id == 1) return;
     const fetchUser = {
-      userName: userInfos.userName,
-      email: userInfos.email,
-      password: userInfos.password, //formik.values.password,
-      urlAvatar: userInfos.urlAvatar,
-      role: userInfos.role,
-      id: userInfos.id,
+      userName: stateUser.userName,
+      email: stateUser.email,
+      password: stateUser.password,
+      urlAvatar: stateUser.urlAvatar,
+      roleId: stateUser.roleId,
+      id: stateUser.id,
     }
-    dispatch(fetchDel(fetchUser))
+    dispatch(fetchDelAdmin(fetchUser))
       .unwrap()
       .then(() => {
-        localStorage.removeItem('token');
         history.push("/");
       })
   }
- 
-  const onClickLogOut = (event: { preventDefault: () => void; }) => {
-    event.preventDefault();
-    // dispatch(fetchDelete( user.email ));
-    dispatch(clearUser());
-    localStorage.removeItem('token');
-    history.push("/");
-  }
- 
-  const formik = useFormik({
-    initialValues: {
-      userName: props.user.userName,
-      email: props.user.email, 
-      password: '',
-      role: 0, //initUser.role,
-      urlAvatar: 'initUser.urlAvatar',
-      id: 0 // initUser.id
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      onSubmitForm(values);
-    },
-  });
-
 
   return (
     <Container maxWidth="lg">
-    {/* <Header title="Blog" /> */}
-    <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
-      <Grid component="main" className={classes.root} >
-        <input accept="image/*"
-          className={classes.input}
-          id="icon-button-file"
-          type="file"
-          onChange={(e) => handleOnChange(e)}
-        />
-        <label htmlFor="icon-button-file">
-          <IconButton color="primary" component="span">
-            <Avatar src={image} className={classes.large} />
-          </IconButton>
-        </label>
-
-        <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
+      <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
+        <Grid component="main" className={classes.root} >
+          <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
             <Typography component="h1" variant="h5">
               Edit
             </Typography>
-            <form className={classes.form} onSubmit={formik.handleSubmit} noValidate>
+            <form className={classes.form}
+              onSubmit={formik.handleSubmit}
+              noValidate
+            >
+              <input accept="image/*"
+                className={classes.input}
+                id="icon-button-file"
+                type="file"
+                onChange={(e) => handleOnChange(e)}
+              />
+              <label htmlFor="icon-button-file">
+                <IconButton color="primary" component="span">
+                  <Avatar src={formik.values.urlAvatar} className={classes.large} />
+                </IconButton>
+              </label>
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -180,7 +170,6 @@ const EditForm: React.FC<Props> = (props) => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    // disabled
                     variant="outlined"
                     required
                     fullWidth
@@ -194,28 +183,30 @@ const EditForm: React.FC<Props> = (props) => {
                     helperText={formik.touched.email && formik.errors.email}
                   />
                 </Grid>
-                {/* <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                    value={formik.values.password}
+                <Grid item xs={12}>
+                  <Select
+                    name="roleId"
+                    value={formik.values.roleId}
                     onChange={formik.handleChange}
-                    error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
-                  />
-                </Grid> */}
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    style={{ marginLeft: 15, marginBottom: 10 }}
+                  >
+                    <MenuItem value="">
+                    </MenuItem>
+                    <MenuItem value={1}>Administrator</MenuItem>
+                    <MenuItem value={2}>User</MenuItem>
+
+                  </Select>
+                </Grid>
               </Grid>
               <Grid
                 container
                 direction="row"
                 justifyContent="space-around"
-                alignItems="center">
+                alignItems="center"
+
+              >
                 <Grid >
                   <Button
                     type="submit"
@@ -230,8 +221,6 @@ const EditForm: React.FC<Props> = (props) => {
                 <Grid >
                   <Button
                     type="submit"
-                    // size='medium'
-                    // fullWidth
                     variant="contained"
                     color="primary"
                     className={classes.submit}
@@ -239,36 +228,11 @@ const EditForm: React.FC<Props> = (props) => {
                     Save
                   </Button>
                 </Grid>
-                {/* <Grid >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={onClickLogOut}
-                  >
-                    LogOut
-                  </Button>
-                </Grid> */}
               </Grid>
             </form>
-              <Grid >
-                <Button
-                  fullWidth
-                  // type="submit"
-                  variant="contained"
-                  color="primary"
-                // className={classes.submit}
-                >
-                  <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
-                    Main page
-                  </Link>
-                </Button>
-              </Grid>
-          {/* </Grid> */}
+          </Grid>
         </Grid>
       </Grid>
-    </Grid>
     </Container>
   );
 }
@@ -280,9 +244,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       justifyContent: 'center',
       flexDirection: 'column',
-      // height: '100vh',
-      // margin: 'auto',
-      // marginRight: 100,
     },
     '& > *': {
       margin: theme.spacing(1),
@@ -294,18 +255,12 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: 0
     },
     list: {
-      // alignItems: 'center',
       display: 'flex',
       padding: 1,
-      // justifyContent: 'flex-start',
       justifyContent: 'center',
       marginTop: 20,
     },
     mainpage: {
-      // display: 'flex',
-      // alignSelf: 'center',
-      // margin: 'auto', 
-      // flex: 1,
     },
     paper: {
       margin: theme.spacing(2, 3, 0, 3),
@@ -313,7 +268,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      // justifyContent: 'center', 
     },
     avatar: {
       margin: theme.spacing(1),

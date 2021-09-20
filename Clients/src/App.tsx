@@ -4,7 +4,6 @@ import SignIn from './components/SignIn';
 import Admin from './components/Admin';
 import AdminEditForm from './components/AdminEditForm';
 import PrivateRoute from './components/PrivateRoute';
-// import { ProtectedPage } from './components/1ProtectedPage';
 import {
   BrowserRouter as Router,
   Switch,
@@ -42,7 +41,6 @@ function App() {
         ? <Router>
           <Switch>
             <Route path="/" exact={true} >
-              {/* <SignUp /> */}
               <MainPage />
             </Route>
             <Route path="/register">
@@ -55,7 +53,7 @@ function App() {
               <Users />
             </PrivateRoute>
             <PrivateRoute path="/admineditform/:userValue">
-              <AdminEditForm user={undefined} />
+              <AdminEditForm />
             </PrivateRoute>
             <PrivateRoute path="/edituser">
               <EditForm />
@@ -63,9 +61,6 @@ function App() {
             <PrivateRoute path="/admin">
               <Admin />
             </PrivateRoute>
-            {/* <PrivateRoute path="/protected">
-              <ProtectedPage />
-            </PrivateRoute> */}
           </Switch>
         </Router>
         : <p>Loading...</p>

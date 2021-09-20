@@ -1,6 +1,4 @@
-import { Button, createStyles, IconButton, makeStyles, Toolbar, Typography, Theme, TextField, InputAdornment, Avatar, Grid } from '@material-ui/core';
-// import SearchSharpIcon from '@material-ui/icons/SearchSharp';
-// import * as React from 'react';
+import { Button, createStyles, makeStyles, Toolbar, Typography, Theme, Avatar, Grid } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser } from '../redux/userSlice';
@@ -18,34 +16,15 @@ const Header = (props: HeaderProps) => {
   const stateUser = useAppSelector(({ user }) => user.userFields);
   const { title } = props;
   const classes = useStyles();
-  // const handleClick = () => {
-  //   return
-  // }
 
   return (
     <Fragment >
-      <Toolbar  > {/* sx={{ borderBottom: 1, borderColor: 'divider' }}> */}
-        {/* <Button size="small">Subscribe</Button> */}
-        {/* <TextField
-          label="Search"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClick}>
-                  <SearchSharpIcon />
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
-        /> */}
+      <Toolbar  >
         <Grid >
           <Button
-            // fullWidth
-            // type="submit"
             size="small"
             variant="contained"
             color="primary"
-          // className={classes.submit}
           >
             <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
               Main page
@@ -53,15 +32,13 @@ const Header = (props: HeaderProps) => {
           </Button>
         </Grid>
         <Typography
-          // component="h2"
+
           variant="h5"
           color="inherit"
           align="center"
           noWrap
           className={classes.title}
-        // sx={{ flex: 1 }}
         >
-          {/* BLog */}
           {title}
         </Typography>
         {(stateUser.id === 0) ?
@@ -78,8 +55,8 @@ const Header = (props: HeaderProps) => {
             </Link>
           </>
           : <>
-            <Link to={'/edituser'} >  {/* `/users/:${stateUser.userId}` */}
-              <Avatar aria-label="recipe" className={classes.avatar} src={stateUser.urlAvatar}>
+            <Link to={'/edituser'} >
+              <Avatar aria-label="recipe" src={stateUser.urlAvatar}>
               </Avatar>
             </Link>
             <Button variant="contained"
@@ -94,10 +71,9 @@ const Header = (props: HeaderProps) => {
             >
               Logout
             </Button>
-
           </>
         }
-        {(stateUser.role === 1) ?
+        {(stateUser.roleId === 1) ?
           <Link to="/admin" style={{ textDecoration: 'none' }}>
             <Button variant="contained" size="small" color="primary">
               Admin
@@ -114,20 +90,11 @@ export default Header;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    // title: {
-    //   flexGrow: 1,
-
-    // },
     menuButton: {
-      // marginRight: theme.spacing(2),
-      // justifyContent: 'space-between',
       flexGrow: 1,
     },
     title: {
       flexGrow: 1,
     },
-    avatar: {
-      // marginLeft: 5,
-    }
   }),
 );
