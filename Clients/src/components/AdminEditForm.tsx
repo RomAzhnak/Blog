@@ -11,9 +11,12 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory, Link, useParams } from 'react-router-dom';
 import { getUserList } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
+import { getUser } from "../api/userApi";
+import Header from './Header';
+import { Container } from '@material-ui/core';
 
 
 const validationSchema = yup.object({
@@ -22,6 +25,9 @@ const validationSchema = yup.object({
     .required('Username is required')
     .min(3, 'Username must be at least 6 characters')
     .max(20, 'Username must not exceed 20 characters'),
+  role: yup
+  .number()
+  .required('Role is required'),
   email: yup
     .string()
     .email('Enter a valid email')
@@ -37,34 +43,30 @@ const validationSchema = yup.object({
 });
 
 type Props = {
-
+user: any,
 };
 
+
+const init: User = {
+  userName: '',
+  email: '',
+  urlAvatar: '',
+  role: 2,
+  id: 0,
+  password: '',
+}
+
 const EditForm: React.FC<Props> = (props) => {
+  // const {userValue}: any = useParams(); 
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const history = useHistory();
   const stateUser = useAppSelector(({ user }) => user.userFields);
+  const [userInfos, setUserInfos] = useState<any>(init);
   const [imageInfos, setAvatar] = useState<any[]>([]);
-  const [image, _setImage] = useState(stateUser.urlAvatar);
+  const [image, setImage] = useState<string>(props.user.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
-
-  useEffect(() => {
-    getUserList(stateUser.id)
-      .then((response) => {
-        setAvatar(response.data);
-      })
-      .catch((err) =>
-        console.log(`Failed request ${err}`)
-      )
-  }, [stateUser])
-
-  const setImage = (newImage: React.SetStateAction<string>) => {
-    if (image) {
-      URL.revokeObjectURL(image);
-    }
-    _setImage(newImage);
-  };
+  let response: any; 
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target?.files?.[0];
@@ -80,12 +82,9 @@ const EditForm: React.FC<Props> = (props) => {
     if (fileName) {
       formData.append("file", fileName);
     }
-    //   for ( let key in user) {
-    //     formData.append(key, user[key]);
-    // }
     formData.append("userName", user.userName);
     formData.append("email", user.email);
-    formData.append("password", user.password);
+    // formData.append("password", user.password);
     formData.append("id", String(stateUser.id));
     formData.append("urlAvatar", image);
     formData.append("role", String(user.role));
@@ -101,12 +100,12 @@ const EditForm: React.FC<Props> = (props) => {
   const onClickDelete = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     const fetchUser = {
-      userName: formik.values.userName,
-      email: formik.values.email,
-      password: formik.values.password,
-      urlAvatar: '',
-      role: 2,
-      id: 0
+      userName: userInfos.userName,
+      email: userInfos.email,
+      password: userInfos.password, //formik.values.password,
+      urlAvatar: userInfos.urlAvatar,
+      role: userInfos.role,
+      id: userInfos.id,
     }
     dispatch(fetchDel(fetchUser))
       .unwrap()
@@ -115,7 +114,7 @@ const EditForm: React.FC<Props> = (props) => {
         history.push("/");
       })
   }
-
+ 
   const onClickLogOut = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     // dispatch(fetchDelete( user.email ));
@@ -123,15 +122,15 @@ const EditForm: React.FC<Props> = (props) => {
     localStorage.removeItem('token');
     history.push("/");
   }
-
+ 
   const formik = useFormik({
     initialValues: {
-      userName: stateUser.userName,
-      email: stateUser.email,
+      userName: props.user.userName,
+      email: props.user.email, 
       password: '',
-      role: stateUser.role,
-      urlAvatar: image,
-      id: 0
+      role: 0, //initUser.role,
+      urlAvatar: 'initUser.urlAvatar',
+      id: 0 // initUser.id
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -141,8 +140,10 @@ const EditForm: React.FC<Props> = (props) => {
 
 
   return (
+    <Container maxWidth="lg">
+    {/* <Header title="Blog" /> */}
     <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
-      <Grid component="main" className={classes.root} md={5}> 
+      <Grid component="main" className={classes.root} >
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
@@ -179,7 +180,7 @@ const EditForm: React.FC<Props> = (props) => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    disabled
+                    // disabled
                     variant="outlined"
                     required
                     fullWidth
@@ -193,7 +194,7 @@ const EditForm: React.FC<Props> = (props) => {
                     helperText={formik.touched.email && formik.errors.email}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <TextField
                     variant="outlined"
                     required
@@ -208,7 +209,7 @@ const EditForm: React.FC<Props> = (props) => {
                     error={formik.touched.password && Boolean(formik.errors.password)}
                     helperText={formik.touched.password && formik.errors.password}
                   />
-                </Grid>
+                </Grid> */}
               </Grid>
               <Grid
                 container
@@ -238,7 +239,7 @@ const EditForm: React.FC<Props> = (props) => {
                     Save
                   </Button>
                 </Grid>
-                <Grid >
+                {/* <Grid >
                   <Button
                     type="submit"
                     variant="contained"
@@ -248,7 +249,7 @@ const EditForm: React.FC<Props> = (props) => {
                   >
                     LogOut
                   </Button>
-                </Grid>
+                </Grid> */}
               </Grid>
             </form>
               <Grid >
@@ -267,28 +268,8 @@ const EditForm: React.FC<Props> = (props) => {
           {/* </Grid> */}
         </Grid>
       </Grid>
-      <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '95vh', overflow: 'auto' }}>
-        <Grid >
-          <Typography variant="h6" className="list-header">
-            List of Users
-          </Typography>
-          <ul className={classes.ul}>
-            {imageInfos &&
-              imageInfos.map((image: any, index) => (
-                <ListItem
-                  divider
-                  key={index}>
-                  {/* <Link to={`/users/${image.id}`} > */}
-                  <Link to={`/users/:${image.id}`} className={classes.list}>
-                    <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
-                    {image.userName}
-                  </Link>
-                </ListItem>
-              ))}
-          </ul>
-        </Grid>
-      </Grid>
     </Grid>
+    </Container>
   );
 }
 

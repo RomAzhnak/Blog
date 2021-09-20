@@ -1,10 +1,11 @@
-import { Button, createStyles, IconButton, makeStyles, Toolbar, Typography, Theme, TextField, InputAdornment, Avatar } from '@material-ui/core';
-import SearchSharpIcon from '@material-ui/icons/SearchSharp';
-import * as React from 'react';
+import { Button, createStyles, IconButton, makeStyles, Toolbar, Typography, Theme, TextField, InputAdornment, Avatar, Grid } from '@material-ui/core';
+// import SearchSharpIcon from '@material-ui/icons/SearchSharp';
+// import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser } from '../redux/userSlice';
 import { useHistory } from "react-router-dom";
+import { Fragment } from 'react';
 
 
 interface HeaderProps {
@@ -17,15 +18,15 @@ const Header = (props: HeaderProps) => {
   const stateUser = useAppSelector(({ user }) => user.userFields);
   const { title } = props;
   const classes = useStyles();
-  const handleClick = () => {
-    return
-  }
+  // const handleClick = () => {
+  //   return
+  // }
 
   return (
-    <React.Fragment >
+    <Fragment >
       <Toolbar  > {/* sx={{ borderBottom: 1, borderColor: 'divider' }}> */}
         {/* <Button size="small">Subscribe</Button> */}
-        <TextField
+        {/* <TextField
           label="Search"
           InputProps={{
             endAdornment: (
@@ -36,7 +37,21 @@ const Header = (props: HeaderProps) => {
               </InputAdornment>
             )
           }}
-        />
+        /> */}
+        <Grid >
+          <Button
+            // fullWidth
+            // type="submit"
+            size="small"
+            variant="contained"
+            color="primary"
+          // className={classes.submit}
+          >
+            <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
+              Main page
+            </Link>
+          </Button>
+        </Grid>
         <Typography
           // component="h2"
           variant="h5"
@@ -46,13 +61,12 @@ const Header = (props: HeaderProps) => {
           className={classes.title}
         // sx={{ flex: 1 }}
         >
-          BLog
-          {/* {title} */}
+          {/* BLog */}
+          {title}
         </Typography>
-
-        {(stateUser.id == 0) ?
+        {(stateUser.id === 0) ?
           <>
-            <Link to="/register" style={{ textDecoration: 'none', marginRight: 5, marginLeft: 55 }} >
+            <Link to="/register" style={{ textDecoration: 'none', marginRight: 5, marginLeft: 25 }} >
               <Button variant="contained" size="small" color="primary">
                 Sign up
               </Button>
@@ -71,39 +85,28 @@ const Header = (props: HeaderProps) => {
             <Button variant="contained"
               size="small"
               color="primary"
-              style={{ textDecoration: 'none', marginRight: 15, marginLeft: 35 }}
+              style={{ textDecoration: 'none', marginRight: 15, marginLeft: 25 }}
               onClick={() => {
                 localStorage.removeItem('token');
                 dispatch(clearUser());
                 history.push("/");
               }}
-            > 
+            >
               Logout
             </Button>
 
           </>
         }
-      </Toolbar>
-      {/* <Toolbar
-        component="nav"
-        variant="dense"
-        // sx={{ justifyContent: 'space-between', overflowX: 'auto' }}
-      >
-        {sections.map((section) => (
-          <Link
-            color="inherit"
-            noWrap
-            key={section.title}
-            variant="body2"
-            href={section.url}
-            className={classes.menuButton} 
-            // sx={{ p: 1, flexShrink: 0 }}
-          >
-            {section.title}
+        {(stateUser.role === 1) ?
+          <Link to="/admin" style={{ textDecoration: 'none' }}>
+            <Button variant="contained" size="small" color="primary">
+              Admin
+            </Button>
           </Link>
-        ))}
-      </Toolbar> */}
-    </React.Fragment>
+          : <></>
+        }
+      </Toolbar>
+    </Fragment>
   );
 }
 
@@ -124,7 +127,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexGrow: 1,
     },
     avatar: {
-      marginLeft: 55,
+      // marginLeft: 5,
     }
   }),
 );

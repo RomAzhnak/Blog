@@ -1,6 +1,6 @@
 import { Container } from '@material-ui/core';
-import  LogOutButton  from './LogOutButton';
-import  EditUserButton  from './EditUserButton';
+import  LogOutButton  from './1LogOutButton';
+import  EditUserButton  from './1EditUserButton';
 
 export function ProtectedPage() {
   return (

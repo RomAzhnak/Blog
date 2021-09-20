@@ -9,8 +9,6 @@ const baseUrl = 'http://localhost:4000/auth/files/';
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-// const { upload } = require("./file.controller");
-
 exports.allUser = (req, res) => {
   User.findAll({
   })
@@ -20,11 +18,12 @@ exports.allUser = (req, res) => {
 };
 
 exports.changeLike = async (req, res) => {
-  let statusLike = true;
+  let statusLike = false;
   try {
     const idAuthor = Number(req.body.idAuthor.slice(1));
     const idPost = req.body.idPost;
     const token = req.headers.authorization.split(' ')[1];
+    let idLiker = 0;
     jwt.verify(token, config.secret, (err, decoded) => {
       idLiker = decoded.id;
     });
@@ -36,27 +35,19 @@ exports.changeLike = async (req, res) => {
         userId: idLiker,
         postId: idPost,
         postAuthorId: idAuthor
-      })
-      await Post.update({
-        likes: db.sequelize.literal('likes+1')
-      },
-        {
-          where: { id: idPost, userId: idAuthor }
-        });
-    } else {
-      await Post.update({
-        likes: db.sequelize.literal('likes-1')
-      },
-        {
-          where: { id: idPost, userId: idAuthor }
-        });
-        statusLike = false;
-    }
-    const numberLikes = await Post.findOne({
-        where: { id: idPost, userId: idAuthor },
-        attributes: ['likes',]
       });
-    res.status(200).send({ statusLike: statusLike, numberLikes: numberLikes.likes });
+      statusLike = true;
+    }
+    // const countLikes = await UserLike.findAll({
+    //   where: { postId: idPost },
+    //   attributes: [
+    //     [db.sequelize.fn('COUNT', db.sequelize.col('postId')), 'likes']
+    //   ],
+    // });
+    const { QueryTypes } = require('sequelize');
+    const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes FROM UserLikes WHERE postId = ${idPost} GROUP BY postId`, { type: QueryTypes.SELECT });
+    const likes = (countLikes.length != 0) ? countLikes[0].likes : 0;
+    res.status(200).send({ statusLike: statusLike, countLikes: likes });
   }
   catch (err) {
     res.status(500).send({
@@ -66,7 +57,7 @@ exports.changeLike = async (req, res) => {
 }
 
 exports.getUserPosts = async (req, res) => {
-  // let idLiker = 0;
+  let idLiker = 0;
   try {
     const token = req.headers.authorization.split(' ')[1];
     jwt.verify(token, config.secret, (err, decoded) => {
@@ -79,14 +70,10 @@ exports.getUserPosts = async (req, res) => {
     });
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
-    // const { QueryTypes, or } = require('sequelize');
-    // const posts = await db.sequelize.query('SELECT post, likes, createdAt From `Posts` WHERE userid = `id`', { type: QueryTypes.SELECT });
-    const posts = await Post.findAll({
-      where: { userId: idAuthor },
-      //  attributes: ['id', ]
-    })
+    const { QueryTypes } = require('sequelize');
+    const posts = await db.sequelize.query(`SELECT count(postid) AS likes, Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, UserLikes.postAuthorId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId WHERE Posts.userId = ${idAuthor} GROUP BY Posts.id`, { type: QueryTypes.SELECT });
     if (!posts) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! Author Not found!");
     }
     res.status(200).send({ posts: posts, userLikes: userLikes });
   } catch (err) {
@@ -106,10 +93,12 @@ exports.getUserById = async (req, res) => {
     res.status(200).send({
       userName: user.userName,
       email: user.email,
-      role: user.role,
+      role: user.roleId,
       urlAvatar: user.urlAvatar,
       id: user.id,
+      password: '',
     })
+    // console.log(user);
   } catch (err) {
     res.status(500).send({
       message: `Failed! : ${err}`,
@@ -120,12 +109,10 @@ exports.getUserById = async (req, res) => {
 exports.edit = async (req, res) => {
   try {
     await uploadFile(req, res);
-    const { userName, email, password, role, urlAvatar, id } = req.body;
-    // console.log(req.body, userName, email, password, role, urlAvatar);
-    const user = await User.findOne({
-      where: { email: email }
-    });
-    // console.log(user);
+    const { userName, email, password, urlAvatar, id } = req.body;
+    const idUser = Number(id);
+    const role = Number(req.body.role);
+    const user = await User.findByPk(id);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
@@ -136,24 +123,15 @@ exports.edit = async (req, res) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     };
-    if ((user.urlAvatar !== urlAvatar) && (req.file !== undefined)) {
-      const filename = req.file.originalname;
-      const result = await User.update({
-        urlAvatar: baseUrl + filename,
-      },
-        {
-          where: { email: email }
-        });
-      if (!result) {
-        throw new Error("Failed update!");
-      };
-    }
+    const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
+      email: email,
       roleId: role,
+      urlAvatar: fileName,
     },
       {
-        where: { email: email }
+        where: { id: idUser }
       });
     if (!result) {
       throw new Error("Failed update!");
@@ -163,12 +141,12 @@ exports.edit = async (req, res) => {
       email: email,
       role: role,
       urlAvatar: urlAvatar,
-      id: id,
+      id: idUser,
       accessToken: ''
     })
   } catch (err) {
     res.status(500).send({
-      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+      message: `Failed edit! ${err}`,
     });
   }
 };
@@ -178,29 +156,26 @@ exports.getListPost = async (req, res) => {
     // const { QueryTypes, or } = require('sequelize');
     // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
     // const users = await 
-    Post.findAll({ 
+    Post.findAll({
       attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
       group: ["userId"],
       raw: true,
-  })
-  .then(function(minIds){
-      return Post.findAll({
-        // attributes: ['title', 'post', 'createdAt', 'userId', 'User.urlAvatar'],
-        include: [{
-          model: User,
-          where: {state: db.Sequelize.col('Post.userId')}
-        }],
+    })
+      .then(function (minIds) {
+        return Post.findAll({
+          include: [{
+            model: User,
+            where: { state: db.Sequelize.col('Post.userId') }
+          }],
           where: {
-              id: { [Op.in]: minIds.map(item => item.minid) }
+            id: { [Op.in]: minIds.map(item => item.minid) }
           },
+        })
       })
-  })
-  .then(function(result){
-    // console.log(result);
-
-    res.status(200).send(result);
-    return Promise.resolve(result);
-  })
+      .then(function (result) {
+        res.status(200).send(result);
+        return Promise.resolve(result);
+      })
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -208,12 +183,10 @@ exports.getListPost = async (req, res) => {
 
 exports.getListUsers = async (req, res) => {
   try {
-    const email = req.query.email;
-    // const { QueryTypes, or } = require('sequelize');
-    // const users = await db.sequelize.query('SELECT userName, urlAvatar, id From `Users`', { type: QueryTypes.SELECT });
+    const id = req.query.id;
     const users = await User.findAll({
-      where: { 
-        email: { [Op.ne]: [email] } 
+      where: {
+        id: { [Op.ne]: [id] }
       }
     });
     res.status(200).send(users);;
@@ -304,9 +277,10 @@ exports.signin = async (req, res) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     }
-    const token = jwt.sign({ email: user.email, id: user.id }, config.secret, {    //{ id: user.id }
-      expiresIn: 86400 // 60*60*24
-    });
+    const token = jwt.sign({ email: user.email, id: user.id }, config.secret,
+      {
+        expiresIn: 86400 // 60*60*24
+      });
     res.status(200).send({
       userName: user.userName,
       email: user.email,
@@ -319,22 +293,6 @@ exports.signin = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
-
-// exports.findAll = (req, res) => {
-//   const title = req.query.title;
-//   const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-
-//   User.findAll({ where: condition })
-//     .then(data => {
-//       res.send(data);
-//     })
-//     .catch(err => {
-//       res.status(500).send({
-//         message:
-//           err.message || "Some error occurred while retrieving user."
-//       });
-//     });
-// };
 
 exports.findOne = (req, res) => {
   const id = req.params.id;

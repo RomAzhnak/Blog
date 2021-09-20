@@ -79,7 +79,6 @@ const SignIn: React.FC<Props> = (props) => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      // console.log(values);
       onSubmitForm(values);
     },
   });

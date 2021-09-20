@@ -29,8 +29,8 @@ export const fetchGet = (): Promise<any> => {
   return instance.get('/auth');
 }
 
-export const getUserList = (email: string): Promise<any>  => {
-  return instance.get(`/auth/users?email=${email}`);
+export const getUserList = (id: number): Promise<any>  => {
+  return instance.get(`/auth/users?id=${id}`);
 }
 
 export const getPosts = (id: string): Promise<any>  => {

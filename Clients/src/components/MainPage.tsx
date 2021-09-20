@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { createTheme, makeStyles, ThemeProvider } from '@material-ui/core';
+import { createTheme, IconButton, InputAdornment, makeStyles, TextField, ThemeProvider } from '@material-ui/core';
+import SearchSharpIcon from '@material-ui/icons/SearchSharp';
 import Header from './Header';
 import FeaturedPost from './FeaturedPost';
 import Footer from './Footer';
@@ -7,10 +8,6 @@ import Pagination from '@material-ui/lab/Pagination';
 import { Container, CssBaseline, Grid } from '@material-ui/core';
 import { useEffect } from 'react';
 import { getUserPostList } from '../api/userApi';
-
-// import MainFeaturedPost from './MainFeaturedPost';
-// import Main from './Main';
-// import Sidebar from './Sidebar';
 
 const theme = createTheme();
 
@@ -23,47 +20,60 @@ const MainPage: React.FC<Props> = (props) => {
   const classes = useStyles();
   const [featuredPosts, setFeaturedPosts] = useState<any[]>([]);
   const [page, setPage] = useState(1);
-
-  const handleChange = (event: object, page: number) => {
-    setPage(page);
-  };
+  const postsOnPage = 5;
 
   useEffect(() => {
     getUserPostList()
       .then((response) => {
         setFeaturedPosts(response.data);
-        console.log(featuredPosts);
       })
       .catch((err) =>
         console.log(`Failed request ${err}`)
       )
   }, [])
 
+  const handleChange = (event: object, page: number) => {
+    setPage(page);
+  };
+
+  const handleClick = () => {
+    return
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" className={classes.container}>
         <Header title="Blog" />
-        <Grid className={classes.main} >
-          {/* <Grid> */}
-          <Grid container spacing={1} direction='column' alignItems='center' >
-          {/* <Grid style={{ maxHeight: '70vh', overflow: 'auto' }}> */}
-            {featuredPosts
-              ? featuredPosts.map((post) => (
-                <FeaturedPost key={post.title} post={post} />
-              )) : <h1>Empty...</h1>
-            }
+        <Grid >
+          <TextField
+            label="Search"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleClick}>
+                    <SearchSharpIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+        </Grid>
+        <Grid className={classes.main} style={{ maxHeight: '65vh', overflow: 'auto' }}>
+          {/* <Grid spacing={1} direction='column' alignItems='center' > */}
+          {featuredPosts
+            ? featuredPosts.slice((page - 1) * postsOnPage, page * postsOnPage).map((post) => (
+              <FeaturedPost key={post.title} post={post} />
+            )) : <h1>Empty...</h1>
+          }
           {/* </Grid> */}
-          </Grid>
-          <Grid className={classes.pagination}>
-            <Pagination 
-            count={Math.ceil(featuredPosts.length/3)} 
-            color="primary" 
+        </Grid>
+        <Grid className={classes.pagination}>
+          <Pagination
+            count={Math.ceil(featuredPosts.length / postsOnPage)}
+            color="primary"
             onChange={handleChange}
-            />
-          </Grid>
-          {/* </Grid>  */}
-
+          />
         </Grid>
         <Footer
           title="Footer"
@@ -85,10 +95,12 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
   },
   main: {
-    flexGrow: 1,
+    // flexGrow: 1,
+    alignSelf: 'center',
+    marginTop: theme.spacing(2),
   },
   pagination: {
-    marginTop: theme.spacing(8),
+    margin: theme.spacing(2),
     display: 'flex',
     justifyContent: 'center',
   },

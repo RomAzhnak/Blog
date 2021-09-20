@@ -1,5 +1,3 @@
-// import { Avatar, Card, CardActionArea, CardContent, CardHeader, CardMedia, Collapse, Grid, IconButton, Typography } from '@material-ui/core';
-// import * as React from 'react';
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
@@ -13,11 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Link } from 'react-router-dom';
-import { red } from '@material-ui/core/colors';
-// import MoreVertIcon from '@material-ui/icons/MoreVert';
-// import FavoriteIcon from '@material-ui/icons/Favorite';
-// import ShareIcon from '@material-ui/icons/Share';
-// import CardMedia from '@material-ui/core/CardMedia';
+import { User } from '../redux/userSlice';
 
 interface FeaturedPostProps {
   post: {
@@ -28,7 +22,7 @@ interface FeaturedPostProps {
     title: string;
     id: number;
     userId: number;
-    User: any;
+    User: User;
   };
 }
 
@@ -44,25 +38,25 @@ export default function FeaturedPost(props: FeaturedPostProps) {
   return (
     <Card className={classes.root}>
       <CardHeader
-      className={classes.card}
+        className={classes.card}
         action={
           <Link to={`/users/:${post.userId}`} >
-          <Avatar aria-label="recipe" className={classes.avatar} src={post.User.urlAvatar}>
-          </Avatar>
+            <Avatar aria-label="recipe" className={classes.avatar} src={post.User.urlAvatar}>
+            </Avatar>
           </Link>
         }
-        titleTypographyProps={{variant:'h6' }}
+        titleTypographyProps={{ variant: 'h6' }}
         title={post.title}
-        subheader={post.createdAt.slice(0,10)}
+        subheader={post.createdAt.slice(0, 10)}
       />
-      <CardActions disableSpacing>
+      <CardActions disableSpacing style={{ paddingTop: 0 }} > 
         <IconButton
           className={clsx(classes.expand, {
             [classes.expandOpen]: expanded,
           })}
           onClick={handleExpandClick}
           aria-expanded={expanded}
-          aria-label="show more"
+        // aria-label="show more"
         >
           <ExpandMoreIcon />
         </IconButton>
@@ -81,15 +75,15 @@ export default function FeaturedPost(props: FeaturedPostProps) {
 const useStyles = makeStyles((theme) => ({
   root: {
     // maxWidth: 900,
-    width: 600, 
-    marginTop: 25,
+    width: 600,
+    marginTop: 5,
   },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
+  // media: {
+  //   height: 0,
+  //   paddingTop: '56.25%', // 16:9
+  // },
   card: {
-    // padding: 10 
+    paddingBottom: 0 
   },
   expand: {
     transform: 'rotate(0deg)',
@@ -102,9 +96,7 @@ const useStyles = makeStyles((theme) => ({
     transform: 'rotate(180deg)',
   },
   avatar: {
-    // backgroundColor: red[500],
     width: theme.spacing(8),
     height: theme.spacing(8),
-    // marginLeft: theme.spacing(10),
   },
 }));
