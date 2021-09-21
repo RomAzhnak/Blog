@@ -1,4 +1,6 @@
 import { Box, Container, Link, Typography } from '@material-ui/core';
+// import { createTheme, makeStyles} from '@material-ui/core';
+// const theme = createTheme();
 
 function Copyright() {
   return (
@@ -19,11 +21,14 @@ interface FooterProps {
 }
 
 export default function Footer(props: FooterProps) {
+  // const classes = useStyles();
   const { description, title } = props;
 
   return (
-    <Box component="footer" >
-      <Container maxWidth="lg">
+    <Box component="footer"  >
+      <Container maxWidth="lg" 
+      // className={classes.footer}
+      >
         <Typography
           variant="subtitle1"
           align="center"
@@ -36,3 +41,9 @@ export default function Footer(props: FooterProps) {
     </Box>
   );
 }
+
+// const useStyles = makeStyles((theme) => ({
+//   footer: {
+//     flex: '0 0 auto',
+//   }
+// }));

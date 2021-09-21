@@ -3,6 +3,7 @@ const app = express();
 const controllerAuth = require("./controllers/auth.controller");
 const db = require("./models");
 const userReq = require("./routers/user.requests");
+const adminReq = require("./routers/admin.requests");
 const cors = require('cors');
 
 global.__basedir = __dirname;
@@ -26,6 +27,7 @@ app.get('/test', (req, res) => {
 })
 
 app.use("/auth", userReq);
+app.use("/admin", adminReq);
 
 const port = 4000;
 app.listen(port, () => {

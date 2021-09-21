@@ -8,6 +8,7 @@ const Op = db.Sequelize.Op;
 const baseUrl = 'http://localhost:4000/auth/files/';
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { QueryTypes } = require('sequelize');
 
 exports.allUser = (req, res) => {
   User.findAll({
@@ -23,10 +24,12 @@ exports.changeLike = async (req, res) => {
     const idAuthor = Number(req.body.idAuthor.slice(1));
     const idPost = req.body.idPost;
     const token = req.headers.authorization.split(' ')[1];
-    let idLiker = 0;
-    jwt.verify(token, config.secret, (err, decoded) => {
-      idLiker = decoded.id;
-    });
+    // let idLiker = 0;
+    // jwt.verify(token, config.secret, (err, decoded) => {
+    //   idLiker = decoded.id;
+    // });
+    const idLiker = req.userId;
+
     const result = await UserLike.destroy({
       where: { userId: idLiker, postId: idPost, postAuthorId: idAuthor }
     })
@@ -38,7 +41,7 @@ exports.changeLike = async (req, res) => {
       });
       statusLike = true;
     }
-    const { QueryTypes } = require('sequelize');
+  
     const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes 
     FROM UserLikes WHERE postId = ${idPost} 
     GROUP BY postId`, { type: QueryTypes.SELECT });
@@ -53,22 +56,22 @@ exports.changeLike = async (req, res) => {
 }
 
 exports.getUserPosts = async (req, res) => {
-  let idLiker = 0;
+  // let idLiker = 0;
   try {
-    const token = req.headers.authorization.split(' ')[1];
-    jwt.verify(token, config.secret, (err, decoded) => {
-      idLiker = decoded.id;
-    });
-    const idAuthor = Number(req.params.id.slice(1));
+    // const token = req.headers.authorization.split(' ')[1];
+    // jwt.verify(token, config.secret, (err, decoded) => {
+    //   idLiker = decoded.id;
+    // });
+    const idLiker = req.userId;
 
+    const idAuthor = Number(req.params.id.slice(1));
     const userLike = await UserLike.findAll({
       where: { userId: idLiker, postAuthorId: idAuthor },
       attributes: ['postId',]
     });
-    console.log(idLiker, idAuthor);
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
-    const { QueryTypes } = require('sequelize');
+   
     const posts = await db.sequelize.query(`SELECT count(UserLikes.id) AS likes, 
     Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, 
     UserLikes.postId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId 
@@ -114,7 +117,6 @@ exports.edit = async (req, res) => {
     const roleId = Number(req.body.roleId);
     const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
-    console.log(idUser, roleId);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
@@ -154,28 +156,76 @@ exports.edit = async (req, res) => {
   }
 };
 
+// 'http://localhost:4000/auth/postlist?filter=""&page=""'
+
+// exports.getListPost = async (req, res) => {
+//   const page = Number(req.params.page) - 1;
+//   try { 
+//     Post.findAll({
+//       attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
+//       group: ["userId"],
+//       raw: true,
+//     })
+//       .then(function (minIds) {
+//         return Post.findAll({
+//           include: [{
+//             model: User,
+//             where: { state: db.Sequelize.col('Post.userId') }
+//           }],
+//           where: {
+//             id: { [Op.in]: minIds.map(item => item.minid) }
+//           },
+//           offset: page * 5,
+//           limit: 5,
+//         })
+//       })
+//       .then(function (result) {
+//         res.status(200).send(result);
+//         return Promise.resolve(result);
+//       })
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// }
+
 exports.getListPost = async (req, res) => {
-  try { 
-    Post.findAll({
+  console.log(req.query);
+  const filter = req.query.filter;
+  const page = Number(req.query.page) - 1;
+  try {
+    const minIds = await Post.findAll({
       attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
       group: ["userId"],
       raw: true,
+    });
+    const result = await Post.findAll({
+      include: [{
+        model: User,
+        where: { state: db.Sequelize.col('Post.userId') }
+      }],
+      where: { 
+        [Op.and]: [
+          {id: { [Op.in]: minIds.map(item => item.minid) }},
+          {title: {[Op.substring]: `${filter}`}},
+      ]
+      },
+      offset: page * 5,
+      limit: 5,
     })
-      .then(function (minIds) {
-        return Post.findAll({
-          include: [{
-            model: User,
-            where: { state: db.Sequelize.col('Post.userId') }
-          }],
-          where: {
-            id: { [Op.in]: minIds.map(item => item.minid) }
-          },
-        })
-      })
-      .then(function (result) {
-        res.status(200).send(result);
-        return Promise.resolve(result);
-      })
+    const postsFilter = await Post.findAll({
+      include: [{
+        model: User,
+        where: { state: db.Sequelize.col('Post.userId') }
+      }],
+      where: { 
+        [Op.and]: [
+          {id: { [Op.in]: minIds.map(item => item.minid) }},
+          {title: {[Op.substring]: `${filter}`}},
+      ]
+      },
+    })
+    const countPosts = postsFilter.length;
+    res.status(200).send({ posts: result, countPosts: countPosts });;
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

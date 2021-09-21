@@ -17,8 +17,13 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-export const getUserPostList = (): Promise<any> => {
-  return instance.get('/auth/postlist'); 
+// export const getUserPostFilter = (filter: string): Promise<any> => {
+//   return instance.get(`/auth/postfilter/${filter}`); 
+// }
+
+export const getUserPostList = (page: number, filter: string): Promise<any> => {
+  // return instance.post('/auth/postlist/', {page, filter}); 
+  return instance.get(`/auth/postlist?page=${page}&filter=${filter}`);
 }
 
 export const changeLike = (data: any): Promise<any> => {

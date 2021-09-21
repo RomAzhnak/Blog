@@ -15,6 +15,7 @@ export interface User {
 export interface UserState {
 	userFields: User,
 	error: string,
+	filter: string,
 	userEditAdmin: User,
 };
 
@@ -28,6 +29,7 @@ const initialState: UserState = {
 		id: 0,
 	},
 	error: '',
+	filter: '',
 	userEditAdmin: {
 		userName: '',
 		email: '',
@@ -114,6 +116,9 @@ export const userSlice = createSlice({
 			state.userFields.urlAvatar = action.payload.urlAvatar;
 			state.userFields.id = action.payload.id;
 		},
+		postFilter: (state, action) => {
+			state.filter = action.payload;
+		},
 		userEditAdmin: (state, action) => {
 			state.userEditAdmin.email = action.payload.email;
 			state.userEditAdmin.userName = action.payload.userName;
@@ -197,7 +202,8 @@ export const userSlice = createSlice({
 export const {
 	addUser,
 	userEditAdmin,
-	clearUser
+	clearUser,
+	postFilter
 } = userSlice.actions;
 
 export default userSlice.reducer;

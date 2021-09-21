@@ -89,6 +89,7 @@ const EditForm: React.FC<Props> = (props) => {
   };
  
   const onSubmitForm = (user: User) => {
+
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
@@ -97,7 +98,8 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("email", user.email);
     formData.append("id", String(stateUser.id));
     formData.append("roleId", String(stateUser.roleId));
-    formData.append("admin", "1");;
+    formData.append("admin", "1");
+    dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(image)}));
     if (user.email) {
       dispatch(fetchEditAdmin(formData))
         .unwrap()
