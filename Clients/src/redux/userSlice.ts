@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, 
-	fetchAvatar, fetchEditUserAdmin, fetchDelUserAdmin } from '../api/userApi';
+	// fetchAvatar,
+	 fetchEditUserAdmin, fetchDelUserAdmin } from '../api/userApi';
 import { RootState } from './store';
 
 export interface User {
@@ -57,13 +58,13 @@ export const fetchAdd = createAsyncThunk<string, User, { state: RootState }>(
 	}
 );
 
-export const fetchAddAvatar = createAsyncThunk<string, FormData, { state: RootState }>(
-	'user/fetchAddAvatar',
-	async (user, thankApi) => {
-		const resp = await fetchAvatar(user);
-		return resp.data
-	}
-);
+// export const fetchAddAvatar = createAsyncThunk<string, FormData, { state: RootState }>(
+// 	'user/fetchAddAvatar',
+// 	async (user, thankApi) => {
+// 		const resp = await fetchAvatar(user);
+// 		return resp.data
+// 	}
+// );
 
 export const fetchLogin = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchLogin',
@@ -98,7 +99,7 @@ export const fetchDel = createAsyncThunk<UserLogin, User, { state: RootState }>(
 );
 
 export const fetchDelAdmin = createAsyncThunk<UserLogin, User, { state: RootState }>(
-	'user/fetchDel',
+	'user/fetchDelAdmin',
 	async (user, thankApi) => {
 		const resp = await fetchDelUserAdmin(user);
 		return resp.data
@@ -194,6 +195,18 @@ export const userSlice = createSlice({
 				state.userFields.id = 0
 			})
 			.addCase(fetchDel.rejected, (state, action) => {
+				state.error = 'error';
+			})
+			.addCase(fetchDelAdmin.pending, (state, action) => {
+			})
+			.addCase(fetchDelAdmin.fulfilled, (state, action) => {
+				state.userEditAdmin.email = '';
+				state.userEditAdmin.userName = '';
+				state.userEditAdmin.roleId = 2;
+				state.userEditAdmin.urlAvatar = '';
+				state.userEditAdmin.id = 0
+			})
+			.addCase(fetchDelAdmin.rejected, (state, action) => {
 				state.error = 'error';
 			})
 	}

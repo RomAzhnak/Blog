@@ -4,6 +4,7 @@ const uploadFile = require("../middleware/upload");
 const User = db.User;
 const Post = db.Post;
 const UserLike = db.UserLike;
+const Subscription = db.Subscription;
 const Op = db.Sequelize.Op;
 const baseUrl = 'http://localhost:4000/auth/files/';
 const jwt = require("jsonwebtoken");
@@ -23,7 +24,7 @@ exports.changeLike = async (req, res) => {
   try {
     const idAuthor = Number(req.body.idAuthor.slice(1));
     const idPost = req.body.idPost;
-    const token = req.headers.authorization.split(' ')[1];
+    // const token = req.headers.authorization.split(' ')[1];
     // let idLiker = 0;
     // jwt.verify(token, config.secret, (err, decoded) => {
     //   idLiker = decoded.id;
@@ -41,7 +42,7 @@ exports.changeLike = async (req, res) => {
       });
       statusLike = true;
     }
-  
+
     const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes 
     FROM UserLikes WHERE postId = ${idPost} 
     GROUP BY postId`, { type: QueryTypes.SELECT });
@@ -71,7 +72,7 @@ exports.getUserPosts = async (req, res) => {
     });
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
-   
+
     const posts = await db.sequelize.query(`SELECT count(UserLikes.id) AS likes, 
     Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, 
     UserLikes.postId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId 
@@ -90,16 +91,23 @@ exports.getUserPosts = async (req, res) => {
 exports.getUserById = async (req, res) => {
   try {
     const id = Number(req.params.id.slice(1));
+    const idSubscriber = req.userId;
     const user = await User.findByPk(id);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
+    const isSubscribe = await Subscription.findOne({
+      where: { userId: idSubscriber, userSubscribe: id }
+    });
+    // const subscribe = isSubscribe ? true : false;
+    const subscribe = Boolean(isSubscribe);
     res.status(200).send({
       userName: user.userName,
       email: user.email,
       roleId: user.roleId,
       urlAvatar: user.urlAvatar,
       id: user.id,
+      subscribe: subscribe,
       password: '',
     })
   } catch (err) {
@@ -117,9 +125,13 @@ exports.edit = async (req, res) => {
     const roleId = Number(req.body.roleId);
     const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
+    console.log(roleId);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
+    if (user.roleId === 1) {
+      throw new Error("Failed! Cannot edit admin");
+    }
     if (!admin) {
       const passwordIsValid = bcrypt.compareSync(
         password,
@@ -146,7 +158,7 @@ exports.edit = async (req, res) => {
       userName: userName,
       email: email,
       roleId: roleId,
-      urlAvatar: urlAvatar,
+      urlAvatar: fileName,
       id: idUser,
     })
   } catch (err) {
@@ -189,7 +201,6 @@ exports.edit = async (req, res) => {
 // }
 
 exports.getListPost = async (req, res) => {
-  console.log(req.query);
   const filter = req.query.filter;
   const page = Number(req.query.page) - 1;
   try {
@@ -203,11 +214,11 @@ exports.getListPost = async (req, res) => {
         model: User,
         where: { state: db.Sequelize.col('Post.userId') }
       }],
-      where: { 
+      where: {
         [Op.and]: [
-          {id: { [Op.in]: minIds.map(item => item.minid) }},
-          {title: {[Op.substring]: `${filter}`}},
-      ]
+          { id: { [Op.in]: minIds.map(item => item.minid) } },
+          { title: { [Op.substring]: `${filter}` } },
+        ]
       },
       offset: page * 5,
       limit: 5,
@@ -217,15 +228,36 @@ exports.getListPost = async (req, res) => {
         model: User,
         where: { state: db.Sequelize.col('Post.userId') }
       }],
-      where: { 
+      where: {
         [Op.and]: [
-          {id: { [Op.in]: minIds.map(item => item.minid) }},
-          {title: {[Op.substring]: `${filter}`}},
-      ]
+          { id: { [Op.in]: minIds.map(item => item.minid) } },
+          { title: { [Op.substring]: `${filter}` } },
+        ]
       },
     })
     const countPosts = postsFilter.length;
     res.status(200).send({ posts: result, countPosts: countPosts });;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
+
+exports.setUserSubscribe = async (req, res) => {
+  let subscribe = false;
+  try {
+    const id = Number(req.query.id);
+    const idSubscriber = req.userId;
+    const result = await Subscription.destroy({
+      where: { userId: idSubscriber, userSubscribe: id }
+    })
+    if (!result) {
+      await Subscription.create({
+        userId: idSubscriber,
+        userSubscribe: id
+      });
+      subscribe = true;
+    }
+    res.status(200).send({subscribe: subscribe});
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -239,7 +271,7 @@ exports.getListUsers = async (req, res) => {
         id: { [Op.ne]: [id] }
       }
     });
-    res.status(200).send(users);;
+    res.status(200).send(users);
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
@@ -247,6 +279,15 @@ exports.getListUsers = async (req, res) => {
 
 exports.deleteAdmin = async (req, res) => {
   try {
+    const user = await User.findOne({
+      where: { id: req.query.id }
+    });
+    if (!user) {
+      throw new Error("Failed! User Not found!");
+    };
+    if (user.roleId === 1) {
+      throw new Error("Failed! Cannot delete admin!");
+    };
     const result = await User.destroy({
       where: { id: req.query.id }
     })

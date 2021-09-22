@@ -44,13 +44,13 @@ type Props = {
 };
 
 
-const init: User = {
-  userName: '',
-  email: '',
-  urlAvatar: '',
-  roleId: 2,
-  id: 0,
-  password: '',
+type InitUser  = {
+  userName: string,
+  email: string,
+  // urlAvatar: '',
+  roleId: number,
+  id: number,
+  password: string,
 }
 
 const EditForm: React.FC<Props> = (props) => {
@@ -67,13 +67,13 @@ const EditForm: React.FC<Props> = (props) => {
       email: stateUser.email,
       password: stateUser.password,
       roleId: stateUser.roleId,
-      urlAvatar: stateUser.urlAvatar,
+      // urlAvatar: stateUser.urlAvatar,
       id: stateUser.id,
     },
     validationSchema: validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      console.log(values);
+      // console.log(values);
       onSubmitForm(values);
     },
   });
@@ -81,15 +81,14 @@ const EditForm: React.FC<Props> = (props) => {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target?.files?.[0];
     if (newImage) {
-      setImage(URL.createObjectURL(newImage));
+      // setImage(URL.createObjectURL(newImage));
       // formik.values.urlAvatar = URL.createObjectURL(newImage);
       setFileName(newImage);
       dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(newImage)}));
     }
   };
  
-  const onSubmitForm = (user: User) => {
-
+  const onSubmitForm = (user: InitUser) => {
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
@@ -97,24 +96,24 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("userName", user.userName);
     formData.append("email", user.email);
     formData.append("id", String(stateUser.id));
-    formData.append("roleId", String(stateUser.roleId));
+    formData.append("roleId", String(user.roleId));
     formData.append("admin", "1");
-    dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(image)}));
+    dispatch(userEditAdmin({...stateUser, urlAvatar: stateUser.urlAvatar })); // urlAvatar: URL.createObjectURL(fileName)
     if (user.email) {
       dispatch(fetchEditAdmin(formData))
         .unwrap()
         .then(() => {
-          history.push("/admin");
+          // history.push("/admin");
         })
         .catch((err) => {
-          console.log(`Failed request ${err}`);
+          console.log(`Failed request editAdmin ${err}`);
         })
     };
   };
 
   const onClickDelete = (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    if (stateUser.id == 1) return;
+    if (stateUser.id === 1) return;
     const fetchUser = {
       userName: stateUser.userName,
       email: stateUser.email,
@@ -126,7 +125,10 @@ const EditForm: React.FC<Props> = (props) => {
     dispatch(fetchDelAdmin(fetchUser))
       .unwrap()
       .then(() => {
-        history.push("/");
+        // history.push("/");
+      })
+      .catch((err) => {
+        console.log(`Failed request delete ${err}`);
       })
   }
 
@@ -138,10 +140,7 @@ const EditForm: React.FC<Props> = (props) => {
             <Typography component="h1" variant="h5">
               Edit
             </Typography>
-            <form className={classes.form}
-              onSubmit={formik.handleSubmit}
-              noValidate
-            >
+
               <input accept="image/*"
                 className={classes.input}
                 id="icon-button-file"
@@ -150,9 +149,15 @@ const EditForm: React.FC<Props> = (props) => {
               />
               <label htmlFor="icon-button-file">
                 <IconButton color="primary" component="span">
-                  <Avatar src={formik.values.urlAvatar} className={classes.large} />
+                  <Avatar src={stateUser.urlAvatar} className={classes.large} />
                 </IconButton>
               </label>
+
+            <form className={classes.form}
+              onSubmit={formik.handleSubmit}
+              noValidate
+            >
+
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField

@@ -4,6 +4,7 @@ const controllerAuth = require("./controllers/auth.controller");
 const db = require("./models");
 const userReq = require("./routers/user.requests");
 const adminReq = require("./routers/admin.requests");
+const authReq = require("./routers/auth.requests");
 const cors = require('cors');
 
 global.__basedir = __dirname;
@@ -26,8 +27,9 @@ app.get('/test', (req, res) => {
   })
 })
 
-app.use("/auth", userReq);
+app.use("/auth", authReq);
 app.use("/admin", adminReq);
+app.use("/user", userReq);
 
 const port = 4000;
 app.listen(port, () => {

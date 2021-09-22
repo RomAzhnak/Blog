@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getUser, getPosts, changeLike } from "../api/userApi";
+import { getUser, getPosts, changeLike, changeSubscribeToUser } from "../api/userApi";
 import Avatar from '@material-ui/core/Avatar';
 import { Button, Checkbox, FormControlLabel, Grid, ListItem, Paper, Typography } from "@material-ui/core";
 import Container from '@material-ui/core/Container';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
 import { useAppSelector } from '../app/hooks';
+import Header from './Header';
 
 type Value = {
   id: number,
@@ -30,6 +31,7 @@ const Users: React.FC<Props> = (props) => {
   const [userName, setUserName] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [userLikes, setUserLikes] = useState<any>(new Set());
+  const [subscribe, setSubscribe] = useState<boolean>();
   const [posts, setPosts] = useState<any[]>();
   const classes = useStyles();
 
@@ -40,6 +42,7 @@ const Users: React.FC<Props> = (props) => {
         setUrlAvatar(response.data.urlAvatar);
         setUserName(response.data.userName);
         setEmail(response.data.email);
+        setSubscribe(response.data.subscribe);
       } catch (err) {
         console.log(`Failed request ${err}`)
       }
@@ -79,47 +82,70 @@ const Users: React.FC<Props> = (props) => {
       )
   }
 
+  const handleSubscribe = async () => {
+    try {
+      const response = await changeSubscribeToUser(id.slice(1));
+      setSubscribe(response.data.subscribe);
+    } catch (err) {
+      console.log(`Failed request ${err}`)
+    }
+  }
+
   return (
-    <Container component="main" maxWidth="sm" >
-      <Grid container spacing={8} justifyContent='center' >
-        <Grid item>
-          <Avatar src={urlAvatar} className={classes.large} />
-        </Grid>
-        <Grid item>
-          <Typography>User Name:{` ${userName}`}</Typography>
-          <Typography>Email:{` ${email}`}</Typography>
-          <Grid className={classes.button}>
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <Button type="submit" variant="contained" color="primary" >
-                Main page
-              </Button>
-            </Link>
+    <Container component="main" maxWidth="md" >
+      <Header title="Blog" />
+      <Container component="main" maxWidth="sm" >
+        <Grid container spacing={8} justifyContent='center' >
+          <Grid item>
+            <Avatar src={urlAvatar} className={classes.large} />
           </Grid>
-          {posts?.length ? <></> : <h2> No posts </h2>}
+          <Grid item>
+            <Typography>User Name:{` ${userName}`}</Typography>
+            <Typography>Email:{` ${email}`}</Typography>
+            <Grid >
+              <Grid className={classes.button}>
+                <Link to="/" style={{ textDecoration: 'none' }}>
+                  <Button type="submit" variant="contained" color="primary" >
+                    Main page
+                  </Button>
+                </Link>
+              </Grid>
+              <Grid className={classes.button}>
+                <Button type="submit"
+                  variant="contained"
+                  color="primary"
+                  onClick={handleSubscribe}
+                >
+                  {subscribe ? 'Отписаться' : 'Подписаться'}
+                </Button>
+              </Grid>
+            </Grid>
+            {posts?.length ? <></> : <h2> No posts </h2>}
+          </Grid>
         </Grid>
-      </Grid>
-      <ul >
-        {posts &&
-          posts.map((post: Value, index: number) => (
-            <ListItem
-              className={classes.list}
-              key={index}>
-              <Paper className={classes.paper}>
-                <Grid item xs>
-                  <Typography>{post.post}</Typography>
-                </Grid>
-              </Paper>
-              <FormControlLabel
-                onChange={() => { handleChangePostLike(post) }}
-                checked={handleGetStatusLike(post)}
-                control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} name="checkedH" />}
-                label={post.likes + " " + post.createdAt.slice(0, 10)}
-              />
-            </ListItem>
-          )
-          )
-        }
-      </ul>
+        <ul >
+          {posts &&
+            posts.map((post: Value, index: number) => (
+              <ListItem
+                className={classes.list}
+                key={index}>
+                <Paper className={classes.paper}>
+                  <Grid item xs>
+                    <Typography>{post.post}</Typography>
+                  </Grid>
+                </Paper>
+                <FormControlLabel
+                  onChange={() => { handleChangePostLike(post) }}
+                  checked={handleGetStatusLike(post)}
+                  control={<Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />} name="checkedH" />}
+                  label={post.likes + " " + post.createdAt.slice(0, 10)}
+                />
+              </ListItem>
+            )
+            )
+          }
+        </ul>
+      </Container>
     </Container>
   )
 }

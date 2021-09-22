@@ -21,13 +21,17 @@ instance.interceptors.request.use((config) => {
 //   return instance.get(`/auth/postfilter/${filter}`); 
 // }
 
+export const changeSubscribeToUser = (id: number): Promise<any>  => {
+  return instance.get(`/user/usersubcribe?id=${id}`);
+}
+
 export const getUserPostList = (page: number, filter: string): Promise<any> => {
   // return instance.post('/auth/postlist/', {page, filter}); 
-  return instance.get(`/auth/postlist?page=${page}&filter=${filter}`);
+  return instance.get(`/user/postlist?page=${page}&filter=${filter}`);
 }
 
 export const changeLike = (data: any): Promise<any> => {
-  return instance.post('/auth/like', data); 
+  return instance.post('/user/like', data); 
 }
 
 export const fetchGet = (): Promise<any> => {
@@ -35,15 +39,15 @@ export const fetchGet = (): Promise<any> => {
 }
 
 export const getUserList = (id: number): Promise<any>  => {
-  return instance.get(`/auth/users?id=${id}`);
+  return instance.get(`/user/users?id=${id}`);
 }
 
 export const getPosts = (id: string): Promise<any>  => {
-  return instance.get(`/auth/user/posts/${id}`);
+  return instance.get(`/user/userposts/${id}`);
 }
 
 export const getUser = (id: string): Promise<any>  => {
-  return instance.get(`/auth/user/${id}`);
+  return instance.get(`/user/getuser/${id}`);
 }
 
 export const fetchAddUser = (user: User): Promise<any> => {
@@ -65,14 +69,14 @@ export const fetchLoginUser = (user: User): Promise<any> => {
   // })
 }
 
-export const fetchAvatar = (file: FormData): Promise<any> => {
-  return instance.post("/auth/upload", file, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      "user": file.get('user')
-    },
-  });
-}
+// export const fetchAvatar = (file: FormData): Promise<any> => {
+//   return instance.post("/auth/upload", file, {
+//     headers: {
+//       "Content-Type": "multipart/form-data",
+//       "user": file.get('user')
+//     },
+//   });
+// }
 
 export const fetchEditUser = (formData: FormData): Promise<any> => {
   return instance.post("/auth/edit", formData
@@ -92,7 +96,7 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
 }
 
 export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
-  return instance.post("/auth/edit", formData
+  return instance.post("/admin/edit", formData
   , {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -119,7 +123,7 @@ export const fetchDelUser = (user: User): Promise<any> => {
 }
 
 export const fetchDelUserAdmin = (user: User): Promise<any> => {
-  return instance.delete('/auth/admin', {
+  return instance.delete('/admin/deleteUser', {
     params: {
       id: user.id,
       // password: user.password,

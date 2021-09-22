@@ -52,15 +52,15 @@ function App() {
             <PrivateRoute path="/users/:id">
               <Users />
             </PrivateRoute>
-            <PrivateRoute path="/admineditform/:userValue">
-              <AdminEditForm />
-            </PrivateRoute>
             <PrivateRoute path="/edituser">
               <EditForm />
             </PrivateRoute>
             <PrivateRoute path="/admin">
               <Admin />
             </PrivateRoute>
+            {/* <PrivateRoute path="/admineditform/:userValue">
+              <AdminEditForm />
+            </PrivateRoute> */}
           </Switch>
         </Router>
         : <p>Loading...</p>

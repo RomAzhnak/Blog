@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { useHistory, Link } from 'react-router-dom';
 import { getUserList } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
+import Header from './Header';
 
 
 const validationSchema = yup.object({
@@ -139,6 +140,7 @@ const EditForm: React.FC<Props> = (props) => {
 
   return (
     <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
+      {/* <Header title="Blog" /> */}
       <Grid component="main" className={classes.root} > 
         <input accept="image/*"
           className={classes.input}
