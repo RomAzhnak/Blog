@@ -15,6 +15,7 @@ import { useHistory, Link } from 'react-router-dom';
 import { getUserList } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
+import { Container } from '@material-ui/core';
 
 
 const validationSchema = yup.object({
@@ -49,6 +50,8 @@ const EditForm: React.FC<Props> = (props) => {
   const [imageInfos, setAvatar] = useState<any[]>([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
+  const [postTitle, setTitlePost] = useState<string>('');
+  const [postText, setTextPost] = useState<string>('');
 
   useEffect(() => {
     getUserList(stateUser.id)
@@ -76,7 +79,7 @@ const EditForm: React.FC<Props> = (props) => {
   };
 
   const onSubmitForm = (user: User) => {
-
+    // const admin = stateUser.roleId === 1 ? '1' : '0';
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
@@ -87,7 +90,7 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("id", String(stateUser.id));
     formData.append("urlAvatar", image);
     formData.append("roleId", String(user.roleId));
-    formData.append("admin", '0');
+    // formData.append("admin", admin);
     if (user.email) {
       dispatch(fetchEdit(formData))
         .unwrap()
@@ -122,6 +125,18 @@ const EditForm: React.FC<Props> = (props) => {
     history.push("/");
   }
 
+  const handleSubmitPost = () => {
+
+  }
+
+  const handleChangeTitle = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setTitlePost(event.target.value);
+  }
+
+  const handleChangePost = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setTextPost(event.target.value);
+  }
+
   const formik = useFormik({
     initialValues: {
       userName: stateUser.userName,
@@ -140,8 +155,11 @@ const EditForm: React.FC<Props> = (props) => {
 
   return (
     <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
-      {/* <Header title="Blog" /> */}
-      <Grid component="main" className={classes.root} > 
+      <Container maxWidth="lg">
+        <Header title="Blog" />
+      </Container>
+      <Grid component="main" className={classes.root} >
+
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
@@ -155,100 +173,154 @@ const EditForm: React.FC<Props> = (props) => {
         </label>
 
         <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
-            <Typography component="h1" variant="h5">
-              Edit
-            </Typography>
-            <form className={classes.form} onSubmit={formik.handleSubmit} noValidate>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    autoComplete="userName"
-                    name="userName"
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="userName"
-                    label="User Name"
-                    autoFocus
-                    value={formik.values.userName}
-                    onChange={formik.handleChange}
-                    error={formik.touched.userName && Boolean(formik.errors.userName)}
-                    helperText={formik.touched.userName && formik.errors.userName}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    disabled
-                    variant="outlined"
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email Address"
-                    name="email"
-                    autoComplete="email"
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    variant="outlined"
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="current-password"
-                    value={formik.values.password}
-                    onChange={formik.handleChange}
-                    error={formik.touched.password && Boolean(formik.errors.password)}
-                    helperText={formik.touched.password && formik.errors.password}
-                  />
-                </Grid>
+          <Typography component="h1" variant="h5">
+            Edit
+          </Typography>
+          <form className={classes.form} name="postForm" onSubmit={formik.handleSubmit} noValidate>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="userName"
+                  name="userName"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="userName"
+                  label="User Name"
+                  autoFocus
+                  value={formik.values.userName}
+                  onChange={formik.handleChange}
+                  error={formik.touched.userName && Boolean(formik.errors.userName)}
+                  helperText={formik.touched.userName && formik.errors.userName}
+                />
               </Grid>
-              <Grid
-                container
-                direction="row"
-                justifyContent="space-around"
-                alignItems="center">
-                <Grid >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={onClickDelete}
-                  >
-                    Delete
-                  </Button>
-                </Grid>
-                <Grid >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                  >
-                    Save
-                  </Button>
-                </Grid>
-                <Grid >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    className={classes.submit}
-                    onClick={onClickLogOut}
-                  >
-                    LogOut
-                  </Button>
-                </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  disabled
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
+                />
               </Grid>
-            </form>
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  error={formik.touched.password && Boolean(formik.errors.password)}
+                  helperText={formik.touched.password && formik.errors.password}
+                />
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-around"
+              alignItems="center">
               <Grid >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={onClickDelete}
+                >
+                  Delete
+                </Button>
+              </Grid>
+              <Grid >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Save
+                </Button>
+              </Grid>
+              <Grid >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={onClickLogOut}
+                >
+                  LogOut
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Grid>
+        <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
+          <Typography component="h1" variant="h5">
+            New post
+          </Typography>
+          <form className={classes.form} noValidate onSubmit={handleSubmitPost}>   {/*  */}
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  autoComplete="userName"
+                  name="userName"
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="title"
+                  label="Title"
+                  autoFocus
+                  value={postTitle}
+                  onChange={handleChangeTitle}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  multiline
+                  rows={5}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  id="post"
+                  label="Post"
+                  name="post"
+                  value={postText}
+                  onChange={handleChangePost}
+                />
+              </Grid>
+            </Grid>
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-around"
+              alignItems="center">
+              <Grid >
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                >
+                  Save
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Grid>
+        {/* <Grid >
                 <Button
                   fullWidth
                   variant="contained"
@@ -258,13 +330,23 @@ const EditForm: React.FC<Props> = (props) => {
                     Main page
                   </Link>
                 </Button>
-              </Grid>
-        </Grid>
+              </Grid> */}
+
+        {/* <Grid item xs={12} component={Paper} elevation={6} className={classes.paper}>
+          <TextField id="titlePost" label="Title" variant="standard" />
+          <TextField
+            id="textPost"
+            label="Text"
+            // multiline
+            // rows={5}
+          // defaultValue="Input text"
+          />
+        </Grid> */}
       </Grid>
       <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '95vh', overflow: 'auto' }}>
         <Grid >
           <Typography variant="h6" className="list-header">
-            List of Users
+            List of Subscriptions
           </Typography>
           <ul className={classes.ul}>
             {imageInfos &&
@@ -281,6 +363,7 @@ const EditForm: React.FC<Props> = (props) => {
           </ul>
         </Grid>
       </Grid>
+
     </Grid>
   );
 }
@@ -315,7 +398,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center', 
+      alignItems: 'center',
     },
     avatar: {
       margin: theme.spacing(1),

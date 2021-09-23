@@ -117,30 +117,29 @@ exports.getUserById = async (req, res) => {
   }
 }
 
-exports.edit = async (req, res) => {
+exports.editAdmin = async (req, res, next) => {
   try {
     await uploadFile(req, res);
     const { userName, email, password, urlAvatar, id } = req.body;
     const idUser = Number(id);
     const roleId = Number(req.body.roleId);
-    const admin = Number(req.body.admin);
+    // const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
-    console.log(roleId);
     if (!user) {
       throw new Error("Failed! User Not found!");
     };
     if (user.roleId === 1) {
       throw new Error("Failed! Cannot edit admin");
     }
-    if (!admin) {
-      const passwordIsValid = bcrypt.compareSync(
-        password,
-        user.password
-      );
-      if (!passwordIsValid) {
-        throw new Error("Failed! Invalid Password!");
-      };
-    };
+    // if (!admin) {
+    //   const passwordIsValid = bcrypt.compareSync(
+    //     password,
+    //     user.password
+    //   );
+    //   if (!passwordIsValid) {
+    //     throw new Error("Failed! Invalid Password!");
+    //   };
+    // };
     const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
@@ -165,6 +164,60 @@ exports.edit = async (req, res) => {
     res.status(500).send({
       message: `Failed edit! ${err}`,
     });
+  // console.log(err);
+  // next(err);
+  }
+};
+
+exports.edit = async (req, res, next) => {
+  try {
+    await uploadFile(req, res);
+    const { userName, email, password, urlAvatar, id } = req.body;
+    const idUser = Number(id);
+    const roleId = Number(req.body.roleId);
+    // const admin = Number(req.body.admin);
+    const user = await User.findByPk(id);
+    if (!user) {
+      throw new Error("Failed! User Not found!");
+    };
+    // if (user.roleId === 1) {
+    //   throw new Error("Failed! Cannot edit admin");
+    // }
+    // if (!admin) {
+      const passwordIsValid = bcrypt.compareSync(
+        password,
+        user.password
+      );
+      if (!passwordIsValid) {
+        throw new Error("Failed! Invalid Password!");
+      };
+    // };
+    const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
+    const result = await User.update({
+      userName: userName,
+      email: email,
+      roleId: roleId,
+      urlAvatar: fileName,
+    },
+      {
+        where: { id: idUser }
+      });
+    if (!result) {
+      throw new Error("Failed update!");
+    };
+    res.status(200).send({
+      userName: userName,
+      email: email,
+      roleId: roleId,
+      urlAvatar: fileName,
+      id: idUser,
+    })
+  } catch (err) {
+    res.status(500).send({
+      message: `Failed edit! ${err}`,
+    });
+  // console.log(err);
+  // next(err);
   }
 };
 
@@ -247,15 +300,17 @@ exports.setUserSubscribe = async (req, res) => {
   try {
     const id = Number(req.query.id);
     const idSubscriber = req.userId;
+    
     const result = await Subscription.destroy({
       where: { userId: idSubscriber, userSubscribe: id }
     })
     if (!result) {
       await Subscription.create({
         userId: idSubscriber,
-        userSubscribe: id
+        userSubscribe: id,
       });
       subscribe = true;
+     
     }
     res.status(200).send({subscribe: subscribe});
   } catch (err) {
@@ -263,7 +318,21 @@ exports.setUserSubscribe = async (req, res) => {
   }
 }
 
-exports.getListUsers = async (req, res) => {
+// exports.getListUsers = async (req, res) => {
+//   try {
+//     const id = req.query.id;
+//     const users = await User.findAll({
+//       where: {
+//         id: { [Op.ne]: [id] }
+//       }
+//     });
+//     res.status(200).send(users);
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// }
+
+exports.getListUsersAdmin = async (req, res) => {
   try {
     const id = req.query.id;
     const users = await User.findAll({
@@ -272,6 +341,46 @@ exports.getListUsers = async (req, res) => {
       }
     });
     res.status(200).send(users);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+}
+
+exports.getListUsers = async (req, res) => {
+  try {
+    const id = req.query.id;
+    // const users = await Subscription.findAll({
+    //   attributes: ['userSubscribe'],
+    //   where: {
+    //     userId: id
+    //   }, 
+    //   // raw: true,
+    // });
+    // console.log(users);
+    // const subscribe = await User.findAll({
+    //   where: {
+    //     [Op.in]: `users`
+    //   }
+    // });
+    // const subscribe = await db.sequelize.query(`select Users.* FROM Subscriptions 
+    // JOIN Users ON userSubscribe = Users.id WHERE Subscriptions.userId = ${id}`, 
+    // { type: QueryTypes.SELECT });
+    const subscribe = await User.findAll(
+      {
+        include: [{
+          model: User,
+          through: {
+            model: Subscription,
+            where: {
+              userId: id
+            }
+          },
+          as: 'subscriber',
+          required: true
+        }]
+      }
+    );
+    res.status(200).send(subscribe);
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

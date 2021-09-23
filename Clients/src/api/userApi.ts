@@ -42,6 +42,10 @@ export const getUserList = (id: number): Promise<any>  => {
   return instance.get(`/user/users?id=${id}`);
 }
 
+export const getUserListAdmin = (id: number): Promise<any>  => {
+  return instance.get(`/admin/users?id=${id}`);
+}
+
 export const getPosts = (id: string): Promise<any>  => {
   return instance.get(`/user/userposts/${id}`);
 }
@@ -79,7 +83,7 @@ export const fetchLoginUser = (user: User): Promise<any> => {
 // }
 
 export const fetchEditUser = (formData: FormData): Promise<any> => {
-  return instance.post("/auth/edit", formData
+  return instance.post("/user/edit", formData
   , {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -96,7 +100,7 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
 }
 
 export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
-  return instance.post("/admin/edit", formData
+  return instance.post("/admin/editAdmin", formData
   , {
     headers: {
       "Content-Type": "multipart/form-data",

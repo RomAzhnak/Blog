@@ -18,6 +18,20 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'roleId',
         onDelete: 'CASCADE'
       });
+      User.belongsToMany(models.User, {
+        through: {
+          model: models.Subscription
+        },
+        foreignKey: 'userSubscribe',
+        as: 'subscriber'
+      });
+      User.belongsToMany(models.User, {
+        through: {
+          model: models.Subscription
+        },
+        foreignKey: 'userId',
+        as: 'user'
+      });
     }
   };
   User.init({

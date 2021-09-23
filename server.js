@@ -7,6 +7,17 @@ const adminReq = require("./routers/admin.requests");
 const authReq = require("./routers/auth.requests");
 const cors = require('cors');
 
+function errorHandler(err, req, res, next) {
+  console.log(err);      
+  if (res.headersSent) {
+
+    return next(err)
+  }
+
+  res.status(500)
+  res.render('error', { error: err })
+}
+
 global.__basedir = __dirname;
 // global.baseURL = 'http://localhost:4000/'
 
@@ -30,6 +41,8 @@ app.get('/test', (req, res) => {
 app.use("/auth", authReq);
 app.use("/admin", adminReq);
 app.use("/user", userReq);
+// app.use(errorHandler);
+
 
 const port = 4000;
 app.listen(port, () => {

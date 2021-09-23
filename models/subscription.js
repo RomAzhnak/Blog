@@ -14,10 +14,6 @@ module.exports = (sequelize, DataTypes) => {
       // Subscription.hasMany(models.UserLike, {
       //   foreignKey: 'postId',
       // });
-      Subscription.belongsTo(models.User, {
-        foreignKey: 'userId',
-        onDelete: 'CASCADE'
-      });
     }
   };
   Subscription.init({

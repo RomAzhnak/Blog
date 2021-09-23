@@ -4,7 +4,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { getUserList } from '../api/userApi';
+import { getUserListAdmin } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
 import Container from '@material-ui/core/Container';
@@ -27,7 +27,7 @@ const EditForm: React.FC<Props> = (props) => {
   const [userProp, setUserProp] = useState<any>();
 
   useEffect(() => {
-    getUserList(stateUser.id)
+    getUserListAdmin(stateUser.id)
       .then((response) => {
         setUserInfos(response.data);
       })

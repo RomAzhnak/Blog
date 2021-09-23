@@ -11,18 +11,6 @@ const { checkDuplicateUsernameOrEmail } = require("../middleware/verifySignUp");
 
 router.post(
   "/signup",
-  // username must be an email
-  // body('email').isEmail(),
-  // // password must be at least 5 chars long
-  // body('password').isLength({ min: 5 }),
-  // (req, res, next) => {
-  //   // Finds the validation errors in this request and wraps them in an object with handy functions
-  //   const errors = validationResult(req);
-  //   if (!errors.isEmpty()) {
-  //     return res.status(400).send({ message: `Failed! Invalid password or email format!` });
-  //   };
-  //   next();
-  // },
   checkDuplicateUsernameOrEmail,
   controllerAuth.signup
 );
@@ -33,8 +21,8 @@ router.post("/signin", controllerAuth.signin);
 router.post("/like", verifyToken, controllerAuth.changeLike);
 router.delete("/", verifyToken, controllerAuth.delete);
 router.delete("/deleteUser", verifyToken, controllerAuth.deleteAdmin); //
-router.post("/edit", verifyToken, controllerAuth.edit); //
-router.get("/users", controllerAuth.getListUsers);
+router.post("/editAdmin", verifyToken, controllerAuth.editAdmin); //
+router.get("/users", controllerAuth.getListUsersAdmin); //
 router.get("/postlist", controllerAuth.getListPost);
 // router.post("/edit", controllerFile.upload);
 // router.get("/files", controllerFile.getListFiles);

@@ -33,7 +33,7 @@ router.post("/signin", controllerAuth.signin);
 router.post("/like", verifyToken, controllerAuth.changeLike); //
 router.delete("/", verifyToken, controllerAuth.delete);
 router.delete("/admin", verifyToken, controllerAuth.deleteAdmin);
-router.post("/edit", verifyToken, controllerAuth.edit);
+router.post("/edit", verifyToken, controllerAuth.edit); //
 router.get("/usersubcribe", verifyToken, controllerAuth.setUserSubscribe);  //
 router.get("/users", controllerAuth.getListUsers);  //
 router.get("/postlist", controllerAuth.getListPost);  //

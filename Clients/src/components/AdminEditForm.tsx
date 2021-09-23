@@ -97,7 +97,7 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("email", user.email);
     formData.append("id", String(stateUser.id));
     formData.append("roleId", String(user.roleId));
-    formData.append("admin", "1");
+    // formData.append("admin", "1");
     dispatch(userEditAdmin({...stateUser, urlAvatar: stateUser.urlAvatar })); // urlAvatar: URL.createObjectURL(fileName)
     if (user.email) {
       dispatch(fetchEditAdmin(formData))

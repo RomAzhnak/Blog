@@ -104,11 +104,11 @@ const Users: React.FC<Props> = (props) => {
             <Typography>Email:{` ${email}`}</Typography>
             <Grid >
               <Grid className={classes.button}>
-                <Link to="/" style={{ textDecoration: 'none' }}>
+                {/* <Link to="/" style={{ textDecoration: 'none' }}>
                   <Button type="submit" variant="contained" color="primary" >
                     Main page
                   </Button>
-                </Link>
+                </Link> */}
               </Grid>
               <Grid className={classes.button}>
                 <Button type="submit"
