@@ -88,6 +88,25 @@ exports.getUserPosts = async (req, res) => {
   }
 }
 
+exports.addPost = async (req, res) => {
+  const id = req.userId;
+  const { title, post } = req.body;
+  try {
+    await Post.create({
+      userId: id,
+      post: post,
+      title: title,
+      likes: 0,
+    });
+    res.status(200).send('Add post');
+  } catch (err) {
+    res.status(500).send({
+      message: `Failed add post! : ${err}`,
+    });
+  }
+
+}
+
 exports.getUserById = async (req, res) => {
   try {
     const id = Number(req.params.id.slice(1));
@@ -164,8 +183,8 @@ exports.editAdmin = async (req, res, next) => {
     res.status(500).send({
       message: `Failed edit! ${err}`,
     });
-  // console.log(err);
-  // next(err);
+    // console.log(err);
+    // next(err);
   }
 };
 
@@ -184,13 +203,13 @@ exports.edit = async (req, res, next) => {
     //   throw new Error("Failed! Cannot edit admin");
     // }
     // if (!admin) {
-      const passwordIsValid = bcrypt.compareSync(
-        password,
-        user.password
-      );
-      if (!passwordIsValid) {
-        throw new Error("Failed! Invalid Password!");
-      };
+    const passwordIsValid = bcrypt.compareSync(
+      password,
+      user.password
+    );
+    if (!passwordIsValid) {
+      throw new Error("Failed! Invalid Password!");
+    };
     // };
     const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
     const result = await User.update({
@@ -216,8 +235,8 @@ exports.edit = async (req, res, next) => {
     res.status(500).send({
       message: `Failed edit! ${err}`,
     });
-  // console.log(err);
-  // next(err);
+    // console.log(err);
+    // next(err);
   }
 };
 
@@ -300,7 +319,7 @@ exports.setUserSubscribe = async (req, res) => {
   try {
     const id = Number(req.query.id);
     const idSubscriber = req.userId;
-    
+
     const result = await Subscription.destroy({
       where: { userId: idSubscriber, userSubscribe: id }
     })
@@ -310,9 +329,9 @@ exports.setUserSubscribe = async (req, res) => {
         userSubscribe: id,
       });
       subscribe = true;
-     
+
     }
-    res.status(200).send({subscribe: subscribe});
+    res.status(200).send({ subscribe: subscribe });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

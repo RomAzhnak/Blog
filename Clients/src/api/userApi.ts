@@ -116,6 +116,10 @@ export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
   });
 }
 
+export const fetchAddPost = (title: string, post: string): Promise<any> => {
+  return instance.post("/user/addpost", {title, post});
+}
+
 export const fetchDelUser = (user: User): Promise<any> => {
   return instance.delete('/auth', {
     params: {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -12,7 +12,7 @@ import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useHistory, Link } from 'react-router-dom';
-import { getUserList } from '../api/userApi';
+import { getUserList, fetchAddPost } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
 import { Container } from '@material-ui/core';
@@ -116,6 +116,9 @@ const EditForm: React.FC<Props> = (props) => {
         localStorage.removeItem('token');
         history.push("/");
       })
+      .catch((err) => {
+        console.log(`Failed request ${err}`);
+      });
   }
 
   const onClickLogOut = (event: { preventDefault: () => void; }) => {
@@ -125,7 +128,15 @@ const EditForm: React.FC<Props> = (props) => {
     history.push("/");
   }
 
-  const handleSubmitPost = () => {
+  const handleSubmitPost =  async (event: FormEvent<HTMLFormElement> ) => {
+    event.preventDefault();
+    try {
+      await fetchAddPost(postTitle, postText);
+      setTitlePost('');
+      setTextPost('');
+    } catch (err) {
+      console.log(`Failed request ${err}`);
+    }
 
   }
 
@@ -234,6 +245,7 @@ const EditForm: React.FC<Props> = (props) => {
               alignItems="center">
               <Grid >
                 <Button
+                size='small'
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -245,6 +257,7 @@ const EditForm: React.FC<Props> = (props) => {
               </Grid>
               <Grid >
                 <Button
+                  size='small'
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -255,6 +268,7 @@ const EditForm: React.FC<Props> = (props) => {
               </Grid>
               <Grid >
                 <Button
+                  size='small'
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -271,7 +285,7 @@ const EditForm: React.FC<Props> = (props) => {
           <Typography component="h1" variant="h5">
             New post
           </Typography>
-          <form className={classes.form} noValidate onSubmit={handleSubmitPost}>   {/*  */}
+          <form className={classes.form} noValidate onSubmit={handleSubmitPost} > {/* */}
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -307,16 +321,18 @@ const EditForm: React.FC<Props> = (props) => {
               direction="row"
               justifyContent="space-around"
               alignItems="center">
-              <Grid >
+              {/* <Grid > */}
                 <Button
+                  size='small'
                   type="submit"
                   variant="contained"
                   color="primary"
                   className={classes.submit}
+                  // onClick={handleSubmitPost}
                 >
-                  Save
+                  Publish
                 </Button>
-              </Grid>
+              {/* </Grid> */}
             </Grid>
           </form>
         </Grid>
@@ -395,7 +411,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     paper: {
       margin: theme.spacing(2, 3, 0, 3),
-      padding: theme.spacing(2),
+      padding: theme.spacing(1, 3, 1, 3),
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -412,7 +428,7 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
     },
     submit: {
-      margin: theme.spacing(2),
+      margin: theme.spacing(1),
       width: theme.spacing(8),
     },
     large: {
