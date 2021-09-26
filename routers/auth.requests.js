@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
-const controllerAuth = require("../controllers/auth.controller");
+const controllerAuth = require("../controllers/controller");
 const controllerFile = require("../controllers/file.controller");
 const { verifyToken } = require('../middleware/authJwt');
 const { checkDuplicateUsernameOrEmail } = require("../middleware/verifySignUp");
@@ -9,7 +9,7 @@ const { checkDuplicateUsernameOrEmail } = require("../middleware/verifySignUp");
 
 // router.get("/test", verifyToken, (req,res) => {res.status(200).send(`User Content id = ${req.userId} `);});
 
-router.post("/signup", checkDuplicateUsernameOrEmail, controllerAuth.signup); //
+router.post("/signup", controllerAuth.signup); // checkDuplicateUsernameOrEmail,
 router.get('/', verifyToken, controllerAuth.getUser); //
 // router.get('/user/:id', verifyToken, controllerAuth.getUserById);
 // router.get('/user/posts/:id', verifyToken, controllerAuth.getUserPosts);

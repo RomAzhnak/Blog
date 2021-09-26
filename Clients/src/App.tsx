@@ -2,7 +2,7 @@ import MainPage from './components/MainPage';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import Admin from './components/Admin';
-import AdminEditForm from './components/AdminEditForm';
+import AlertComponent from './components/AlertComponent';
 import PrivateRoute from './components/PrivateRoute';
 import {
   BrowserRouter as Router,
@@ -19,6 +19,7 @@ import Users from './components/Users';
 function App() {
   const dispatch = useAppDispatch();
   const [initialized, setInitialized] = useState(false);
+
   useEffect(() => {
     if (!localStorage.getItem('token')) {
       return setInitialized(true);
@@ -62,6 +63,7 @@ function App() {
               <AdminEditForm />
             </PrivateRoute> */}
           </Switch>
+          {/* <AlertComponent errorMessage={errorMessage} hideError={updateErrorMessage}/> */}
         </Router>
         : <p>Loading...</p>
       }

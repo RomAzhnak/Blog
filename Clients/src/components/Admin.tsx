@@ -12,6 +12,8 @@ import Link from '@material-ui/core/Link';
 import { CssBaseline } from '@material-ui/core';
 import AdminEditForm from './AdminEditForm';
 import { userEditAdmin } from "../redux/userSlice";
+import AlertComponent from "./AlertComponent";
+
 
 type Props = {
 
@@ -21,27 +23,32 @@ const EditForm: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const stateUser = useAppSelector(({ user }) => user.userFields);
-  const stateUsersForAdmin = useAppSelector(( user ) => user);
+  const stateUsersForAdmin = useAppSelector((user) => user);
   const [userInfos, setUserInfos] = useState<any[]>([]);
   const [editUser, setEditUser] = useState<boolean>(false);
-  const [userProp, setUserProp] = useState<any>();
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
 
   useEffect(() => {
     getUserListAdmin(stateUser.id)
       .then((response) => {
         setUserInfos(response.data);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request ${err}`)
+      }
       )
   }, [stateUsersForAdmin]);
-  
+
   return (
     <Container maxWidth="lg">
       <CssBaseline />
       <Header title="Blog" />
+      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
       <Grid container
-        style={{ marginTop: 25 }} 
+        style={{ marginTop: 25 }}
         justifyContent='center'
       >
         <Grid item
@@ -58,10 +65,10 @@ const EditForm: React.FC<Props> = (props) => {
                   userInfos.map((userValue: any, index) => (
                     <ListItem
                       key={index}>
-                      <Link onClick={ ()=>{ dispatch(userEditAdmin(userValue)); setEditUser(true); }}>
+                      <Link onClick={() => { dispatch(userEditAdmin(userValue)); setEditUser(true); }}>
                         <Avatar src={userValue.urlAvatar} alt={userValue.userName}
-                          className={classes.middle} 
-                          />
+                          className={classes.middle}
+                        />
                         {userValue.userName}
                       </Link>
                     </ListItem>
@@ -116,7 +123,7 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(2),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center', 
+      alignItems: 'center',
     },
     avatar: {
       margin: theme.spacing(1),

@@ -19,7 +19,7 @@ exports.allUser = (req, res) => {
     });
 };
 
-exports.changeLike = async (req, res) => {
+exports.changeLike = async (req, res, next) => {
   let statusLike = false;
   try {
     const idAuthor = Number(req.body.idAuthor.slice(1));
@@ -50,21 +50,16 @@ exports.changeLike = async (req, res) => {
     res.status(200).send({ statusLike: statusLike, countLikes: likes });
   }
   catch (err) {
-    res.status(500).send({
-      message: `Failed! : ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed! : ${err}`,
+    // });
+    next(err);
   }
 }
 
-exports.getUserPosts = async (req, res) => {
-  // let idLiker = 0;
+exports.getUserPosts = async (req, res, next) => {
   try {
-    // const token = req.headers.authorization.split(' ')[1];
-    // jwt.verify(token, config.secret, (err, decoded) => {
-    //   idLiker = decoded.id;
-    // });
     const idLiker = req.userId;
-
     const idAuthor = Number(req.params.id.slice(1));
     const userLike = await UserLike.findAll({
       where: { userId: idLiker, postAuthorId: idAuthor },
@@ -77,18 +72,20 @@ exports.getUserPosts = async (req, res) => {
     Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, 
     UserLikes.postId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId 
     WHERE Posts.userId = ${idAuthor} GROUP BY Posts.id`, { type: QueryTypes.SELECT });
+
     if (!posts) {
-      throw new Error("Failed! Author Not found!");
+      throw new Error("Failed! Author not found!");
     }
     res.status(200).send({ posts: posts, userLikes: userLikes });
   } catch (err) {
-    res.status(500).send({
-      message: `Failed! : ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed! : ${err}`,
+    // });
+      next(err);
   }
 }
 
-exports.addPost = async (req, res) => {
+exports.addPost = async (req, res, next) => {
   const id = req.userId;
   const { title, post } = req.body;
   try {
@@ -100,20 +97,21 @@ exports.addPost = async (req, res) => {
     });
     res.status(200).send('Add post');
   } catch (err) {
-    res.status(500).send({
-      message: `Failed add post! : ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed add post! : ${err}`,
+    // });
+      next(err);
   }
 
 }
 
-exports.getUserById = async (req, res) => {
+exports.getUserById = async (req, res, next) => {
   try {
     const id = Number(req.params.id.slice(1));
     const idSubscriber = req.userId;
     const user = await User.findByPk(id);
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     };
     const isSubscribe = await Subscription.findOne({
       where: { userId: idSubscriber, userSubscribe: id }
@@ -130,9 +128,10 @@ exports.getUserById = async (req, res) => {
       password: '',
     })
   } catch (err) {
-    res.status(500).send({
-      message: `Failed! : ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed! : ${err}`,
+    // });
+        next(err);
   }
 }
 
@@ -145,7 +144,7 @@ exports.editAdmin = async (req, res, next) => {
     // const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     };
     if (user.roleId === 1) {
       throw new Error("Failed! Cannot edit admin");
@@ -180,11 +179,11 @@ exports.editAdmin = async (req, res, next) => {
       id: idUser,
     })
   } catch (err) {
-    res.status(500).send({
-      message: `Failed edit! ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed edit! ${err}`,
+    // });
     // console.log(err);
-    // next(err);
+    next(err);
   }
 };
 
@@ -197,7 +196,7 @@ exports.edit = async (req, res, next) => {
     // const admin = Number(req.body.admin);
     const user = await User.findByPk(id);
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     };
     // if (user.roleId === 1) {
     //   throw new Error("Failed! Cannot edit admin");
@@ -232,47 +231,15 @@ exports.edit = async (req, res, next) => {
       id: idUser,
     })
   } catch (err) {
-    res.status(500).send({
-      message: `Failed edit! ${err}`,
-    });
+    // res.status(500).send({
+    //   message: `Failed edit! ${err}`,
+    // });
     // console.log(err);
-    // next(err);
+    next(err);
   }
 };
 
-// 'http://localhost:4000/auth/postlist?filter=""&page=""'
-
-// exports.getListPost = async (req, res) => {
-//   const page = Number(req.params.page) - 1;
-//   try { 
-//     Post.findAll({
-//       attributes: [[db.sequelize.fn("min", db.sequelize.col('id')), 'minid']],
-//       group: ["userId"],
-//       raw: true,
-//     })
-//       .then(function (minIds) {
-//         return Post.findAll({
-//           include: [{
-//             model: User,
-//             where: { state: db.Sequelize.col('Post.userId') }
-//           }],
-//           where: {
-//             id: { [Op.in]: minIds.map(item => item.minid) }
-//           },
-//           offset: page * 5,
-//           limit: 5,
-//         })
-//       })
-//       .then(function (result) {
-//         res.status(200).send(result);
-//         return Promise.resolve(result);
-//       })
-//   } catch (err) {
-//     res.status(500).send({ message: err.message });
-//   }
-// }
-
-exports.getListPost = async (req, res) => {
+exports.getListPost = async (req, res, next) => {
   const filter = req.query.filter;
   const page = Number(req.query.page) - 1;
   try {
@@ -310,16 +277,16 @@ exports.getListPost = async (req, res) => {
     const countPosts = postsFilter.length;
     res.status(200).send({ posts: result, countPosts: countPosts });;
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-exports.setUserSubscribe = async (req, res) => {
+exports.setUserSubscribe = async (req, res, next) => {
   let subscribe = false;
   try {
     const id = Number(req.query.id);
     const idSubscriber = req.userId;
-
     const result = await Subscription.destroy({
       where: { userId: idSubscriber, userSubscribe: id }
     })
@@ -329,29 +296,15 @@ exports.setUserSubscribe = async (req, res) => {
         userSubscribe: id,
       });
       subscribe = true;
-
     }
     res.status(200).send({ subscribe: subscribe });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-// exports.getListUsers = async (req, res) => {
-//   try {
-//     const id = req.query.id;
-//     const users = await User.findAll({
-//       where: {
-//         id: { [Op.ne]: [id] }
-//       }
-//     });
-//     res.status(200).send(users);
-//   } catch (err) {
-//     res.status(500).send({ message: err.message });
-//   }
-// }
-
-exports.getListUsersAdmin = async (req, res) => {
+exports.getListUsersAdmin = async (req, res, next) => {
   try {
     const id = req.query.id;
     const users = await User.findAll({
@@ -361,11 +314,12 @@ exports.getListUsersAdmin = async (req, res) => {
     });
     res.status(200).send(users);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-exports.getListUsers = async (req, res) => {
+exports.getListUsers = async (req, res, next) => {
   try {
     const id = req.query.id;
     // const users = await Subscription.findAll({
@@ -401,17 +355,18 @@ exports.getListUsers = async (req, res) => {
     );
     res.status(200).send(subscribe);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-exports.deleteAdmin = async (req, res) => {
+exports.deleteAdmin = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: { id: req.query.id }
     });
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     };
     if (user.roleId === 1) {
       throw new Error("Failed! Cannot delete admin!");
@@ -422,19 +377,20 @@ exports.deleteAdmin = async (req, res) => {
     if (!result) {
       throw new Error("Failed delete!");
     };
-    res.send({ message: "User was deleted successfully!" });
+    res.status(200).send({ message: "User was deleted successfully!" });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-exports.delete = async (req, res) => {
+exports.delete = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: { id: req.query.id }
     });
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     };
     const passwordIsValid = bcrypt.compareSync(
       req.query.password,
@@ -449,27 +405,42 @@ exports.delete = async (req, res) => {
     if (!result) {
       throw new Error("Failed delete!");
     };
-    res.send({ message: "User was deleted successfully!" });
+    res.status(200).send({ message: "User was deleted successfully!" });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 };
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   try {
+
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [
+          { userName: req.body.userName },
+          { email: req.body.email }
+        ]
+      }
+    });
+    if (user) {
+      throw new Error("Failed! Username or email already in use!");
+    }
+
     await User.create({
       userName: req.body.userName,
       email: req.body.email,
       roleId: req.body.roleId,
       password: bcrypt.hashSync(req.body.password, 8)
     })
-    res.send({ message: "User registered successfully!" })
+    res.status(200).send({ message: "User registered successfully!" })
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+      next(err);
   }
 };
 
-exports.getUser = async (req, res) => {
+exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: {
@@ -477,7 +448,7 @@ exports.getUser = async (req, res) => {
       }
     });
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     }
     res.status(200).send({
       userName: user.userName,
@@ -487,11 +458,12 @@ exports.getUser = async (req, res) => {
       id: user.id,
     });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 }
 
-exports.signin = async (req, res) => {
+exports.signin = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: {
@@ -499,7 +471,7 @@ exports.signin = async (req, res) => {
       }
     });
     if (!user) {
-      throw new Error("Failed! User Not found!");
+      throw new Error("Failed! User not found!");
     }
     const passwordIsValid = bcrypt.compareSync(
       req.body.password,
@@ -521,36 +493,23 @@ exports.signin = async (req, res) => {
       accessToken: token
     });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    // res.status(500).send({ message: err.message });
+        next(err);
   }
 };
 
-exports.findOne = (req, res) => {
-  const id = req.params.id;
-
-  User.findByPk(id)
-    .then(data => {
-      res.send(data);
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error retrieving user with id=" + id
-      });
-    });
-};
-
-exports.deleteAll = (req, res) => {
-  User.destroy({
-    where: {},
-    truncate: false
-  })
-    .then(nums => {
-      res.send({ message: `${nums} Users were deleted successfully!` });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while removing all users."
-      });
-    });
-};
+// exports.deleteAll = (req, res) => {
+//   User.destroy({
+//     where: {},
+//     truncate: false
+//   })
+//     .then(nums => {
+//       res.send({ message: `${nums} Users were deleted successfully!` });
+//     })
+//     .catch(err => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Some error occurred while removing all users."
+//       });
+//     });
+// };

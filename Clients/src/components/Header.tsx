@@ -66,7 +66,7 @@ const Header = (props: HeaderProps) => {
               onClick={() => {
                 localStorage.removeItem('token');
                 dispatch(clearUser());
-                history.push("/");
+                // history.push("/");
               }}
             >
               Logout

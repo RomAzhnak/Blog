@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { User } from '../redux/userSlice'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Typography } from "@material-ui/core";
+import AlertComponent from "./AlertComponent";
 
 const validationSchema = yup.object({
   userName: yup
@@ -32,19 +33,29 @@ const validationSchema = yup.object({
 });
 
 type Props = {
+
 };
 
 const SignUp: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   let history = useHistory();
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
 
   const onSubmitForm = (user: User) => {
     dispatch(fetchAdd(user))
       .unwrap()
-      .then(() => history.push("/login"))
-      .catch(err =>
+      .then(() => new Promise(() => {
+        setTimeout(() => history.push("/login"), 1000);
+        setTypeMesssage(200);
+        setTextMessage('SUCCESS');
+      }))
+      .catch(err => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request ${err}`)
+      }
       )
   };
 
@@ -67,6 +78,7 @@ const SignUp: React.FC<Props> = (props) => {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />

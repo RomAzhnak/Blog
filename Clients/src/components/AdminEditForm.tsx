@@ -106,6 +106,7 @@ const EditForm: React.FC<Props> = (props) => {
           // history.push("/admin");
         })
         .catch((err) => {
+          
           console.log(`Failed request editAdmin ${err}`);
         })
     };

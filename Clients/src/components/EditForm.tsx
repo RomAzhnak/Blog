@@ -16,6 +16,8 @@ import { getUserList, fetchAddPost } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
 import { Container } from '@material-ui/core';
+import AlertComponent from "./AlertComponent";
+import { Settings } from 'http2';
 
 
 const validationSchema = yup.object({
@@ -52,14 +54,19 @@ const EditForm: React.FC<Props> = (props) => {
   const [fileName, setFileName] = useState<File | undefined>();
   const [postTitle, setTitlePost] = useState<string>('');
   const [postText, setTextPost] = useState<string>('');
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
 
   useEffect(() => {
     getUserList(stateUser.id)
       .then((response) => {
         setAvatar(response.data);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request ${err}`)
+      }
       )
   }, [stateUser])
 
@@ -94,8 +101,15 @@ const EditForm: React.FC<Props> = (props) => {
     if (user.email) {
       dispatch(fetchEdit(formData))
         .unwrap()
+        .then(() => {
+          setTypeMesssage(200);
+          setTextMessage('SUCCESS. User edited');
+        })
         .catch((err) => {
-          console.log(`Failed request ${err}`);
+          setTypeMesssage(400);
+          // setTextMessage(`${err.name}  ${err.message}`);
+          setTextMessage(err.message);
+          console.log(err);
         })
     };
   };
@@ -108,16 +122,25 @@ const EditForm: React.FC<Props> = (props) => {
       password: formik.values.password,
       urlAvatar: '',
       roleId: 2,
-      id: 0
+      id: stateUser.id,
     }
     dispatch(fetchDel(fetchUser))
       .unwrap()
-      .then(() => {
-        localStorage.removeItem('token');
-        history.push("/");
-      })
+      .then(() => new Promise(() => {
+        setTimeout(() => localStorage.removeItem('token'), 1000); // history.push("/"); 
+        setTypeMesssage(200);
+        setTextMessage('SUCCESS. User deleted');
+        
+      }))
+      // .then(() => {
+
+      //   localStorage.removeItem('token');
+      //   history.push("/");
+      // })
       .catch((err) => {
-        console.log(`Failed request ${err}`);
+        setTypeMesssage(400);
+        setTextMessage(err.message);
+        console.log(err); 
       });
   }
 
@@ -125,17 +148,21 @@ const EditForm: React.FC<Props> = (props) => {
     event.preventDefault();
     dispatch(clearUser());
     localStorage.removeItem('token');
-    history.push("/");
+    // history.push("/");
   }
 
-  const handleSubmitPost =  async (event: FormEvent<HTMLFormElement> ) => {
+  const handleSubmitPost = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       await fetchAddPost(postTitle, postText);
       setTitlePost('');
       setTextPost('');
-    } catch (err) {
-      console.log(`Failed request ${err}`);
+      setTypeMesssage(200);
+      setTextMessage('SUCCESS. Add post');
+    } catch (err: any) {
+      setTypeMesssage(400);
+      setTextMessage(err.message);
+      // console.log(`Failed request ${err}`);
     }
 
   }
@@ -168,9 +195,9 @@ const EditForm: React.FC<Props> = (props) => {
     <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
       <Container maxWidth="lg">
         <Header title="Blog" />
+        <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
       </Container>
       <Grid component="main" className={classes.root} >
-
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
@@ -182,7 +209,6 @@ const EditForm: React.FC<Props> = (props) => {
             <Avatar src={image} className={classes.large} />
           </IconButton>
         </label>
-
         <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
           <Typography component="h1" variant="h5">
             Edit
@@ -245,7 +271,7 @@ const EditForm: React.FC<Props> = (props) => {
               alignItems="center">
               <Grid >
                 <Button
-                size='small'
+                  size='small'
                   type="submit"
                   variant="contained"
                   color="primary"
@@ -285,7 +311,7 @@ const EditForm: React.FC<Props> = (props) => {
           <Typography component="h1" variant="h5">
             New post
           </Typography>
-          <form className={classes.form} noValidate onSubmit={handleSubmitPost} > {/* */}
+          <form className={classes.form} onSubmit={handleSubmitPost} > {/* noValidate */}
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -322,16 +348,16 @@ const EditForm: React.FC<Props> = (props) => {
               justifyContent="space-around"
               alignItems="center">
               {/* <Grid > */}
-                <Button
-                  size='small'
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  // onClick={handleSubmitPost}
-                >
-                  Publish
-                </Button>
+              <Button
+                size='small'
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              // onClick={handleSubmitPost}
+              >
+                Publish
+              </Button>
               {/* </Grid> */}
             </Grid>
           </form>

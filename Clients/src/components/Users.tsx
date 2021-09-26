@@ -8,6 +8,7 @@ import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
 import { useAppSelector } from '../app/hooks';
 import Header from './Header';
+import AlertComponent from "./AlertComponent";
 
 type Value = {
   id: number,
@@ -34,6 +35,8 @@ const Users: React.FC<Props> = (props) => {
   const [subscribe, setSubscribe] = useState<boolean>();
   const [posts, setPosts] = useState<any[]>();
   const classes = useStyles();
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
 
   useEffect(() => {
     async function fetchUserData() {
@@ -43,7 +46,9 @@ const Users: React.FC<Props> = (props) => {
         setUserName(response.data.userName);
         setEmail(response.data.email);
         setSubscribe(response.data.subscribe);
-      } catch (err) {
+      } catch (err: any) {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request ${err}`)
       }
     }
@@ -56,8 +61,11 @@ const Users: React.FC<Props> = (props) => {
         setPosts(response.data.posts);
         setUserLikes(new Set(response.data.userLikes));
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request! ${err}`)
+      }
       )
   }, [id]);
 
@@ -77,8 +85,11 @@ const Users: React.FC<Props> = (props) => {
         response.data.statusLike ? userLikes.add(post.id) : userLikes.delete(post.id)
         setPosts(temp);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request ${err}`)
+      }
       )
   }
 
@@ -86,7 +97,9 @@ const Users: React.FC<Props> = (props) => {
     try {
       const response = await changeSubscribeToUser(id.slice(1));
       setSubscribe(response.data.subscribe);
-    } catch (err) {
+    } catch (err: any) {
+      setTypeMesssage(400);
+      setTextMessage(err.message);
       console.log(`Failed request ${err}`)
     }
   }
@@ -94,6 +107,7 @@ const Users: React.FC<Props> = (props) => {
   return (
     <Container component="main" maxWidth="md" >
       <Header title="Blog" />
+      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
       <Container component="main" maxWidth="sm" >
         <Grid container spacing={8} justifyContent='center' >
           <Grid item>

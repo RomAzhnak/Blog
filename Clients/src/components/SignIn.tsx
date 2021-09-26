@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -14,25 +14,34 @@ import { fetchLogin } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { User } from '../redux/userSlice'
+import AlertComponent from "./AlertComponent";
 
 type Props = {
+
 };
 
 const SignIn: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
+
   let history = useHistory();
 
   const onSubmitForm = (user: User) => {
     if (user.email) {
-        dispatch(fetchLogin( user ))
-          .unwrap()
-          .then(res => {
+      dispatch(fetchLogin(user))
+        .unwrap()
+        .then(res => {
+          // setTypeMesssage(200);
+          // setTextMessage('SUCCESS');
           history.push("/");
-          })
-          .catch( e => {
-            console.log(e)
-          })
+        })
+        .catch(err => {
+          setTypeMesssage(400);
+          setTextMessage(err.message);
+          console.log(err)
+        })
     };
   };
 
@@ -65,6 +74,7 @@ const SignIn: React.FC<Props> = (props) => {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
+      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -72,8 +82,8 @@ const SignIn: React.FC<Props> = (props) => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <form className={classes.form} 
-          onSubmit={formik.handleSubmit} 
+        <form className={classes.form}
+          onSubmit={formik.handleSubmit}
           noValidate>
           <Grid item xs={12}>
             <TextField

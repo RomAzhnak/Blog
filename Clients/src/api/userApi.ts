@@ -121,7 +121,7 @@ export const fetchAddPost = (title: string, post: string): Promise<any> => {
 }
 
 export const fetchDelUser = (user: User): Promise<any> => {
-  return instance.delete('/auth', {
+  return instance.delete('/user', {
     params: {
       id: user.id,
       roleId: user.roleId,

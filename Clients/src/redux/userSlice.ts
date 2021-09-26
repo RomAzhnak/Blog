@@ -1,7 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser, 
+import {
+	fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser,
 	// fetchAvatar,
-	 fetchEditUserAdmin, fetchDelUserAdmin } from '../api/userApi';
+	fetchEditUserAdmin, fetchDelUserAdmin
+} from '../api/userApi';
 import { RootState } from './store';
 
 export interface User {
@@ -10,7 +12,7 @@ export interface User {
 	urlAvatar: string,
 	roleId: number,
 	id: number,
-	password: string,	
+	password: string,
 };
 
 export interface UserState {
@@ -52,57 +54,73 @@ interface UserLogin {
 
 export const fetchAdd = createAsyncThunk<string, User, { state: RootState }>(
 	'user/fetchAdd',
-	async (user, thankApi) => {
-		const resp = await fetchAddUser(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchAddUser(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
-// export const fetchAddAvatar = createAsyncThunk<string, FormData, { state: RootState }>(
-// 	'user/fetchAddAvatar',
-// 	async (user, thankApi) => {
-// 		const resp = await fetchAvatar(user);
-// 		return resp.data
-// 	}
-// );
-
 export const fetchLogin = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchLogin',
-	async (user, thankApi) => {
-		const resp = await fetchLoginUser(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchLoginUser(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
 export const fetchEdit = createAsyncThunk<UserLogin, FormData, { state: RootState }>(
 	'user/fetchEdit',
-	async (user, thankApi) => {
-		const resp = await fetchEditUser(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchEditUser(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
 export const fetchEditAdmin = createAsyncThunk<UserLogin, FormData, { state: RootState }>(
 	'user/fetchEditAdmin',
-	async (user, thankApi) => {
-		const resp = await fetchEditUserAdmin(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchEditUserAdmin(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
 export const fetchDel = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchDel',
-	async (user, thankApi) => {
-		const resp = await fetchDelUser(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchDelUser(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
 export const fetchDelAdmin = createAsyncThunk<UserLogin, User, { state: RootState }>(
 	'user/fetchDelAdmin',
-	async (user, thankApi) => {
-		const resp = await fetchDelUserAdmin(user);
-		return resp.data
+	async (user, { rejectWithValue }) => {
+		try {
+			const resp = await fetchDelUserAdmin(user);
+			return resp.data
+		} catch (err: any) {
+			return rejectWithValue(err.response.data)
+		}
 	}
 );
 
@@ -172,6 +190,7 @@ export const userSlice = createSlice({
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
 				state.error = 'error';
+				// console.log(action);
 			})
 			.addCase(fetchEditAdmin.pending, (state, action) => {
 			})

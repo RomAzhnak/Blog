@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { getUserPostList } from '../api/userApi';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { postFilter } from "../redux/userSlice";
+import AlertComponent from "./AlertComponent";
 
 const theme = createTheme();
 
@@ -26,7 +27,8 @@ const MainPage: React.FC<Props> = (props) => {
   const postsOnPage = 5;
   const [countPosts, setCountPosts] = useState<number>(0);
   const [valueFilter, setValueFilter] = useState<string>(stateFilter);
-  // const [filter, setFilter] = useState<boolean>(false);
+  const [typeMessage, setTypeMesssage] = useState<number>(200);
+  const [textMessage, setTextMessage] = useState<string>('');
 
   useEffect(() => {
     getUserPostList(page, stateFilter)
@@ -34,8 +36,11 @@ const MainPage: React.FC<Props> = (props) => {
         setFeaturedPosts(response.data.posts);
         setCountPosts(response.data.countPosts);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request PostList ${err}`)
+      }
       )
   }, [])
 
@@ -46,21 +51,27 @@ const MainPage: React.FC<Props> = (props) => {
         setFeaturedPosts(response.data.posts);
         setCountPosts(response.data.countPosts);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request pagination ${err}`)
+      }
       )
   };
 
   const handleClickFilter = () => {
     dispatch(postFilter(valueFilter));
-      // setFilter(false);
-      getUserPostList(page, valueFilter)
+    // setFilter(false);
+    getUserPostList(page, valueFilter)
       .then((response) => {
         setFeaturedPosts(response.data.posts);
         setCountPosts(response.data.countPosts);
       })
-      .catch((err) =>
+      .catch((err) => {
+        setTypeMesssage(400);
+        setTextMessage(err.message);
         console.log(`Failed request pagination ${err}`)
+      }
       )
   }
 
@@ -68,46 +79,13 @@ const MainPage: React.FC<Props> = (props) => {
     setValueFilter(event.target.value);
   };
 
-  // const handleClickFilter = () => {
-  //   dispatch(postFilter(valueFilter));
-  //   if (valueFilter === '') {
-  //     // setFilter(false);
-  //     getUserPostList(page, '')
-  //     .then((response) => {
-  //       setFeaturedPosts(response.data.posts);
-  //       setCountPosts(response.data.countPosts);
-  //     })
-  //     .catch((err) =>
-  //       console.log(`Failed request pagination ${err}`)
-  //     )
-
-  //   } else {
-  //     // setFilter(true);
-  //     getUserPostList(page, valueFilter)
-  //     .then((response) => {
-  //       setFeaturedPosts(response.data.posts);
-  //       setCountPosts(response.data.countPosts);
-  //     })
-  //     .catch((err) =>
-  //       console.log(`Failed request pagination ${err}`)
-  //     )
-  //   }
-  // }
-
-  // const handleFilterPosts = (postFilter: string) => {
-  //   if (filter) {
-  //     return postFilter.toLowerCase().indexOf(valueFilter.toLowerCase()) !== -1
-  //   } else {
-  //     return true
-  //   }
-  // }
-
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" className={classes.container}>
         <Header title="Blog" />
+        <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
         <Grid >
           <TextField
             label="Search"
