@@ -8,33 +8,6 @@ const authReq = require("./routers/auth.requests");
 const cors = require('cors');
 const {errorHandler} = require("./middleware/errorHandler");
 
-// function errorHandler(err, req, res, next) {
-//   console.log(err);      
-//   if (res.headersSent) {
-
-//     return next(err)
-//   }
-
-//   res.status(500)
-//   res.render('error', { error: err })
-// }
-
-// errorHandler = (err, req, res, next) => {
-//   console.log(err);
-//   switch (true) {
-//       case typeof err === 'string':
-//           // custom application error
-//           const is404 = err.toLowerCase().endsWith('not found');
-//           const statusCode = is404 ? 404 : 400;
-//           return res.status(statusCode).json({ message: err });
-//       case err.name === 'UnauthorizedError':
-//           // jwt authentication error
-//           return res.status(401).json({ message: 'Unauthorized' });
-//       default:
-//           return res.status(500).json({ message: err.message });
-//   }
-// }
-
 
 global.__basedir = __dirname;
 // global.baseURL = 'http://localhost:4000/'

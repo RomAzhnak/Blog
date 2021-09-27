@@ -46,11 +46,17 @@ const SignUp: React.FC<Props> = (props) => {
   const onSubmitForm = (user: User) => {
     dispatch(fetchAdd(user))
       .unwrap()
-      .then(() => new Promise(() => {
-        setTimeout(() => history.push("/login"), 1000);
+      .then(() => {
         setTypeMesssage(200);
         setTextMessage('SUCCESS');
-      }))
+        return new Promise((res) => {
+        setTimeout(() => res('done'), 1000);
+      })
+    }
+      )
+      .then(() => {
+        history.push("/login")
+      })
       .catch(err => {
         setTypeMesssage(400);
         setTextMessage(err.message);

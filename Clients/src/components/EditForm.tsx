@@ -126,17 +126,16 @@ const EditForm: React.FC<Props> = (props) => {
     }
     dispatch(fetchDel(fetchUser))
       .unwrap()
-      .then(() => new Promise(() => {
-        setTimeout(() => localStorage.removeItem('token'), 1000); // history.push("/"); 
+      .then(() => {
         setTypeMesssage(200);
         setTextMessage('SUCCESS. User deleted');
-        
-      }))
-      // .then(() => {
-
-      //   localStorage.removeItem('token');
-      //   history.push("/");
-      // })
+        return new Promise((res) => {
+        setTimeout(() => res(''), 1000);
+      })}
+      )
+      .then(() => {
+        localStorage.removeItem('token');
+      })
       .catch((err) => {
         setTypeMesssage(400);
         setTextMessage(err.message);
