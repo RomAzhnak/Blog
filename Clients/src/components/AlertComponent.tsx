@@ -1,6 +1,6 @@
-import { Button, makeStyles, Modal, Snackbar } from '@material-ui/core';
+import { Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
-// import React, { useState, useEffect } from 'react';
+
 
 type Props = {
   typeAlert: number,

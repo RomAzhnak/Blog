@@ -3,7 +3,6 @@ import { createTheme, IconButton, InputAdornment, makeStyles, TextField, ThemePr
 import SearchSharpIcon from '@material-ui/icons/SearchSharp';
 import Header from './Header';
 import FeaturedPost from './FeaturedPost';
-import Footer from './Footer';
 import Pagination from '@material-ui/lab/Pagination';
 import { Container, CssBaseline, Grid } from '@material-ui/core';
 import { useEffect } from 'react';
@@ -61,7 +60,6 @@ const MainPage: React.FC<Props> = (props) => {
 
   const handleClickFilter = () => {
     dispatch(postFilter(valueFilter));
-    // setFilter(false);
     getUserPostList(page, valueFilter)
       .then((response) => {
         setFeaturedPosts(response.data.posts);
@@ -105,8 +103,6 @@ const MainPage: React.FC<Props> = (props) => {
         <Grid className={classes.main} style={{ maxHeight: '65vh', overflow: 'auto' }}>
           {featuredPosts
             ? featuredPosts
-              // .filter((post) => handleFilterPosts(post.title))
-              // .slice((page - 1) * postsOnPage, page * postsOnPage)
               .map((post) => (
                 <FeaturedPost key={post.id} post={post} />
               )) : <h1>Empty...</h1>
@@ -119,10 +115,6 @@ const MainPage: React.FC<Props> = (props) => {
             onChange={handleChange}
           />
         </Grid>
-        {/* <Footer
-          title="Footer"
-          description="Something here to give the footer a purpose!"
-        /> */}
       </Container>
     </ThemeProvider>
   );
@@ -135,7 +127,6 @@ const useStyles = makeStyles((theme) => ({
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
-    // justifyContent: 'center',
   },
   main: {
     alignSelf: 'center',

@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useHistory, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getUserList, fetchAddPost } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
@@ -46,7 +46,6 @@ type Props = {
 const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const stateUser = useAppSelector(({ user }) => user.userFields);
   const [imageInfos, setAvatar] = useState<any[]>([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
@@ -85,7 +84,6 @@ const EditForm: React.FC<Props> = (props) => {
   };
 
   const onSubmitForm = (user: User) => {
-    // const admin = stateUser.roleId === 1 ? '1' : '0';
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
@@ -96,7 +94,6 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("id", String(stateUser.id));
     formData.append("urlAvatar", image);
     formData.append("roleId", String(user.roleId));
-    // formData.append("admin", admin);
     if (user.email) {
       dispatch(fetchEdit(formData))
         .unwrap()
@@ -106,7 +103,6 @@ const EditForm: React.FC<Props> = (props) => {
         })
         .catch((err) => {
           setTypeMesssage(400);
-          // setTextMessage(`${err.name}  ${err.message}`);
           setTextMessage(err.message);
           console.log(err);
         })
@@ -146,7 +142,6 @@ const EditForm: React.FC<Props> = (props) => {
     event.preventDefault();
     dispatch(clearUser());
     localStorage.removeItem('token');
-    // history.push("/");
   }
 
   const handleSubmitPost = async (event: FormEvent<HTMLFormElement>) => {
@@ -160,9 +155,7 @@ const EditForm: React.FC<Props> = (props) => {
     } catch (err: any) {
       setTypeMesssage(400);
       setTextMessage(err.message);
-      // console.log(`Failed request ${err}`);
     }
-
   }
 
   const handleChangeTitle = (event: { target: { value: React.SetStateAction<string>; }; }) => {
@@ -309,7 +302,7 @@ const EditForm: React.FC<Props> = (props) => {
           <Typography component="h1" variant="h5">
             New post
           </Typography>
-          <form className={classes.form} onSubmit={handleSubmitPost} > {/* noValidate */}
+          <form className={classes.form} onSubmit={handleSubmitPost} >
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
@@ -345,43 +338,18 @@ const EditForm: React.FC<Props> = (props) => {
               direction="row"
               justifyContent="space-around"
               alignItems="center">
-              {/* <Grid > */}
               <Button
                 size='small'
                 type="submit"
                 variant="contained"
                 color="primary"
                 className={classes.submit}
-              // onClick={handleSubmitPost}
               >
                 Publish
               </Button>
-              {/* </Grid> */}
             </Grid>
           </form>
         </Grid>
-        {/* <Grid >
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                >
-                  <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>
-                    Main page
-                  </Link>
-                </Button>
-              </Grid> */}
-
-        {/* <Grid item xs={12} component={Paper} elevation={6} className={classes.paper}>
-          <TextField id="titlePost" label="Title" variant="standard" />
-          <TextField
-            id="textPost"
-            label="Text"
-            // multiline
-            // rows={5}
-          // defaultValue="Input text"
-          />
-        </Grid> */}
       </Grid>
       <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '95vh', overflow: 'auto' }}>
         <Grid >

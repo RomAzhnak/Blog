@@ -5,8 +5,6 @@ const instance = axios.create({
   baseURL: 'http://localhost:4000/'
 });
 
-// type config = {headers: {authorization: string}};
-
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -17,16 +15,11 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-// export const getUserPostFilter = (filter: string): Promise<any> => {
-//   return instance.get(`/auth/postfilter/${filter}`); 
-// }
-
 export const changeSubscribeToUser = (id: number): Promise<any>  => {
   return instance.get(`/user/usersubcribe?id=${id}`);
 }
 
 export const getUserPostList = (page: number, filter: string): Promise<any> => {
-  // return instance.post('/auth/postlist/', {page, filter}); 
   return instance.get(`/user/postlist?page=${page}&filter=${filter}`);
 }
 
@@ -60,27 +53,7 @@ export const fetchAddUser = (user: User): Promise<any> => {
 
 export const fetchLoginUser = (user: User): Promise<any> => {
   return instance.post("/auth/signin", user);
-  // return new Promise((res, rej) => {
-  //   setTimeout(() => {
-  //     res({
-  //       data: {
-  //         userName: user.userName,
-  //         email: user.email,
-  //         accessToken: 'token'
-  //       }
-  //     })
-  //   }, 100)
-  // })
 }
-
-// export const fetchAvatar = (file: FormData): Promise<any> => {
-//   return instance.post("/auth/upload", file, {
-//     headers: {
-//       "Content-Type": "multipart/form-data",
-//       "user": file.get('user')
-//     },
-//   });
-// }
 
 export const fetchEditUser = (formData: FormData): Promise<any> => {
   return instance.post("/user/edit", formData
@@ -88,14 +61,6 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-    // headers: {
-    //   "Content-Type": "multipart/form-data",
-    //   "userName": file.get('userName'),
-    //   "email": file.get('email'),
-    //   "password": file.get('password'),
-    //   "urlAvatar": file.get('urlAvatar'),
-    //   "roleId": 2
-    // },
   });
 }
 
@@ -105,14 +70,6 @@ export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
     headers: {
       "Content-Type": "multipart/form-data",
     },
-    // headers: {
-    //   "Content-Type": "multipart/form-data",
-    //   "userName": file.get('userName'),
-    //   "email": file.get('email'),
-    //   "password": file.get('password'),
-    //   "urlAvatar": file.get('urlAvatar'),
-    //   "roleId": 2
-    // },
   });
 }
 
@@ -134,7 +91,6 @@ export const fetchDelUserAdmin = (user: User): Promise<any> => {
   return instance.delete('/admin/deleteUser', {
     params: {
       id: user.id,
-      // password: user.password,
     }
   })
 }
@@ -145,15 +101,3 @@ export default instance;
 function params(arg0: string, params: any, arg2: { email: string; }): Promise<any> {
   throw new Error("Function not implemented.");
 }
-// export const userReLogin = async () => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     try {
-//       const resp = await instance.get("/auth");
-//       const user = resp.data.json();
-
-//     } catch (error) {
-//       localStorage.removeItem("token");
-//     }
-//   }
-// }

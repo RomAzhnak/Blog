@@ -2,7 +2,6 @@ import MainPage from './components/MainPage';
 import SignUp from './components/SignUp';
 import SignIn from './components/SignIn';
 import Admin from './components/Admin';
-import AlertComponent from './components/AlertComponent';
 import PrivateRoute from './components/PrivateRoute';
 import {
   BrowserRouter as Router,
@@ -59,11 +58,7 @@ function App() {
             <PrivateRoute path="/admin">
               <Admin />
             </PrivateRoute>
-            {/* <PrivateRoute path="/admineditform/:userValue">
-              <AdminEditForm />
-            </PrivateRoute> */}
           </Switch>
-          {/* <AlertComponent errorMessage={errorMessage} hideError={updateErrorMessage}/> */}
         </Router>
         : <p>Loading...</p>
       }

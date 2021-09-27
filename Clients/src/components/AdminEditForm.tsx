@@ -8,10 +8,9 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { User, fetchEditAdmin, fetchDelAdmin } from "../redux/userSlice";
+import { fetchEditAdmin, fetchDelAdmin } from "../redux/userSlice";
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useHistory } from 'react-router-dom';
 import { Container, MenuItem, Select } from '@material-ui/core';
 import { userEditAdmin } from "../redux/userSlice";
 
@@ -47,7 +46,6 @@ type Props = {
 type InitUser  = {
   userName: string,
   email: string,
-  // urlAvatar: '',
   roleId: number,
   id: number,
   password: string,
@@ -56,9 +54,7 @@ type InitUser  = {
 const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
-  const history = useHistory();
   const stateUser = useAppSelector(({ user }) => user.userEditAdmin);
-  const [image, setImage] = useState<string>(stateUser.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
 
   const formik = useFormik({
@@ -67,13 +63,11 @@ const EditForm: React.FC<Props> = (props) => {
       email: stateUser.email,
       password: stateUser.password,
       roleId: stateUser.roleId,
-      // urlAvatar: stateUser.urlAvatar,
       id: stateUser.id,
     },
     validationSchema: validationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
-      // console.log(values);
       onSubmitForm(values);
     },
   });
@@ -81,8 +75,6 @@ const EditForm: React.FC<Props> = (props) => {
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newImage = event.target?.files?.[0];
     if (newImage) {
-      // setImage(URL.createObjectURL(newImage));
-      // formik.values.urlAvatar = URL.createObjectURL(newImage);
       setFileName(newImage);
       dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(newImage)}));
     }
@@ -97,13 +89,11 @@ const EditForm: React.FC<Props> = (props) => {
     formData.append("email", user.email);
     formData.append("id", String(stateUser.id));
     formData.append("roleId", String(user.roleId));
-    // formData.append("admin", "1");
-    dispatch(userEditAdmin({...stateUser, urlAvatar: stateUser.urlAvatar })); // urlAvatar: URL.createObjectURL(fileName)
+    dispatch(userEditAdmin({...stateUser, urlAvatar: stateUser.urlAvatar }));
     if (user.email) {
       dispatch(fetchEditAdmin(formData))
         .unwrap()
         .then(() => {
-          // history.push("/admin");
         })
         .catch((err) => {
           
@@ -126,7 +116,6 @@ const EditForm: React.FC<Props> = (props) => {
     dispatch(fetchDelAdmin(fetchUser))
       .unwrap()
       .then(() => {
-        // history.push("/");
       })
       .catch((err) => {
         console.log(`Failed request delete ${err}`);
@@ -141,7 +130,6 @@ const EditForm: React.FC<Props> = (props) => {
             <Typography component="h1" variant="h5">
               Edit
             </Typography>
-
               <input accept="image/*"
                 className={classes.input}
                 id="icon-button-file"
@@ -153,12 +141,10 @@ const EditForm: React.FC<Props> = (props) => {
                   <Avatar src={stateUser.urlAvatar} className={classes.large} />
                 </IconButton>
               </label>
-
             <form className={classes.form}
               onSubmit={formik.handleSubmit}
               noValidate
             >
-
               <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
@@ -213,7 +199,6 @@ const EditForm: React.FC<Props> = (props) => {
                 direction="row"
                 justifyContent="space-around"
                 alignItems="center"
-
               >
                 <Grid >
                   <Button

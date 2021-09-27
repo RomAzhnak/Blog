@@ -33,8 +33,6 @@ const SignIn: React.FC<Props> = (props) => {
       dispatch(fetchLogin(user))
         .unwrap()
         .then(res => {
-          // setTypeMesssage(200);
-          // setTextMessage('SUCCESS');
           history.push("/");
         })
         .catch(err => {

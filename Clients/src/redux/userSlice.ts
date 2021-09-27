@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
 	fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser,
-	// fetchAvatar,
 	fetchEditUserAdmin, fetchDelUserAdmin
 } from '../api/userApi';
 import { RootState } from './store';
@@ -190,7 +189,6 @@ export const userSlice = createSlice({
 			})
 			.addCase(fetchEdit.rejected, (state, action) => {
 				state.error = 'error';
-				// console.log(action);
 			})
 			.addCase(fetchEditAdmin.pending, (state, action) => {
 			})

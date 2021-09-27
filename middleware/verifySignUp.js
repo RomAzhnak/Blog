@@ -12,13 +12,11 @@ exports.checkDuplicateUsernameOrEmail = async (req, res, next) => {
         ]
       }
     });
-    // const user = await User.findOne({ where: { email: req.body.email } });
     if (user) {
       throw new Error("Failed! Username or email already in use!");
     }
     next();
   } catch(err) {
-    // res.status(500).send({ message: err.message });
     next(err)
   }
 };

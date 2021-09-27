@@ -2,7 +2,6 @@ import { Button, createStyles, makeStyles, Toolbar, Typography, Theme, Avatar, G
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser } from '../redux/userSlice';
-import { useHistory } from "react-router-dom";
 import { Fragment } from 'react';
 
 
@@ -11,7 +10,6 @@ interface HeaderProps {
 }
 
 const Header = (props: HeaderProps) => {
-  let history = useHistory();
   const dispatch = useAppDispatch();
   const stateUser = useAppSelector(({ user }) => user.userFields);
   const { title } = props;
@@ -66,7 +64,6 @@ const Header = (props: HeaderProps) => {
               onClick={() => {
                 localStorage.removeItem('token');
                 dispatch(clearUser());
-                // history.push("/");
               }}
             >
               Logout

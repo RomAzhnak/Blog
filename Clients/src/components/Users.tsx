@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getUser, getPosts, changeLike, changeSubscribeToUser } from "../api/userApi";
 import Avatar from '@material-ui/core/Avatar';
 import { Button, Checkbox, FormControlLabel, Grid, ListItem, Paper, Typography } from "@material-ui/core";
@@ -118,11 +118,6 @@ const Users: React.FC<Props> = (props) => {
             <Typography>Email:{` ${email}`}</Typography>
             <Grid >
               <Grid className={classes.button}>
-                {/* <Link to="/" style={{ textDecoration: 'none' }}>
-                  <Button type="submit" variant="contained" color="primary" >
-                    Main page
-                  </Button>
-                </Link> */}
               </Grid>
               <Grid className={classes.button}>
                 <Button type="submit"

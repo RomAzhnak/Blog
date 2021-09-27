@@ -21,13 +21,11 @@ interface FooterProps {
 }
 
 export default function Footer(props: FooterProps) {
-  // const classes = useStyles();
   const { description, title } = props;
 
   return (
     <Box component="footer"  >
       <Container maxWidth="lg" 
-      // className={classes.footer}
       >
         <Typography
           variant="subtitle1"
@@ -41,9 +39,3 @@ export default function Footer(props: FooterProps) {
     </Box>
   );
 }
-
-// const useStyles = makeStyles((theme) => ({
-//   footer: {
-//     flex: '0 0 auto',
-//   }
-// }));
