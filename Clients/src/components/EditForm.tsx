@@ -17,7 +17,6 @@ import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
 import { Container } from '@material-ui/core';
 import AlertComponent from "./AlertComponent";
-import { Settings } from 'http2';
 
 
 const validationSchema = yup.object({
