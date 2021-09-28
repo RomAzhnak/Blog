@@ -1,15 +1,15 @@
 const db = require("../models");
-const config = require("../config/auth.config");
 const uploadFile = require("../middleware/upload");
 const User = db.User;
 const Post = db.Post;
 const UserLike = db.UserLike;
 const Subscription = db.Subscription;
 const Op = db.Sequelize.Op;
-const baseUrl = 'http://localhost:4000/auth/files/';
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { QueryTypes } = require('sequelize');
+require('dotenv').config();
+
 
 exports.allUser = (req, res) => {
   User.findAll({
@@ -126,7 +126,7 @@ exports.editAdmin = async (req, res, next) => {
     if (user.roleId === 1) {
       throw new Error("Failed! Cannot edit admin");
     }
-    const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
+    const fileName = req.file === undefined ? '' : process.env.baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
       email: email,
@@ -168,7 +168,7 @@ exports.edit = async (req, res, next) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     };
-    const fileName = req.file === undefined ? '' : baseUrl + req.file.originalname;
+    const fileName = req.file === undefined ? '' : process.env.baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
       email: email,
@@ -409,7 +409,7 @@ exports.signin = async (req, res, next) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     }
-    const token = jwt.sign({ email: user.email, id: user.id }, config.secret,
+    const token = jwt.sign({ email: user.email, id: user.id }, process.env.SECRET,
       {
         expiresIn: 86400 // 60*60*24
       });

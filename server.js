@@ -1,16 +1,13 @@
 const express = require("express");
 const app = express();
-const controllerAuth = require("./controllers/controller");
 const db = require("./models");
 const userReq = require("./routers/user.requests");
 const adminReq = require("./routers/admin.requests");
 const authReq = require("./routers/auth.requests");
 const cors = require('cors');
 const {errorHandler} = require("./middleware/errorHandler");
-
-
+require('dotenv').config()
 global.__basedir = __dirname;
-// global.baseURL = 'http://localhost:4000/'
 
 db.sequelize.sync();
 // force: true will drop the table if it already exists
@@ -35,7 +32,7 @@ app.use("/user", userReq);
 app.use(errorHandler);
 
 
-const port = 4000;
+const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running on port ${port}.`);
 });

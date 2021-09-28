@@ -1,6 +1,8 @@
+require('dotenv').config();
+
 const uploadFile = require("../middleware/upload");
 fs = require('fs');
-const baseUrl = 'http://localhost:4000/auth/files/';
+
 
 const upload = async (req, res) => {
   try {
@@ -23,7 +25,7 @@ const upload = async (req, res) => {
     if ((user.urlAvatar !== urlAvatar) && (req.file !== undefined)) {
       const filename = req.file.originalname;
       const result = await User.update({
-        urlAvatar: baseUrl + filename,
+        urlAvatar: process.env.baseUrl + filename,
       },
         {
           where: { email: email }
@@ -71,7 +73,7 @@ const getListFiles = (req, res) => {
     files.forEach((file) => {
       fileInfos.push({
         name: file,
-        url: baseUrl + file,
+        url: process.env.baseUrl + file,
       });
     });
 
