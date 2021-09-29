@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const controllerAuth = require("../controllers/uer.controller");
+const controllerUser = require("../controllers/user.controller");
 const controllerFile = require("../controllers/file.controller");
 const { verifyToken } = require('../middleware/authJwt');
 
 
-router.delete("/deleteUser", verifyToken, controllerAuth.deleteAdmin);
-router.post("/editAdmin", verifyToken, controllerAuth.editAdmin);
-router.get("/users", verifyToken, controllerAuth.getListUsersAdmin);
+router.delete("/deleteUser", verifyToken, controllerUser.deleteAdmin);
+router.post("/editAdmin", verifyToken, controllerUser.editAdmin);
+router.get("/users", verifyToken, controllerUser.getListUsersAdmin);
 router.get("/files/:name", controllerFile.download);
 
 module.exports = router;

@@ -47,7 +47,7 @@ const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const stateUser = useAppSelector(({ user }) => user.userFields);
-  const [imageInfos, setAvatar] = useState<any[]>([]);
+  const [imageInfos, setImageInfos] = useState<any[]>([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
   const [postTitle, setTitlePost] = useState<string>('');
@@ -58,7 +58,7 @@ const EditForm: React.FC<Props> = (props) => {
   useEffect(() => {
     getUserList(stateUser.id)
       .then((response) => {
-        setAvatar(response.data);
+        setImageInfos(response.data);
       })
       .catch((err) => {
         setTypeMesssage(400);

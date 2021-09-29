@@ -275,7 +275,8 @@ exports.getListUsersAdmin = async (req, res, next) => {
     const users = await User.findAll({
       where: {
         id: { [Op.ne]: [id] }
-      }
+      },
+      order: [[ 'roleId'], ['userName', 'DESC' ]],
     });
     res.status(200).send(users);
   } catch (err) {
@@ -298,7 +299,8 @@ exports.getListUsers = async (req, res, next) => {
           },
           as: 'subscriber',
           required: true
-        }]
+        }],
+        order: [ 'userName' ]
       }
     );
     res.status(200).send(subscribe);
