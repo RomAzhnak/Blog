@@ -14,11 +14,11 @@ module.exports = {
       post: {
         type: Sequelize.TEXT,
       },
-      likes: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0       
-      },
+      // likes: {
+      //   type: Sequelize.INTEGER,
+      //   allowNull: false,
+      //   defaultValue: 0       
+      // },
       userId: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',

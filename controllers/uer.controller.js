@@ -7,7 +7,6 @@ const Subscription = db.Subscription;
 const Op = db.Sequelize.Op;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { QueryTypes } = require('sequelize');
 require('dotenv').config();
 
 
@@ -36,11 +35,15 @@ exports.changeLike = async (req, res, next) => {
       });
       statusLike = true;
     }
-    const countLikes = await db.sequelize.query(`SELECT COUNT(postId) AS likes 
-    FROM UserLikes WHERE postId = ${idPost} 
-    GROUP BY postId`, { type: QueryTypes.SELECT });
+    const countLikes = await UserLike.findAll({
+      where: { postId: `${idPost}` },
+      attributes: [
+        [db.sequelize.fn("count", db.sequelize.col('postId')), 'likes']
+      ],
+      raw: true,
+    })
     const likes = (countLikes.length != 0) ? countLikes[0].likes : 0;
-    res.status(200).send({ statusLike: statusLike, countLikes: likes });
+    res.status(200).send({ statusLike: statusLike, countLikes: countLikes[0].likes });
   }
   catch (err) {
     next(err);
@@ -57,16 +60,27 @@ exports.getUserPosts = async (req, res, next) => {
     });
     let userLikes = [];
     userLike.map((user) => userLikes.push(user.postId));
-    const posts = await db.sequelize.query(`SELECT count(UserLikes.id) AS likes, 
-    Posts.id, Posts.title, Posts.post, Posts.userId, Posts.createdAt, 
-    UserLikes.postId FROM Posts LEFT JOIN UserLikes ON Posts.id = UserLikes.postId 
-    WHERE Posts.userId = ${idAuthor} GROUP BY Posts.id`, { type: QueryTypes.SELECT });
+    const posts = await Post.findAll({
+      where: { userId: idAuthor },
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM userLikes
+              WHERE
+                  UserLikes.postId = Post.id
+          )`), 'likes'
+          ]
+        ]
+      },
+    });
     if (!posts) {
       throw new Error("Failed! Author not found!");
     }
     res.status(200).send({ posts: posts, userLikes: userLikes });
   } catch (err) {
-      next(err);
+    next(err);
   }
 }
 
@@ -82,9 +96,8 @@ exports.addPost = async (req, res, next) => {
     });
     res.status(200).send('Add post');
   } catch (err) {
-      next(err);
+    next(err);
   }
-
 }
 
 exports.getUserById = async (req, res, next) => {
@@ -109,7 +122,7 @@ exports.getUserById = async (req, res, next) => {
       password: '',
     })
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -231,7 +244,7 @@ exports.getListPost = async (req, res, next) => {
     const countPosts = postsFilter.length;
     res.status(200).send({ posts: result, countPosts: countPosts });;
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -252,7 +265,7 @@ exports.setUserSubscribe = async (req, res, next) => {
     }
     res.status(200).send({ subscribe: subscribe });
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -266,7 +279,7 @@ exports.getListUsersAdmin = async (req, res, next) => {
     });
     res.status(200).send(users);
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -290,7 +303,7 @@ exports.getListUsers = async (req, res, next) => {
     );
     res.status(200).send(subscribe);
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -313,7 +326,7 @@ exports.deleteAdmin = async (req, res, next) => {
     };
     res.status(200).send({ message: "User was deleted successfully!" });
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -340,7 +353,7 @@ exports.delete = async (req, res, next) => {
     };
     res.status(200).send({ message: "User was deleted successfully!" });
   } catch (err) {
-        next(err);
+    next(err);
   }
 };
 
@@ -366,7 +379,7 @@ exports.signup = async (req, res, next) => {
     })
     res.status(200).send({ message: "User registered successfully!" })
   } catch (err) {
-      next(err);
+    next(err);
   }
 };
 
@@ -388,7 +401,7 @@ exports.getUser = async (req, res, next) => {
       id: user.id,
     });
   } catch (err) {
-        next(err);
+    next(err);
   }
 }
 
@@ -422,6 +435,6 @@ exports.signin = async (req, res, next) => {
       accessToken: token
     });
   } catch (err) {
-        next(err);
+    next(err);
   }
 };
