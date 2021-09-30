@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
 	fetchAddUser, fetchLoginUser, fetchDelUser, fetchEditUser,
 	fetchEditUserAdmin, fetchDelUserAdmin
@@ -127,7 +127,7 @@ export const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducers: {
-		addUser: (state, action) => {
+		addUser: (state, action:PayloadAction<UserLogin>) => {
 			state.userFields.email = action.payload.email;
 			state.userFields.userName = action.payload.userName;
 			state.userFields.roleId = action.payload.roleId;

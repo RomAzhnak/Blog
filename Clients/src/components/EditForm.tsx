@@ -138,7 +138,7 @@ const EditForm: React.FC<Props> = (props) => {
       });
   }
 
-  const onClickLogOut = (event: { preventDefault: () => void; }) => {
+  const onClickLogOut = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     dispatch(clearUser());
     localStorage.removeItem('token');
@@ -158,7 +158,7 @@ const EditForm: React.FC<Props> = (props) => {
     }
   }
 
-  const handleChangeTitle = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleChangeTitle = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setTitlePost(event.target.value);
   }
 
@@ -290,7 +290,7 @@ const EditForm: React.FC<Props> = (props) => {
                   variant="contained"
                   color="primary"
                   className={classes.submit}
-                  onClick={onClickLogOut}
+                  onClick={(e) => onClickLogOut}
                 >
                   LogOut
                 </Button>
@@ -315,7 +315,7 @@ const EditForm: React.FC<Props> = (props) => {
                   label="Title"
                   autoFocus
                   value={postTitle}
-                  onChange={handleChangeTitle}
+                  onChange={(e) =>  handleChangeTitle}
                 />
               </Grid>
               <Grid item xs={12}>

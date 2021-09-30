@@ -3,16 +3,20 @@ import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { getUserListAdmin } from '../api/userApi';
 import ListItem from '@material-ui/core/ListItem';
-import Header from './Header';
 import Container from '@material-ui/core/Container';
-import Link from '@material-ui/core/Link';
 import { CssBaseline } from '@material-ui/core';
+import Link from '@material-ui/core/Link';
+
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+
+import { getUserListAdmin } from '../api/userApi';
+
+import Header from './Header';
 import AdminEditForm from './AdminEditForm';
-import { userEditAdmin } from "../redux/userSlice";
 import AlertComponent from "./AlertComponent";
+
+import { userEditAdmin } from "../redux/userSlice";
 
 
 type Props = {
@@ -23,7 +27,7 @@ const EditForm: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   const stateUser = useAppSelector(({ user }) => user.userFields);
-  const stateUsersForAdmin = useAppSelector((user) => user);
+  const stateUsersForAdmin = useAppSelector((store) => store.user);
   const [userInfos, setUserInfos] = useState<any[]>([]);
   const [editUser, setEditUser] = useState<boolean>(false);
   const [typeMessage, setTypeMesssage] = useState<number>(200);
@@ -65,7 +69,11 @@ const EditForm: React.FC<Props> = (props) => {
                   userInfos.map((userValue: any, index) => (
                     <ListItem
                       key={index}>
-                      <Link onClick={() => { dispatch(userEditAdmin(userValue)); setEditUser(true); }}>
+                      <Link onClick={() => { 
+                        dispatch(userEditAdmin(userValue));
+                         setEditUser(true); 
+                      
+                         }}>
                         <Avatar src={userValue.urlAvatar} alt={userValue.userName}
                           className={classes.middle}
                         />
@@ -78,7 +86,7 @@ const EditForm: React.FC<Props> = (props) => {
           </Grid>
         </Grid>
       </Grid >
-      {editUser ? <AdminEditForm /> : <></>}
+      {editUser && <AdminEditForm />}
     </Container>
   );
 }

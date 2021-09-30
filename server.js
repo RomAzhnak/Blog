@@ -9,7 +9,7 @@ const {errorHandler} = require("./middleware/errorHandler");
 require('dotenv').config()
 global.__basedir = __dirname;
 
-db.sequelize.sync();
+// db.sequelize.sync();
 // force: true will drop the table if it already exists
 // db.sequelize.sync({force: true}).then(() => {
 // });
@@ -33,6 +33,19 @@ app.use(errorHandler);
 
 
 const port = process.env.PORT;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}.`);
-});
+
+(async () => {
+  try {
+    await db.sequelize.sync()
+    app.listen(port, (err) => {
+      if (err) {
+        
+        return;
+      }
+      console.log(`Server is running on port ${port}.`);
+    });
+    
+  } catch(e) {
+
+  }
+})()

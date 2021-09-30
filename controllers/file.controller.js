@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const uploadFile = require("../middleware/upload");
-fs = require('fs');
+const fs = require('fs');
 
 
 const upload = async (req, res) => {

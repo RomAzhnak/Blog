@@ -1,21 +1,22 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { User } from "../redux/userSlice";
 
 const instance = axios.create({
-  baseURL: 'http://localhost:4000/'
+  baseURL: 'http://localhost:4000'
 });
 
 instance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
     config.headers.authorization = `Bearer ${token}`
-  } else {
-
   }
   return config;
 });
 
-export const changeSubscribeToUser = (id: number): Promise<any>  => {
+// type User = {
+//   user: string
+// }
+export const changeSubscribeToUser = (id: number): Promise<AxiosResponse<any>>  => {
   return instance.get(`/user/usersubcribe?id=${id}`);
 }
 
@@ -77,14 +78,16 @@ export const fetchAddPost = (title: string, post: string): Promise<any> => {
   return instance.post("/user/addpost", {title, post});
 }
 
-export const fetchDelUser = (user: User): Promise<any> => {
-  return instance.delete('/user', {
+export const fetchDelUser = async (user: User): Promise<any> => {
+  const response = await instance.delete('/user', {
     params: {
       id: user.id,
       roleId: user.roleId,
       password: user.password,
     }
   })
+
+  return response.data
 }
 
 export const fetchDelUserAdmin = (user: User): Promise<any> => {

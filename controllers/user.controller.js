@@ -67,7 +67,7 @@ exports.getUserPosts = async (req, res, next) => {
           [
             db.sequelize.literal(`(
               SELECT COUNT(*)
-              FROM userLikes
+              FROM UserLikes
               WHERE
                   UserLikes.postId = Post.id
           )`), 'likes'

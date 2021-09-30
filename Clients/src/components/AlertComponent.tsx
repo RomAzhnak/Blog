@@ -5,7 +5,7 @@ import { Alert } from '@material-ui/lab';
 type Props = {
   typeAlert: number,
   messageAlert: string | null,
-  show: any,
+  show: (a: string) => void,
 };
 
 const AlertComponent: React.FC<Props> = (props) => {
