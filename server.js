@@ -39,7 +39,7 @@ const port = process.env.PORT;
     await db.sequelize.sync()
     app.listen(port, (err) => {
       if (err) {
-        
+        console.log(err);
         return;
       }
       console.log(`Server is running on port ${port}.`);
