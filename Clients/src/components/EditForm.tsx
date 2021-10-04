@@ -1,4 +1,8 @@
 import React, { FormEvent, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
+import { Link } from 'react-router-dom';
+
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -7,15 +11,15 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { clearUser, fetchDel, fetchEdit, User } from "../redux/userSlice";
+import ListItem from '@material-ui/core/ListItem';
+import { Container } from '@material-ui/core';
+
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Link } from 'react-router-dom';
+
+
 import { getUserList, fetchAddPost } from '../api/userApi';
-import ListItem from '@material-ui/core/ListItem';
 import Header from './Header';
-import { Container } from '@material-ui/core';
 import AlertComponent from "./AlertComponent";
 
 
@@ -39,6 +43,12 @@ const validationSchema = yup.object({
   // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
 });
 
+type UserList = {
+  id: number,
+  urlAvatar: string,
+  userName: string,
+};
+
 type Props = {
 
 };
@@ -47,26 +57,25 @@ const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const stateUser = useAppSelector(({ user }) => user.userFields);
-  const [imageInfos, setImageInfos] = useState<any[]>([]);
+  const [imageInfos, setImageInfos] = useState<UserList[]>([]);
   const [image, _setImage] = useState(stateUser.urlAvatar);
   const [fileName, setFileName] = useState<File | undefined>();
   const [postTitle, setTitlePost] = useState<string>('');
   const [postText, setTextPost] = useState<string>('');
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+  { typeAlert: number, messageAlert: string }
+>
+  ({ typeAlert: 200, messageAlert: '' });
 
   useEffect(() => {
     getUserList(stateUser.id)
       .then((response) => {
         setImageInfos(response.data);
       })
-      .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request ${err}`)
-      }
-      )
-  }, [stateUser])
+      .catch((err) => {       
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
+  }, [stateUser.id])
 
   const setImage = (newImage: React.SetStateAction<string>) => {
     if (image) {
@@ -98,18 +107,15 @@ const EditForm: React.FC<Props> = (props) => {
       dispatch(fetchEdit(formData))
         .unwrap()
         .then(() => {
-          setTypeMesssage(200);
-          setTextMessage('SUCCESS. User edited');
+          setAlert({typeAlert: 200, messageAlert: 'SUCCESS. User edited'});
         })
         .catch((err) => {
-          setTypeMesssage(400);
-          setTextMessage(err.message);
-          console.log(err);
+          setAlert({typeAlert: 400, messageAlert: err.message});
         })
     };
   };
 
-  const onClickDelete = (event: { preventDefault: () => void; }) => {
+  const onClickDelete = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     const fetchUser = {
       userName: formik.values.userName,
@@ -122,19 +128,10 @@ const EditForm: React.FC<Props> = (props) => {
     dispatch(fetchDel(fetchUser))
       .unwrap()
       .then(() => {
-        setTypeMesssage(200);
-        setTextMessage('SUCCESS. User deleted');
-        return new Promise((res) => {
-        setTimeout(() => res(''), 1000);
-      })}
-      )
-      .then(() => {
         localStorage.removeItem('token');
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(err); 
+        setAlert({typeAlert: 400, messageAlert: err.message});
       });
   }
 
@@ -150,11 +147,9 @@ const EditForm: React.FC<Props> = (props) => {
       await fetchAddPost(postTitle, postText);
       setTitlePost('');
       setTextPost('');
-      setTypeMesssage(200);
-      setTextMessage('SUCCESS. Add post');
+      setAlert({typeAlert: 200, messageAlert: 'SUCCESS. Add post'});
     } catch (err: any) {
-      setTypeMesssage(400);
-      setTextMessage(err.message);
+      setAlert({typeAlert: 400, messageAlert: err.message});
     }
   }
 
@@ -162,7 +157,7 @@ const EditForm: React.FC<Props> = (props) => {
     setTitlePost(event.target.value);
   }
 
-  const handleChangePost = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+  const handleChangePost = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setTextPost(event.target.value);
   }
 
@@ -183,24 +178,25 @@ const EditForm: React.FC<Props> = (props) => {
 
 
   return (
-    <Grid container className={classes.mainpage} spacing={2} justifyContent='center'>
+    <Grid container spacing={2} justifyContent='center' >
       <Container maxWidth="lg">
         <Header title="Blog" />
-        <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+        <AlertComponent show={setAlert} alert={alert} />
       </Container>
+      <Grid>
       <Grid component="main" className={classes.root} >
         <input accept="image/*"
           className={classes.input}
           id="icon-button-file"
           type="file"
-          onChange={(e) => handleOnChange(e)}
+          onChange={handleOnChange}
         />
         <label htmlFor="icon-button-file">
           <IconButton color="primary" component="span">
             <Avatar src={image} className={classes.large} />
           </IconButton>
         </label>
-        <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
+        <Grid item xs={3} component={Paper} elevation={6} className={classes.paper} >
           <Typography component="h1" variant="h5">
             Edit
           </Typography>
@@ -260,18 +256,7 @@ const EditForm: React.FC<Props> = (props) => {
               direction="row"
               justifyContent="space-around"
               alignItems="center">
-              <Grid >
-                <Button
-                  size='small'
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  className={classes.submit}
-                  onClick={onClickDelete}
-                >
-                  Delete
-                </Button>
-              </Grid>
+
               <Grid >
                 <Button
                   size='small'
@@ -286,11 +271,21 @@ const EditForm: React.FC<Props> = (props) => {
               <Grid >
                 <Button
                   size='small'
-                  type="submit"
                   variant="contained"
                   color="primary"
                   className={classes.submit}
-                  onClick={(e) => onClickLogOut}
+                  onClick={onClickDelete}
+                >
+                  Delete
+                </Button>
+              </Grid>
+              <Grid >
+                <Button
+                  size='small'
+                  variant="contained"
+                  color="primary"
+                  className={classes.submit}
+                  onClick={onClickLogOut}
                 >
                   LogOut
                 </Button>
@@ -298,7 +293,7 @@ const EditForm: React.FC<Props> = (props) => {
             </Grid>
           </form>
         </Grid>
-        <Grid item xs={7} component={Paper} elevation={6} className={classes.paper}>
+        <Grid item xs={5} component={Paper} elevation={6} className={classes.paper}>
           <Typography component="h1" variant="h5">
             New post
           </Typography>
@@ -315,7 +310,7 @@ const EditForm: React.FC<Props> = (props) => {
                   label="Title"
                   autoFocus
                   value={postTitle}
-                  onChange={(e) =>  handleChangeTitle}
+                  onChange={handleChangeTitle}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -351,16 +346,21 @@ const EditForm: React.FC<Props> = (props) => {
           </form>
         </Grid>
       </Grid>
-      <Grid item xs={2} component={Paper} elevation={6} className={classes.list} style={{ maxHeight: '95vh', overflow: 'auto' }}>
-        <Grid >
+      <Grid container
+        style={{ marginTop: 25 }}
+        justifyContent='center'
+      >
+      <Grid item component={Paper} elevation={6} style={{ overflow: 'auto', padding: 15 }}  >
+        <Grid item className={classes.list} >
           <Typography variant="h6" className="list-header">
             List of Subscriptions
           </Typography>
           <ul className={classes.ul}>
             {imageInfos &&
-              imageInfos.map((image: any, index) => (
+              imageInfos.map((image: UserList, index) => (
                 <ListItem
-                  divider
+                style={{padding: 8}}
+                  // divider
                   key={index}>
                   <Link to={`/users/:${image.id}`} className={classes.list}>
                     <Avatar src={image.urlAvatar} alt={image.userName} className={classes.middle} />
@@ -371,7 +371,8 @@ const EditForm: React.FC<Props> = (props) => {
           </ul>
         </Grid>
       </Grid>
-
+      </Grid >
+      </Grid>
     </Grid>
   );
 }
@@ -382,7 +383,6 @@ const useStyles = makeStyles((theme: Theme) =>
       alignItems: 'center',
       display: 'flex',
       justifyContent: 'center',
-      flexDirection: 'column',
     },
     '& > *': {
       margin: theme.spacing(1),
@@ -391,15 +391,13 @@ const useStyles = makeStyles((theme: Theme) =>
       display: "none",
     },
     ul: {
-      padding: 0
+      display: 'flex',
+      padding: 5,
     },
     list: {
       display: 'flex',
-      padding: 1,
-      justifyContent: 'center',
-      marginTop: 20,
-    },
-    mainpage: {
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     paper: {
       margin: theme.spacing(2, 3, 0, 3),
@@ -407,10 +405,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-    },
-    avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
     },
     form: {
       width: '100%', // Fix IE 11 issue.
@@ -431,7 +425,6 @@ const useStyles = makeStyles((theme: Theme) =>
     middle: {
       width: theme.spacing(5),
       height: theme.spacing(5),
-      marginRight: 5,
     }
   }));
 

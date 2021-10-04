@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { fetchEditAdmin, fetchDelAdmin, userEditAdmin } from "../redux/userSlice";
+
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Button from '@material-ui/core/Button';
@@ -7,12 +10,10 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { fetchEditAdmin, fetchDelAdmin } from "../redux/userSlice";
+import { Container, FormControl, MenuItem, Select } from '@material-ui/core';
+
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Container, MenuItem, Select } from '@material-ui/core';
-import { userEditAdmin } from "../redux/userSlice";
 
 
 const validationSchema = yup.object({
@@ -32,18 +33,13 @@ const validationSchema = yup.object({
     .string()
     .required('Password is required')
     .min(6, 'Password should be of minimum 6 characters length'),
-  //   confirmPassword: Yup.string()
-  //   .required('Confirm Password is required')
-  //   .oneOf([Yup.ref('password'), null], 'Confirm Password does not match'),
-  // acceptTerms: Yup.bool().oneOf([true], 'Accept Terms is required')
 });
 
 type Props = {
-
+  showAlert: (a: any) => void,
 };
 
-
-type InitUser  = {
+type InitUser = {
   userName: string,
   email: string,
   roleId: number,
@@ -55,7 +51,7 @@ const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const stateUser = useAppSelector(({ user }) => user.userEditAdmin);
-  const [fileName, setFileName] = useState<File | undefined>();
+  const [fileName, setFileName] = useState<File | undefined>(undefined);
 
   const formik = useFormik({
     initialValues: {
@@ -76,35 +72,42 @@ const EditForm: React.FC<Props> = (props) => {
     const newImage = event.target?.files?.[0];
     if (newImage) {
       setFileName(newImage);
-      dispatch(userEditAdmin({...stateUser, urlAvatar: URL.createObjectURL(newImage)}));
+      dispatch(userEditAdmin({ ...stateUser, urlAvatar: URL.createObjectURL(newImage) }));
     }
   };
- 
+
   const onSubmitForm = (user: InitUser) => {
+    if (stateUser.roleId === 1) {
+      props.showAlert({typeAlert: 400, messageAlert: 'Can`t edit admin'})
+      return;
+    };
     let formData = new FormData();
     if (fileName) {
       formData.append("file", fileName);
+      setFileName(undefined);
     }
     formData.append("userName", user.userName);
     formData.append("email", user.email);
     formData.append("id", String(stateUser.id));
     formData.append("roleId", String(user.roleId));
-    dispatch(userEditAdmin({...stateUser, urlAvatar: stateUser.urlAvatar }));
+    formData.append("urlAvatar", stateUser.urlAvatar);
     if (user.email) {
       dispatch(fetchEditAdmin(formData))
         .unwrap()
         .then(() => {
         })
         .catch((err) => {
-          
-          console.log(`Failed request editAdmin ${err}`);
+          props.showAlert({typeAlert: 400, messageAlert: err.message})
         })
     };
   };
 
-  const onClickDelete = (event: { preventDefault: () => void; }) => {
+  const onClickDelete = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    if (stateUser.id === 1) return;
+    if (stateUser.roleId === 1) {
+      props.showAlert({typeAlert: 400, messageAlert: 'Can`t delete admin'})
+      return;
+    };
     const fetchUser = {
       userName: stateUser.userName,
       email: stateUser.email,
@@ -118,7 +121,7 @@ const EditForm: React.FC<Props> = (props) => {
       .then(() => {
       })
       .catch((err) => {
-        console.log(`Failed request delete ${err}`);
+        props.showAlert({typeAlert: 400, messageAlert: err.message})
       })
   }
 
@@ -130,17 +133,17 @@ const EditForm: React.FC<Props> = (props) => {
             <Typography component="h1" variant="h5">
               Edit
             </Typography>
-              <input accept="image/*"
-                className={classes.input}
-                id="icon-button-file"
-                type="file"
-                onChange={(e) => handleOnChange(e)}
-              />
-              <label htmlFor="icon-button-file">
-                <IconButton color="primary" component="span">
-                  <Avatar src={stateUser.urlAvatar} className={classes.large} />
-                </IconButton>
-              </label>
+            <input accept="image/*"
+              className={classes.input}
+              id="icon-button-file"
+              type="file"
+              onChange={(e) => handleOnChange(e)}
+            />
+            <label htmlFor="icon-button-file">
+              <IconButton color="primary" component="span">
+                <Avatar src={stateUser.urlAvatar} className={classes.large} />
+              </IconButton>
+            </label>
             <form className={classes.form}
               onSubmit={formik.handleSubmit}
               noValidate
@@ -166,6 +169,7 @@ const EditForm: React.FC<Props> = (props) => {
                   <TextField
                     variant="outlined"
                     required
+                    disabled
                     fullWidth
                     id="email"
                     label="Email Address"
@@ -177,21 +181,20 @@ const EditForm: React.FC<Props> = (props) => {
                     helperText={formik.touched.email && formik.errors.email}
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item>
+                <FormControl style={{ minWidth: 125 }}>
                   <Select
                     name="roleId"
                     value={formik.values.roleId}
                     onChange={formik.handleChange}
-                    displayEmpty
-                    inputProps={{ 'aria-label': 'Without label' }}
-                    style={{ marginLeft: 15, marginBottom: 10 }}
+                    style={{ marginBottom: 10 }}
                   >
                     <MenuItem value="">
                     </MenuItem>
                     <MenuItem value={1}>Administrator</MenuItem>
                     <MenuItem value={2}>User</MenuItem>
-
                   </Select>
+                </FormControl>
                 </Grid>
               </Grid>
               <Grid
@@ -244,15 +247,6 @@ const useStyles = makeStyles((theme: Theme) =>
     input: {
       display: "none",
     },
-    ul: {
-      padding: 0
-    },
-    list: {
-      display: 'flex',
-      padding: 1,
-      justifyContent: 'center',
-      marginTop: 20,
-    },
     mainpage: {
     },
     paper: {
@@ -261,10 +255,6 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-    },
-    avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
     },
     form: {
       width: '100%', // Fix IE 11 issue.
@@ -282,11 +272,6 @@ const useStyles = makeStyles((theme: Theme) =>
       height: theme.spacing(25),
       marginTop: 10,
     },
-    middle: {
-      width: theme.spacing(5),
-      height: theme.spacing(5),
-      marginRight: 5,
-    }
   }));
 
 export default EditForm;

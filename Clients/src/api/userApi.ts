@@ -1,63 +1,51 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { User } from "../redux/userSlice";
+import instance from './index';
 
-const instance = axios.create({
-  baseURL: 'http://localhost:4000'
-});
+// const instance = axios.create({
+//   baseURL: 'http://3.69.48.83/api'
+// });
 
-instance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.authorization = `Bearer ${token}`
-  }
-  return config;
-});
+// instance.interceptors.request.use((config) => {
+//   const token = localStorage.getItem('token');
+//   if (token) {
+//     config.headers.authorization = `Bearer ${token}`
+//   }
+//   return config;
+// });
 
-// type User = {
-//   user: string
-// }
-export const changeSubscribeToUser = (id: number): Promise<AxiosResponse<any>>  => {
-  return instance.get(`/user/usersubcribe?id=${id}`);
+type Data = {
+  idPost: number,
+  idAuthor: string,
 }
 
-export const getUserPostList = (page: number, filter: string): Promise<any> => {
-  return instance.get(`/user/postlist?page=${page}&filter=${filter}`);
-}
-
-export const changeLike = (data: any): Promise<any> => {
-  return instance.post('/user/like', data); 
-}
-
-export const fetchGet = (): Promise<any> => {
-  return instance.get('/auth');
-}
-
-export const getUserList = (id: number): Promise<any>  => {
-  return instance.get(`/user/users?id=${id}`);
-}
-
-export const getUserListAdmin = (id: number): Promise<any>  => {
-  return instance.get(`/admin/users?id=${id}`);
-}
-
-export const getPosts = (id: string): Promise<any>  => {
-  return instance.get(`/user/userposts/${id}`);
-}
-
-export const getUser = (id: string): Promise<any>  => {
-  return instance.get(`/user/getuser/${id}`);
-}
-
-export const fetchAddUser = (user: User): Promise<any> => {
+export const fetchAddUser = (user: User): Promise<AxiosResponse> => {
   return instance.post("/auth/signup", user);
 }
 
-export const fetchLoginUser = (user: User): Promise<any> => {
+export const fetchLoginUser = (user: User): Promise<AxiosResponse> => {
   return instance.post("/auth/signin", user);
 }
 
-export const fetchEditUser = (formData: FormData): Promise<any> => {
-  return instance.post("/user/edit", formData
+export const fetchGet = (): Promise<AxiosResponse> => {
+  return instance.get('/auth');
+}
+
+export const getUserList = (id: number): Promise<AxiosResponse>  => {
+  return instance.get(`/user/list?id=${id}`);
+}
+
+export const changeSubscribeToUser = (id: number): Promise<AxiosResponse>  => {
+  const res = instance.get(`/user/subcribe?id=${id}`);
+  return res
+}
+
+export const getUser = (id: string): Promise<AxiosResponse>  => {
+  return instance.get(`/user/bloger/${id}`);
+}
+
+export const fetchEditUser = (formData: FormData): Promise<AxiosResponse> => {
+  return instance.post("/user/bloger", formData
   , {
     headers: {
       "Content-Type": "multipart/form-data",
@@ -65,42 +53,52 @@ export const fetchEditUser = (formData: FormData): Promise<any> => {
   });
 }
 
-export const fetchEditUserAdmin = (formData: FormData): Promise<any> => {
-  return instance.post("/admin/editAdmin", formData
-  , {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-}
-
-export const fetchAddPost = (title: string, post: string): Promise<any> => {
-  return instance.post("/user/addpost", {title, post});
-}
-
-export const fetchDelUser = async (user: User): Promise<any> => {
-  const response = await instance.delete('/user', {
+export const fetchDelUser = async (user: User): Promise<AxiosResponse> => {
+  const response = await instance.delete('/user/bloger', {
     params: {
       id: user.id,
       roleId: user.roleId,
       password: user.password,
     }
   })
-
   return response.data
 }
 
-export const fetchDelUserAdmin = (user: User): Promise<any> => {
-  return instance.delete('/admin/deleteUser', {
+export const getUserPostList = (page: number, filter: string): Promise<AxiosResponse> => {
+  return instance.get(`/post/list?page=${page}&filter=${filter}`);
+}
+
+export const changeLike = (data: Data): Promise<AxiosResponse> => {
+  return instance.post('/post/like', data); 
+}
+
+export const getPosts = (id: string): Promise<AxiosResponse>  => {
+  return instance.get(`/post/user/${id}`);
+}
+
+export const fetchAddPost = (title: string, post: string): Promise<AxiosResponse> => {
+  return instance.post("/post/addpost", {title, post});
+}
+
+export const getUserListAdmin = (id: number): Promise<AxiosResponse>  => {
+  return instance.get(`/admin/user?id=${id}`);
+}
+
+export const fetchEditUserAdmin = (formData: FormData): Promise<AxiosResponse> => {
+  return instance.post("/admin/user", formData
+  , {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+}
+
+export const fetchDelUserAdmin = (user: User): Promise<AxiosResponse> => {
+  return instance.delete('/admin/user', {
     params: {
       id: user.id,
     }
   })
 }
 
-export default instance;
-
-
-function params(arg0: string, params: any, arg2: { email: string; }): Promise<any> {
-  throw new Error("Function not implemented.");
-}
+export default instance

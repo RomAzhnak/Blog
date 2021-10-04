@@ -1,19 +1,21 @@
 import React, { useState } from "react";
+import { Link, useHistory } from 'react-router-dom';
+import { useAppDispatch } from '../app/hooks';
+import { fetchLogin, User } from "../redux/userSlice";
+
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import { Link, useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useAppDispatch } from '../app/hooks';
-import { fetchLogin } from "../redux/userSlice";
+
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { User } from '../redux/userSlice'
+
 import AlertComponent from "./AlertComponent";
 
 type Props = {
@@ -23,8 +25,9 @@ type Props = {
 const SignIn: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+  { typeAlert: number, messageAlert: string }
+>({ typeAlert: 200, messageAlert: '' });
 
   let history = useHistory();
 
@@ -36,9 +39,7 @@ const SignIn: React.FC<Props> = (props) => {
           history.push("/");
         })
         .catch(err => {
-          setTypeMesssage(400);
-          setTextMessage(err.message);
-          console.log(err)
+          setAlert({typeAlert: 400, messageAlert: err.message});
         })
     };
   };
@@ -72,7 +73,7 @@ const SignIn: React.FC<Props> = (props) => {
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+      <AlertComponent show={setAlert} alert={alert} />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />

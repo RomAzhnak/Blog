@@ -1,18 +1,20 @@
-import MainPage from './components/MainPage';
-import SignUp from './components/SignUp';
-import SignIn from './components/SignIn';
-import Admin from './components/Admin';
-import PrivateRoute from './components/PrivateRoute';
+import { useEffect, useState } from 'react';
+import { useAppDispatch } from './app/hooks';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
 } from "react-router-dom";
-import EditForm from './components/EditForm';
-import { useEffect, useState } from 'react';
-import { useAppDispatch } from './app/hooks';
-import { fetchGet } from './api/userApi';
+
 import { addUser } from './redux/userSlice';
+import { fetchGet } from './api/userApi';
+
+import MainPage from './components/MainPage';
+import SignUp from './components/SignUp';
+import SignIn from './components/SignIn';
+import Admin from './components/Admin';
+import PrivateRoute from './components/PrivateRoute';
+import EditForm from './components/EditForm';
 import Users from './components/Users';
 
 function App() {

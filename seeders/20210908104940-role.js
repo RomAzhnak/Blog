@@ -8,7 +8,7 @@ module.exports = {
      * Example:
      * */
     await queryInterface.bulkInsert('Roles', [{
-      role: 'administrator',
+      role: 'admin',
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

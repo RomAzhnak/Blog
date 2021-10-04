@@ -1,15 +1,18 @@
 import { Snackbar } from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 
-
-type Props = {
+type AlertType = {
   typeAlert: number,
   messageAlert: string | null,
-  show: (a: string) => void,
+};
+
+type Props = {
+  alert: AlertType,
+  show: (a: any) => void,
 };
 
 const AlertComponent: React.FC<Props> = (props) => {
-  const handleClose = () => props.show('');
+  const handleClose = () => props.show({typeAlert: props.alert.typeAlert, messageAlert: ''});
 
   return (
     <div>
@@ -17,11 +20,11 @@ const AlertComponent: React.FC<Props> = (props) => {
         onClose={handleClose}
         autoHideDuration={3000}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={props.messageAlert ? true : false}>
+        open={props.alert.messageAlert ? true : false}>
         <Alert
           onClose={handleClose}
-          severity={props.typeAlert === 200 ? 'success' : 'error'}>
-          {props.messageAlert}
+          severity={props.alert.typeAlert === 200 ? 'success' : 'error'}>
+          {props.alert.messageAlert}
         </Alert>
       </Snackbar>
     </div>

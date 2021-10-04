@@ -1,17 +1,36 @@
-import React, { useState } from 'react';
-import { createTheme, IconButton, InputAdornment, makeStyles, TextField, ThemeProvider } from '@material-ui/core';
-import SearchSharpIcon from '@material-ui/icons/SearchSharp';
-import Header from './Header';
-import FeaturedPost from './FeaturedPost';
-import Pagination from '@material-ui/lab/Pagination';
-import { Container, CssBaseline, Grid } from '@material-ui/core';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getUserPostList } from '../api/userApi';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { postFilter } from "../redux/userSlice";
+import { postFilter, User } from "../redux/userSlice";
+
+import {
+  createTheme,
+  IconButton,
+  InputAdornment,
+  makeStyles,
+  TextField,
+  ThemeProvider,
+  Container,
+  CssBaseline,
+  Grid
+} from '@material-ui/core';
+import SearchSharpIcon from '@material-ui/icons/SearchSharp';
+import Pagination from '@material-ui/lab/Pagination';
+
+import Header from './Header';
+import FeaturedPost from './FeaturedPost';
 import AlertComponent from "./AlertComponent";
 
 const theme = createTheme();
+
+type Post = {
+    createdAt: string,
+    post: string,
+    title: string,
+    id: number,
+    userId: number,
+    User: User,
+}
 
 type Props = {
 
@@ -21,13 +40,14 @@ const MainPage: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const stateFilter = useAppSelector(({ user }) => user.filter);
   const classes = useStyles();
-  const [featuredPosts, setFeaturedPosts] = useState<any[]>([]);
+  const [featuredPosts, setFeaturedPosts] = useState<Post[]>([]);
   const [page, setPage] = useState(1);
   const postsOnPage = 5;
   const [countPosts, setCountPosts] = useState<number>(0);
   const [valueFilter, setValueFilter] = useState<string>(stateFilter);
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+  { typeAlert: number, messageAlert: string }
+>({ typeAlert: 200, messageAlert: '' });
 
   useEffect(() => {
     getUserPostList(page, stateFilter)
@@ -36,14 +56,11 @@ const MainPage: React.FC<Props> = (props) => {
         setCountPosts(response.data.countPosts);
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request PostList ${err}`)
-      }
-      )
-  }, [])
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
+  }, [page, stateFilter])
 
-  const handleChange = (event: object, page: number) => {
+  const handleChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setPage(page);
     getUserPostList(page, stateFilter)
       .then((response) => {
@@ -51,11 +68,8 @@ const MainPage: React.FC<Props> = (props) => {
         setCountPosts(response.data.countPosts);
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request pagination ${err}`)
-      }
-      )
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
   };
 
   const handleClickFilter = () => {
@@ -66,11 +80,8 @@ const MainPage: React.FC<Props> = (props) => {
         setCountPosts(response.data.countPosts);
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request pagination ${err}`)
-      }
-      )
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
   }
 
   const handleChangeFilter = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +94,7 @@ const MainPage: React.FC<Props> = (props) => {
       <CssBaseline />
       <Container maxWidth="lg" className={classes.container}>
         <Header title="Blog" />
-        <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+        <AlertComponent show={setAlert} alert={alert} />
         <Grid >
           <TextField
             label="Search"
@@ -137,7 +148,4 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
   },
-  footer: {
-    flex: 'auto',
-  }
 }));

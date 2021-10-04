@@ -1,4 +1,14 @@
-import { Button, createStyles, makeStyles, Toolbar, Typography, Theme, Avatar, Grid } from '@material-ui/core';
+import {
+  Button,
+  createStyles,
+  makeStyles,
+  Toolbar,
+  Typography,
+  Theme,
+  Avatar,
+  Grid
+} from '@material-ui/core';
+
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { clearUser } from '../redux/userSlice';
@@ -30,7 +40,6 @@ const Header = (props: HeaderProps) => {
           </Button>
         </Grid>
         <Typography
-
           variant="h5"
           color="inherit"
           align="center"

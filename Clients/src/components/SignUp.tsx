@@ -1,20 +1,23 @@
 import React, { useState } from "react";
+import { Link, useHistory } from 'react-router-dom';
+import { useAppDispatch } from '../app/hooks';
+import { fetchAdd, User } from "../redux/userSlice";
+
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import { Link, useHistory } from 'react-router-dom';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import { useAppDispatch } from '../app/hooks';
-import { fetchAdd } from "../redux/userSlice";
-import { useFormik } from 'formik';
-import * as yup from 'yup';
-import { User } from '../redux/userSlice'
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Typography } from "@material-ui/core";
+
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+
 import AlertComponent from "./AlertComponent";
+
 
 const validationSchema = yup.object({
   userName: yup
@@ -40,15 +43,15 @@ const SignUp: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
   const classes = useStyles();
   let history = useHistory();
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+  { typeAlert: number, messageAlert: string }
+>({ typeAlert: 200, messageAlert: '' });
 
   const onSubmitForm = (user: User) => {
     dispatch(fetchAdd(user))
       .unwrap()
       .then(() => {
-        setTypeMesssage(200);
-        setTextMessage('SUCCESS');
+        setAlert({typeAlert: 200, messageAlert: 'SUCCESS'});
         return new Promise((res) => {
         setTimeout(() => res('done'), 1000);
       })
@@ -58,11 +61,8 @@ const SignUp: React.FC<Props> = (props) => {
         history.push("/login")
       })
       .catch(err => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request ${err}`)
-      }
-      )
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
   };
 
   const formik = useFormik({
@@ -80,11 +80,10 @@ const SignUp: React.FC<Props> = (props) => {
     },
   });
 
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
-      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+      <AlertComponent show={setAlert} alert={alert} />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <LockOutlinedIcon />
@@ -199,13 +198,4 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-  input: {
-    display: "none",
-  },
-  large: {
-
-    width: theme.spacing(25),
-    height: theme.spacing(25),
-    margin: 'auto',
-  }
 }));

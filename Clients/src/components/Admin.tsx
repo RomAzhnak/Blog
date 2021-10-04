@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { userEditAdmin } from "../redux/userSlice";
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+
 import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -8,16 +11,20 @@ import Container from '@material-ui/core/Container';
 import { CssBaseline } from '@material-ui/core';
 import Link from '@material-ui/core/Link';
 
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-
 import { getUserListAdmin } from '../api/userApi';
 
 import Header from './Header';
 import AdminEditForm from './AdminEditForm';
 import AlertComponent from "./AlertComponent";
 
-import { userEditAdmin } from "../redux/userSlice";
-
+type UserValue = {
+  email: string,
+  userName: string,
+  urlAvatar: string,
+  roleId: number,
+  id: number,
+  password: string,
+}
 
 type Props = {
 
@@ -28,10 +35,12 @@ const EditForm: React.FC<Props> = (props) => {
   const classes = useStyles();
   const stateUser = useAppSelector(({ user }) => user.userFields);
   const stateUsersForAdmin = useAppSelector((store) => store.user);
-  const [userInfos, setUserInfos] = useState<any[]>([]);
+  const [userInfos, setUserInfos] = useState<UserValue[]>([]);
   const [editUser, setEditUser] = useState<boolean>(false);
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+    { typeAlert: number, messageAlert: string }
+  >
+    ({ typeAlert: 200, messageAlert: '' });
 
   useEffect(() => {
     getUserListAdmin(stateUser.id)
@@ -39,24 +48,25 @@ const EditForm: React.FC<Props> = (props) => {
         setUserInfos(response.data);
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request ${err}`)
-      }
-      )
+        setAlert({ typeAlert: 400, messageAlert: err.message });
+      })
   }, [stateUsersForAdmin]);
+
+  const handleOnClick = (userValue: UserValue) => {
+    dispatch(userEditAdmin(userValue));
+    setEditUser(true);
+  }
 
   return (
     <Container maxWidth="lg">
       <CssBaseline />
       <Header title="Blog" />
-      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+      <AlertComponent show={setAlert} alert={alert} />
       <Grid container
         style={{ marginTop: 25 }}
         justifyContent='center'
       >
         <Grid item
-          xs={10}
           component={Paper}
           elevation={6}
           style={{ overflow: 'auto' }}
@@ -66,14 +76,10 @@ const EditForm: React.FC<Props> = (props) => {
             <Grid container >
               <ul className={classes.ul} >
                 {userInfos &&
-                  userInfos.map((userValue: any, index) => (
+                  userInfos.map((userValue: UserValue, index) => (
                     <ListItem
                       key={index}>
-                      <Link onClick={() => { 
-                        dispatch(userEditAdmin(userValue));
-                         setEditUser(true); 
-                      
-                         }}>
+                      <Link onClick={() => handleOnClick(userValue)} className={classes.list}>
                         <Avatar src={userValue.urlAvatar} alt={userValue.userName}
                           className={classes.middle}
                         />
@@ -86,77 +92,25 @@ const EditForm: React.FC<Props> = (props) => {
           </Grid>
         </Grid>
       </Grid >
-      {editUser && <AdminEditForm />}
+      {editUser && <AdminEditForm showAlert={setAlert} />}
     </Container>
   );
 }
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      alignItems: 'center',
-      display: 'flex',
-      justifyContent: 'center',
-      flexDirection: 'column',
-    },
-    '& > *': {
-      margin: theme.spacing(1),
-    },
-    input: {
-      display: "none",
-    },
     ul: {
       padding: 5,
       display: "flex",
-    },
-    listUl: {
-      display: 'flex',
-      flexDirection: 'row',
-      padding: 1,
-      alignItems: 'center',
-
-      marginTop: 20,
     },
     list: {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-
-      marginTop: 20,
-    },
-    mainpage: {
-    },
-    paper: {
-      margin: theme.spacing(2, 3, 0, 3),
-      padding: theme.spacing(2),
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
-    },
-    form: {
-      width: '100%', // Fix IE 11 issue.
-      marginTop: theme.spacing(1),
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    },
-    submit: {
-      margin: theme.spacing(2),
-      width: theme.spacing(8),
-    },
-    large: {
-      width: theme.spacing(25),
-      height: theme.spacing(25),
-      marginTop: 10,
     },
     middle: {
       width: theme.spacing(5),
       height: theme.spacing(5),
-      marginRight: 5,
     }
   }));
 

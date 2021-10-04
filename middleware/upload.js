@@ -5,11 +5,9 @@ require('dotenv').config();
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __basedir + "/resources/static/");
+    cb(null, __basedir + "/static/image/");
   },
   filename: (req, file, cb) => {
-    console.log(file.originalname);
-    console.log(__basedir);
     cb(null, file.originalname);
   },
 });

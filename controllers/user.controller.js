@@ -10,14 +10,6 @@ const bcrypt = require("bcryptjs");
 require('dotenv').config();
 
 
-exports.allUser = (req, res) => {
-  User.findAll({
-  })
-    .then(user => {
-      res.json(user)
-    });
-};
-
 exports.changeLike = async (req, res, next) => {
   let statusLike = false;
   try {
@@ -139,7 +131,7 @@ exports.editAdmin = async (req, res, next) => {
     if (user.roleId === 1) {
       throw new Error("Failed! Cannot edit admin");
     }
-    const fileName = req.file === undefined ? '' : process.env.baseUrl + req.file.originalname;
+    const fileName = req.file === undefined ? urlAvatar : process.env.baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
       email: email,
@@ -181,7 +173,7 @@ exports.edit = async (req, res, next) => {
     if (!passwordIsValid) {
       throw new Error("Failed! Invalid Password!");
     };
-    const fileName = req.file === undefined ? '' : process.env.baseUrl + req.file.originalname;
+    const fileName = req.file === undefined ? urlAvatar : process.env.baseUrl + req.file.originalname;
     const result = await User.update({
       userName: userName,
       email: email,
@@ -285,7 +277,7 @@ exports.getListUsersAdmin = async (req, res, next) => {
 }
 
 exports.getListUsers = async (req, res, next) => {
-  try {
+  try {   
     const id = req.query.id;
     const subscribe = await User.findAll(
       {
@@ -361,7 +353,6 @@ exports.delete = async (req, res, next) => {
 
 exports.signup = async (req, res, next) => {
   try {
-
     const user = await User.findOne({
       where: {
         [Op.or]: [
@@ -377,6 +368,7 @@ exports.signup = async (req, res, next) => {
       userName: req.body.userName,
       email: req.body.email,
       roleId: req.body.roleId,
+      urlAvatar: "",
       password: bcrypt.hashSync(req.body.password, 8)
     })
     res.status(200).send({ message: "User registered successfully!" })

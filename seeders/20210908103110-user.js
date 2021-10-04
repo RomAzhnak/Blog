@@ -11,7 +11,8 @@ module.exports = {
       username: 'admin',
       email: "admin@gmail.com",
       password: "admin",
-      avatarfilename: "",
+      urlAvatar: "",
+      roleId: 1,
       createdAt: new Date(),
       updatedAt: new Date()
     }], {});

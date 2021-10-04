@@ -1,12 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getUser, getPosts, changeLike, changeSubscribeToUser } from "../api/userApi";
+import { useAppSelector } from '../app/hooks';
+
 import Avatar from '@material-ui/core/Avatar';
-import { Button, Checkbox, FormControlLabel, Grid, ListItem, Paper, Typography } from "@material-ui/core";
+import {
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Grid, ListItem,
+  Paper,
+  Typography
+} from "@material-ui/core";
 import Container from '@material-ui/core/Container';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import { Favorite, FavoriteBorder } from "@material-ui/icons";
-import { useAppSelector } from '../app/hooks';
+
 import Header from './Header';
 import AlertComponent from "./AlertComponent";
 
@@ -21,22 +30,27 @@ type Value = {
   postAuthorId: number,
 }
 
+type Id = {
+  id: string,
+}
+
 type Props = {
 
 };
 
 const Users: React.FC<Props> = (props) => {
   const stateUser = useAppSelector(({ user }) => user.userFields);
-  const { id }: any = useParams();
+  const { id }: Id = useParams();
   const [urlAvatar, setUrlAvatar] = useState<string>();
   const [userName, setUserName] = useState<string>();
   const [email, setEmail] = useState<string>();
-  const [userLikes, setUserLikes] = useState<any>(new Set());
+  const [userLikes, setUserLikes] = useState<Set<number>>(new Set());
   const [subscribe, setSubscribe] = useState<boolean>();
-  const [posts, setPosts] = useState<any[]>();
+  const [posts, setPosts] = useState<Value[]>();
   const classes = useStyles();
-  const [typeMessage, setTypeMesssage] = useState<number>(200);
-  const [textMessage, setTextMessage] = useState<string>('');
+  const [alert, setAlert] = useState<
+  { typeAlert: number, messageAlert: string }
+>({ typeAlert: 200, messageAlert: '' });
 
   useEffect(() => {
     async function fetchUserData() {
@@ -47,9 +61,7 @@ const Users: React.FC<Props> = (props) => {
         setEmail(response.data.email);
         setSubscribe(response.data.subscribe);
       } catch (err: any) {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request ${err}`)
+        setAlert({typeAlert: 400, messageAlert: err.message});
       }
     }
     fetchUserData();
@@ -62,11 +74,8 @@ const Users: React.FC<Props> = (props) => {
         setUserLikes(new Set(response.data.userLikes));
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request! ${err}`)
-      }
-      )
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
   }, [id]);
 
   const handleGetStatusLike = (post: Value) => {
@@ -86,28 +95,25 @@ const Users: React.FC<Props> = (props) => {
         setPosts(temp);
       })
       .catch((err) => {
-        setTypeMesssage(400);
-        setTextMessage(err.message);
-        console.log(`Failed request ${err}`)
-      }
-      )
+        setAlert({typeAlert: 400, messageAlert: err.message});
+      })
   }
 
   const handleSubscribe = async () => {
+    const idLiker = stateUser.id;
+    if (idLiker === Number(id.slice(1))) return;
     try {
-      const response = await changeSubscribeToUser(id.slice(1));
+      const response = await changeSubscribeToUser(Number(id.slice(1)));
       setSubscribe(response.data.subscribe);
     } catch (err: any) {
-      setTypeMesssage(400);
-      setTextMessage(err.message);
-      console.log(`Failed request ${err}`)
+      setAlert({typeAlert: 400, messageAlert: err.message});
     }
   }
 
   return (
     <Container component="main" maxWidth="md" >
       <Header title="Blog" />
-      <AlertComponent show={setTextMessage} typeAlert={typeMessage} messageAlert={textMessage} />
+      <AlertComponent show={setAlert} alert={alert} />
       <Container component="main" maxWidth="sm" >
         <Grid container spacing={8} justifyContent='center' >
           <Grid item>
@@ -161,19 +167,9 @@ const Users: React.FC<Props> = (props) => {
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {
-      display: 'flex',
-      '& > *': {
-        margin: theme.spacing(1),
-      },
-    },
     list: {
       display: 'flex',
       flexDirection: 'column',
-    },
-    small: {
-      width: theme.spacing(3),
-      height: theme.spacing(3),
     },
     large: {
       width: theme.spacing(15),

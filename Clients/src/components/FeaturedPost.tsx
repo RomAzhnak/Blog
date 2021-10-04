@@ -1,6 +1,10 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { User } from '../redux/userSlice';
+
 import clsx from 'clsx';
+
+import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,15 +14,12 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link } from 'react-router-dom';
-import { User } from '../redux/userSlice';
+
 
 interface FeaturedPostProps {
   post: {
     createdAt: string;
     post: string;
-    image: string;
-    imageLabel: string;
     title: string;
     id: number;
     userId: number;

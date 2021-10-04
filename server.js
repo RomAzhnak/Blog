@@ -4,6 +4,7 @@ const db = require("./models");
 const userReq = require("./routers/user.requests");
 const adminReq = require("./routers/admin.requests");
 const authReq = require("./routers/auth.requests");
+const postReq = require("./routers/post.requests");
 const cors = require('cors');
 const {errorHandler} = require("./middleware/errorHandler");
 require('dotenv').config()
@@ -26,11 +27,12 @@ app.get('/test', (req, res) => {
   })
 })
 
-app.use("/auth", authReq);
-app.use("/admin", adminReq);
-app.use("/user", userReq);
+app.use(express.static(__basedir + '/static'));
+app.use("/api/auth", authReq);
+app.use("/api/admin", adminReq);
+app.use("/api/user", userReq);
+app.use("/api/post", postReq);
 app.use(errorHandler);
-
 
 const port = process.env.PORT;
 
